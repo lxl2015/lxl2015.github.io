@@ -1,0 +1,1898 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Hash算法总结 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="隐藏正文">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Hash算法总结"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2019-09-01T12:24:33.000Z"><a href="/2019/09/01/Hash算法总结/">2019-09-01</a></time>
+        
+  
+    <h1 class="title">Hash算法总结</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFHash%E7%AE%97%E6%B3%95"><span class="toc-text">1.什么是Hash算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95"><span class="toc-text">2.常见的Hash算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9F%A5%E6%89%BE"><span class="toc-text">4.查找</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%85%B3%E4%BA%8EHash%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%AD%A6%E4%B9%A0"><span class="toc-text">5.关于Hash使用与学习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-HASH%E8%BF%9B%E9%98%B6-PHP%E5%BA%95%E5%B1%82Hash%E8%AE%BE%E8%AE%A1"><span class="toc-text">6.HASH进阶(PHP底层Hash设计)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%AF%B9Hash%E7%AE%97%E6%B3%95%E7%9A%84%E8%AF%84%E4%BB%B7"><span class="toc-text">7.对Hash算法的评价</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E7%AE%80%E5%8D%95hash%E9%93%BE%E8%A1%A8%E4%BB%A3%E7%A0%81"><span class="toc-text">8.简单hash链表代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E5%A4%9A%E9%98%B6hash"><span class="toc-text">9.多阶hash</span></a></li></ol>
+    </div>
+
+        <p>隐藏正文</p>
+<span id="more"></span>
+<h3 id="1-什么是Hash算法"><a href="#1-什么是Hash算法" class="headerlink" title="1.什么是Hash算法"></a>1.什么是Hash算法</h3><p>主要原理就是把大范围映射到小范围，因此输入范围必须和小范围相当或者比它更小，否则增加冲突。</p>
+<p>Hash算法将任意长度的二进制值映射为较短的固定长度的二进制值，这个小的二进制值称为哈希值。哈希值是一段数据唯一且极其紧凑的数值表示形式。如果散列一段明文而且哪怕只更改该段落的一个字母，随后的哈希都将产生不同的值。要找到散列为同一个值的两个不同的输入，在计算上是不可能的，所以数据的哈希值可以检验数据的完整性。实际中的Hash主要有两种应用：加密和压缩。在加密方面，Hash哈希是把一些不同长度的信息转化成杂乱的128位的编码,这些编码值叫做HASH值，最广泛应用的Hash算法有MD4、MD5、SHA1。在压缩方面，Hash哈希是指把一个大范围映射到一个小范围，往往是为了节省空间，使得数据容易保存。</p>
+<pre><code>Hash函数：大概就是 value = hash(key)，我们希望key和value之间是唯一的映射关系。
+</code></pre>
+<p>散列表（Hash table，也叫哈希表），是根据关键码值(Key value)而直接进行访问的数据结构。也就是说，它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做散列函数（Hash函数），存放记录的数组叫做散列表（Hash表）。（是一种典型的“空间换时间”的做法）。哈希表的做法其实很简单，就是把Key通过一个固定的算法函数既所谓的哈希函数转换成一个整型数字，然后就将该数字对数组长度进行取余，取余结果就当作数组的下标，将value存储在以该数字为下标的数组空间里。而当使用哈希表进行查询的时候，就是再次使用哈希函数将key转换为对应的数组下标，并定位到该空间获取value，如此一来，就可以充分利用到数组的定位性能进行数据定位。</p>
+<p>Hash函数逼近单向函数，所以可以用来对数据进行加密。（单项函数：如果某个函数在给定输入的时候，很容易计算出其结果来；而当给定结果的时候，很难计算出输入来）</p>
+<p>不同的应用对Hash函数有着不同的要求：用于加密的Hash函数主要考虑它和单项函数的差距，而用于查找的Hash函数主要考虑它映射到小范围的冲突率。</p>
+<p>了解了hash基本定义，就不能不提到一些着名的hash算法，MD5 和 SHA-1 能够说是眼下应用最广泛的Hash算法，而它们都是以 MD4 为基础设计的。那么他们都是什么意思呢?<br>这里简单说一下：<br>(1) MD4<br>MD4(RFC 1320)是 MIT 的 Ronald L. Rivest 在 1990 年设计的，MD 是 Message Digest 的缩写。它适用在32位字长的处理器上用快速软件实现–它是基于 32 位操作数的位操作来实现的。<br>(2) MD5<br>MD5(RFC 1321)是 Rivest 于1991年对MD4的改进版本号。它对输入仍以512位分组，其输出是4个32位字的级联，与 MD4 同样。MD5比MD4来得复杂，而且速度较之要慢一点，但更安全，在抗分析和抗差分方面表现更好<br>(3) SHA-1 及其它<br>SHA1是由NIST NSA设计为同DSA一起使用的，它对长度小于264的输入，产生长度为160bit的散列值，因此抗穷举(brute-force)性更好。SHA-1 设计时基于和MD4同样原理,而且模仿了该算法。</p>
+<p>哈希表不可避免冲突(collision)现象：对不同的keyword可能得到同一哈希地址 即key1≠key2，而hash(key1)=hash(key2)。因此，在建造哈希表时不仅要设定一个好的哈希函数，并且要设定一种处理冲突的方法。可例如以下描写叙述哈希表：依据设定的哈希函数H(key)和所选中的处理冲突的方法，将一组keyword映象到一个有限的、地址连续的地址集(区间)上并以keyword在地址集中的“象”作为对应记录在表中的存储位置，这样的表被称为哈希表。<br>对于动态查找表而言，1) 表长不确定；2)在设计查找表时，仅仅知道keyword所属范围，而不知道确切的keyword。因此，普通情况需建立一个函数关系，以f(key)作为keyword为key的录在表中的位置，通常称这个函数f(key)为哈希函数。(注意：这个函数并不一定是数学函数)<br>哈希函数是一个映象，即：将keyword的集合映射到某个地址集合上，它的设置非常灵活，仅仅要这个地址集合的大小不超出同意范围就可以。<br>现实中哈希函数是须要构造的，而且构造的好才干使用的好。</p>
+<p>那么这些Hash算法究竟有什么用呢?<br>Hash算法在信息安全方面的应用主要体如今下面的3个方面：<br>(1) 文件校验<br>　　我们比较熟悉的校验算法有奇偶校验和CRC校验，这2种校验并没有抗数据篡改的能力，它们一定程度上能检测并纠正传输数据中的信道误码，但却不能防止对数据的恶意破坏。MD5 Hash算法的”数字指纹”特性，使它成为眼下应用最广泛的一种文件完整性校验和(Checksum)算法，不少Unix系统有提供计算md5 checksum的命令。<br>(2) 数字签名<br>　　Hash 算法也是现代password体系中的一个重要组成部分。因为非对称算法的运算速度较慢，所以在数字签名协议中，单向散列函数扮演了一个重要的角色。 对 Hash 值，又称”数字摘要”进行数字签名，在统计上能够觉得与对文件本身进行数字签名是等效的。并且这种协议还有其它的长处。<br>(3) 鉴权协议<br>　　例如以下的鉴权协议又被称作挑战–认证模式：在传输信道是可被侦听，但不可被篡改的情况下，这是一种简单而安全的方法。</p>
+<p>文件hash值</p>
+<p>　　MD5-Hash-文件的数字文摘通过Hash函数计算得到。无论文件长度怎样，它的Hash函数计算结果是一个固定长度的数字。与加密算法不同，这一个Hash算法是一个不可逆的单向函数。採用安全性高的Hash算法，如MD5、SHA时，两个不同的文件差点儿不可能得到同样的Hash结果。因此，一旦文件被改动，就可检测出来。<br>Hash函数还有另外的含义。实际中的Hash函数是指把一个大范围映射到一个小范围。把大范围映射到一个小范围的目的往往是为了节省空间，使得数据easy保存。除此以外，Hash函数往往应用于查找上。所以，在考虑使用Hash函数之前，须要明确它的几个限制：</p>
+<ol>
+<li>Hash的主要原理就是把大范围映射到小范围；所以，你输入的实际值的个数必须和小范围相当或者比它更小。不然冲突就会非常多。</li>
+<li>因为Hash逼近单向函数；所以，你能够用它来对数据进行加密。</li>
+<li>不同的应用对Hash函数有着不同的要求；比方，用于加密的Hash函数主要考虑它和单项函数的差距，而用于查找的Hash函数主要考虑它映射到小范围的冲突率。<br>应用于加密的Hash函数已经探讨过太多了，在作者的博客里面有更具体的介绍。所以，本文仅仅探讨用于查找的Hash函数。<br>Hash函数应用的主要对象是数组（比方，字符串），而其目标通常是一个int类型。下面我们都依照这样的方式来说明。<br>就是为该关键字的记录扎到另一个“空”的哈希地址。即在处理哈希地址的冲突时，若得到的另一个哈希地址H1仍然发生冲突，则再求下一个地址H2，若H2仍然冲突，再求的H3，直至Hk不发生冲突为止，则Hk为记录在表中的地址。</li>
+</ol>
+<h3 id="2-常见的Hash算法"><a href="#2-常见的Hash算法" class="headerlink" title="2.常见的Hash算法"></a>2.常见的Hash算法</h3><pre><code>//为了方便生成32位或者64位散列
+typedef unsigned int ub4;/*无符号4个字节*/
+typedef unsigned char ub1;/*无符号1个字节*/
+</code></pre>
+<p><strong>1.加法Hash</strong>    </p>
+<pre><code>/*
+ * 加法Hash算法
+ * param key 输入字符串
+ * param len 字符串长度
+ * param prime 为质数
+ * return hash值
+*/
+ub4 addtive(char *key,int len,ub4 prime)
+&#123;
+    ub4 hash,i;
+    for(hash = len,i = 0;i &lt; len;++ i)
+        hash += key[i];
+    return (hash % prime);
+&#125;
+</code></pre>
+<p>这里的prime是任意的质数，看得出，结果的值域为[0,prime-1]。</p>
+<p><strong>2.位运算Hash</strong><br><strong>2.1.旋转Hash</strong></p>
+<pre><code>/* 
+* 位运算Hash
+* 旋转hash   
+* param key 输入字符串
+* param len 字符串长度   
+* param prime 质数   
+* return hash值
+*/
+ub4 rotating(char *key,ub4 len,ub4 prime)
+&#123;
+    ub4 hash,i;
+    for(hash = len,i = 0;i &lt; len; ++i)
+        hash = (hash &lt;&lt; 4)^(hash &gt;&gt; 28)^key[i];
+    return (hash % prime);
+&#125;
+</code></pre>
+<p><strong>2.2.一次一个Hash</strong></p>
+<pre><code>/*
+* 一次一个Hash
+* static int mask = 0x8765fed1;  
+* mask最好是质数  
+* param key 输入字符串
+* param len 字符串长度
+* return hash值
+*/
+ub4 one_at_a_time(char *key, ub4 len)
+&#123;
+    ub4   hash, i;
+    for (hash=0, i=0; i&lt;len; ++i)
+    &#123;
+        hash += key[i];
+        hash += (hash &lt;&lt; 10);
+        hash ^= (hash &gt;&gt; 6);
+    &#125;
+    hash += (hash &lt;&lt; 3);
+    hash ^= (hash &gt;&gt; 11);
+    hash += (hash &lt;&lt; 15);
+    return (hash &amp; mask);
+&#125; 
+</code></pre>
+<p><strong>3.乘法Hash</strong></p>
+<p>这种类型的Hash函数利用了乘法的不相关性（乘法的这种性质，最有名的莫过于平方取头尾的随机数生成算法，虽然这种算法效果并不好）。</p>
+<p><strong>3.1.Bernstein’s hash</strong></p>
+<pre><code>/*
+* Bernstein&#39;s hash
+* @param key 输入字节数组
+* @param level 初始hash常量
+* @return 结果hash
+* 这样的类型的Hash函数利用了乘法的不相关性（乘法的这样的性质，最有名的莫过于平方取头尾的随机数生成算法，尽管这样的算法效果并不好）
+*/
+ub4 bernstein(ub1 *key, ub4 len, ub4 level)
+&#123;
+    ub4 hash = level;
+    ub4 i;
+    for (i=0; i&lt;len; ++i) 
+        hash = 33*hash + key[i];
+    return hash;
+&#125;
+</code></pre>
+<p><strong>3.2.FNV哈希算法</strong></p>
+<p>由来：FNV哈希算法全名为Fowler-Noll-Vo算法，是以三位发明人Glenn Fowler，Landon Curt Noll，Phong Vo的名字来命名的，最早在1991年提出。<br>特点和用途：FNV能快速hash大量数据并保持较小的冲突率，它的高度分散使它适用于hash一些非常相近的字符串，比如URL，hostname，文件名，text，IP地址等。</p>
+<p>算法版本：FNV算法有两个版本FNV-1和FNV-1a</p>
+<p>算法描述：</p>
+<p>相关变量：</p>
+<pre><code>hash值：一个n位的unsigned int型hash值
+offset_basis：初始的哈希值
+FNV_prime：FNV用于散列的质数
+octet_of_data：8位数据（即一个字节）
+</code></pre>
+<p>FNV-1描述：</p>
+<pre><code>hash = offset_basis
+for each octet_of_data to be hashed
+   hash = hash * FNV_prime
+hash = hash xor octet_of_data
+return hash
+</code></pre>
+<p>FNV-1a描述：</p>
+<pre><code>hash = offset_basis 
+for each octet_of_data to be hashed
+   hash = hash xor octet_of_data
+hash = hash * FNV_prime
+return hash
+</code></pre>
+<p>FNV-1a和FNV-1的唯一区别就是xor和multiply的顺序不同，他们所采用的FNV_prime和offset_basis都相同，有人认为FNV-1a在进行小数据（小于4个字节）哈希时有更好的性能。</p>
+<p>区别是有两句操作顺序调换，产生FNV-1a的原因是，有些人使用FNV-1a代替FNV-1发现算法离散性或CPU利用效率更好（我感觉应该没什么太大差距，只是微小的）。<br>for each octet_of_data to be hashed 意思是对于你要算哈希值的数，它的每一个字节。<br>hash = hash * FNV_prime，是包含取模运算的，具体看你采用多少位的哈希函数。例如，你用32为哈希，hash = hash * FNV_prime % （2的32次方）；<br>hash = hash xor octet_of_data，意思是把当前取来的字节和当前的hash值的第八位做抑或运算。</p>
+<pre><code>32 bit FNV_prime = 224 + 28 + 0x93 = 16777619
+64 bit FNV_prime = 240 + 28 + 0xb3 = 1099511628211
+128 bit FNV_prime = 288 + 28 + 0x3b = 309485009821345068724781371
+256 bit FNV_prime = 2168 + 28 + 0x63 = 374144419156711147060143317175368453031918731002211
+512 bit FNV_prime = 2344 + 28 + 0x57 = 35835915874844867368919076489095108449946327955754392558399825615420669938882575126094039892345713852759
+1024 bit FNV_prime = 2680 + 28 + 0x8d = 5016456510113118655434598811035278955030765345404790744303017523831112055108147451509157692220295382716162651878526895249385292291816524375083746691371804094271873160484737966720260389217684476157468082573
+</code></pre>
+<p>以上这几个数都是质数（哈希的理论基石，质数分辨定理，我理解也不深），不用管为什么，用的时候照搬就是了。</p>
+<pre><code>/*
+ * modified FNV hash function (see http://www.isthe.com/chongo/tech/comp/fnv/)
+ * @param key 输入字节数组
+ * @param level 初始hash常量
+ * @return 结果hash
+ */
+ub4    hash_modfnv(const void *data, size_t len, ub4 seed)
+&#123;
+    const uchar    *p = (const uchar *)data;
+    ub4    hash;
+    hash = 2166136261u ^ seed;
+    while (len-- &gt;= 1)
+    &#123;
+        hash = (hash ^ *(p++)) * 16777619u;
+    &#125;
+    hash += hash &lt;&lt; 13;
+    hash ^= hash &gt;&gt; 7;
+    hash += hash &lt;&lt; 3;
+    hash ^= hash &gt;&gt; 17;
+    hash += hash &lt;&lt; 5;
+    return hash;
+&#125;
+//sheepdog中64位FNV-1a算法的实现  
+/* 
+ * 64 bit FNV-1a non-zero initial basis 
+ */  
+#define FNV1A_64_INIT ((uint64_t) 0xcbf29ce484222325ULL)  
+/* 
+ * 64 bit Fowler/Noll/Vo FNV-1a hash code 
+ */  
+// 调用时，hval的参数值为FNV1A_64_INT,即算法描述中的offset_basis  
+static inline uint64_t fnv_64a_buf(void *buf, size_t len, uint64_t hval)  
+&#123;  
+    unsigned char *bp = (unsigned char *) buf;  
+    unsigned char *be = bp + len;  
+    while (bp &lt; be) &#123;  
+        hval ^= (uint64_t) *bp++;  
+        hval += (hval &lt;&lt; 1) + (hval &lt;&lt; 4) + (hval &lt;&lt; 5) +  (hval &lt;&lt; 7) + (hval &lt;&lt; 8) + (hval &lt;&lt; 40);  
+    &#125;  
+    return hval;  
+&#125; 
+</code></pre>
+<p><strong>4.除法Hash</strong></p>
+<p>除法和乘法一样，同样具有表面上看起来的不相关性。不过，因为除法太慢，这种方式几乎找不到真正的应用。需要注意的是，我们在前面看到的hash的 结果除以一个prime的目的只是为了保证结果的范围。如果你不需要它限制一个范围的话，可以使用如下的代码替代<code>hash%prime： hash = hash ^ (hash&gt;&gt;10) ^ (hash&gt;&gt;20)</code>。</p>
+<p><strong>5.查表Hash</strong></p>
+<p>查表Hash最有名的样例莫过于CRC系列算法。尽管CRC系列算法本身并非查表，可是，查表是它的一种最快的实现方式。查表Hash中有名的例子有：Universal Hashing和Zobrist Hashing。他们的表格都是随机生成的.</p>
+<p><strong>5.1.Pearson’s Hash</strong></p>
+<pre><code>/*
+Pearson&#39;s Hash
+*/
+char pearson(char *key, ub4 len, char tab[256])
+&#123;
+  char hash;
+  ub4  i;
+  for (hash=len, i=0; i&lt;len; ++i) 
+    hash=tab[hash^key[i]];
+  return (hash);
+&#125;
+</code></pre>
+<p><strong>5.2.Universal Hashing</strong></p>
+<pre><code>/*
+Universal Hashing
+*/
+ub4 universal(char *key, ub4 len, ub4 mask, ub4 tab[MAXBITS])
+&#123;
+  ub4 hash, i;
+  for (hash=len, i=0; i&lt;(len&lt;&lt;3); i+=8)
+  &#123;
+    register char k = key[i&gt;&gt;3];
+    if (k&amp;0x01) hash ^= tab[i+0];
+    if (k&amp;0x02) hash ^= tab[i+1];
+    if (k&amp;0x04) hash ^= tab[i+2];
+    if (k&amp;0x08) hash ^= tab[i+3];
+    if (k&amp;0x10) hash ^= tab[i+4];
+    if (k&amp;0x20) hash ^= tab[i+5];
+    if (k&amp;0x40) hash ^= tab[i+6];
+    if (k&amp;0x80) hash ^= tab[i+7];
+  &#125;
+  return (hash &amp; mask);
+&#125;
+</code></pre>
+<p>（Universal Hashing）全域哈希的基本思想是在执行开始时，从一组哈希函数中，随机地抽取一个作为要使用的哈希函数。就像在快速排序中一样，随机化保证了没有哪一种输入会始终导致最坏情况的发生。同时，随机化也使得即使是对同一个输入，算法在每一次执行时的情况也都不一样。这样就确保了对于任何输入，算法都具有较好的平均运行情况。</p>
+<pre><code>hash a,b(key) = ((a\*key + b) mod p) mod m
+</code></pre>
+<p>其中，p 为一个足够大的质数，使得每一个可能的关键字 key 都落在 0 到 p - 1 的范围内。m 为哈希表中槽位数。任意 a∈{1,2,3,…,p-1}，b∈{0,1,2,…,p-1}。mod为求余数。</p>
+<p><strong>5.3.Goulburn Hash</strong></p>
+<pre><code>/*
+* Goulburn Hash
+*/
+u4 goulburn( const unsigned char *cp, size_t len, uint32_t last_value)
+&#123;
+  register u4 h = last_value;
+  int u;
+  for( u=0; u&lt;len; ++u ) &#123;
+    h += g_table0[ cp[u] ];
+    h ^= (h &lt;&lt; 3) ^ (h &gt;&gt; 29);
+    h += g_table1[ h &gt;&gt; 25 ];
+    h ^= (h &lt;&lt; 14) ^ (h &gt;&gt; 18);
+    h += 1783936964UL;
+  &#125;
+  return h;
+&#125;
+</code></pre>
+<p>完整的CRC Hashing</p>
+<pre><code>/*完整的CRCHash*/
+/* By Bob Jenkins, (c) 2006, Public Domain */
+#include &lt;stdio.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;string.h&gt;
+typedef  unsigned long  ub4;
+typedef  unsigned char  ub1;
+/* every byte is an arbitrary permutation of 0..255 */
+static const ub4 gencrctab[256] = &#123;
+  0x46d1e192, 0x66edf9aa, 0x927fc9e5, 0xa53baacc, 0x29b47658, 0x5a411a01,
+  0x0e66d5bd, 0x0dd5b1db, 0xcb38340e, 0x04d4ebb6, 0x98bc4f54, 0x36f20f2c,
+  0x4a3047ed, 0x1ec1e0eb, 0x568c0c1f, 0x6a731432, 0x81367fc6, 0xe3e25237,
+  0xe7f64884, 0x0fa59f64, 0x4f3109de, 0xf02d61f5, 0x5daec03b, 0x7f740e83,
+  0x056ff2d8, 0x2026cc0a, 0x7ac2112d, 0x82c55605, 0xb0911ef2, 0xa7b88e4c,
+  0x89dca282, 0x4b254d27, 0x7694a6d3, 0xd229eadd, 0x8e8f3738, 0x5bee7a55,
+  0x012eb6ab, 0x08dd28c8, 0xb5abc274, 0xbc7931f0, 0xf2396ed5, 0xe4e43d97,
+  0x943f4b7f, 0x85d0293d, 0xaed83a88, 0xc8f932fc, 0xc5496f20, 0xe9228173,
+  0x9b465b7d, 0xfda26680, 0x1ddeab35, 0x0c4f25cb, 0x86e32faf, 0xe59fa13a,
+  0xe192e2c4, 0xf147da1a, 0x67620a8d, 0x5c9a24c5, 0xfe6afde2, 0xacad0250,
+  0xd359730b, 0xf35203b3, 0x96a4b44d, 0xfbcacea6, 0x41a165ec, 0xd71e53ac,
+  0x835f39bf, 0x6b6bde7e, 0xd07085ba, 0x79064e07, 0xee5b20c3, 0x3b90bd65,
+  0x5827aef4, 0x4d12d31c, 0x9143496e, 0x6c485976, 0xd9552733, 0x220f6895,
+  0xe69def19, 0xeb89cd70, 0xc9bb9644, 0x93ec7e0d, 0x2ace3842, 0x2b6158da,
+  0x039e9178, 0xbb5367d7, 0x55682285, 0x4315d891, 0x19fd8906, 0x7d8d4448,
+  0xb4168a03, 0x40b56a53, 0xaa3e69e0, 0xa25182fe, 0xad34d16c, 0x720c4171,
+  0x9dc3b961, 0x321db563, 0x8b801b9e, 0xf5971893, 0x14cc1251, 0x8f4ae962,
+  0xf65aff1e, 0x13bd9dee, 0x5e7c78c7, 0xddb61731, 0x73832c15, 0xefebdd5b,
+  0x1f959aca, 0xe801fb22, 0xa89826ce, 0x30b7165d, 0x458a4077, 0x24fec52a,
+  0x849b065f, 0x3c6930cd, 0xa199a81d, 0xdb768f30, 0x2e45c64a, 0xff2f0d94,
+  0x4ea97917, 0x6f572acf, 0x653a195c, 0x17a88c5a, 0x27e11fb5, 0x3f09c4c1,
+  0x2f87e71b, 0xea1493e4, 0xd4b3a55e, 0xbe6090be, 0xaf6cd9d9, 0xda58ca00,
+  0x612b7034, 0x31711dad, 0x6d7db041, 0x8ca786b7, 0x09e8bf7a, 0xc3c4d7ea,
+  0xa3cd77a8, 0x7700f608, 0xdf3de559, 0x71c9353f, 0x9fd236fb, 0x1675d43e,
+  0x390d9e9a, 0x21ba4c6b, 0xbd1371e8, 0x90338440, 0xd5f163d2, 0xb140fef9,
+  0x52f50b57, 0x3710cf67, 0x4c11a79c, 0xc6d6624e, 0x3dc7afa9, 0x34a69969,
+  0x70544a26, 0xf7d9ec98, 0x7c027496, 0x1bfb3ba3, 0xb3b1dc8f, 0x9a241039,
+  0xf993f5a4, 0x15786b99, 0x26e704f7, 0x51503c04, 0x028bb3b8, 0xede5600c,
+  0x9cb22b29, 0xb6ff339b, 0x7e771c43, 0xc71c05f1, 0x604ca924, 0x695eed60,
+  0x688ed0bc, 0x3e0b232f, 0xf8a39c11, 0xbae6e67c, 0xb8cf75e1, 0x970321a7,
+  0x5328922b, 0xdef3df2e, 0x8d0443b0, 0x2885e3ae, 0x6435eed1, 0xcc375e81,
+  0xa98495f6, 0xe0bff114, 0xb2da3e4f, 0xc01b5adf, 0x507e0721, 0x6267a36a,
+  0x181a6df8, 0x7baff0c0, 0xfa6d6c13, 0x427250b2, 0xe2f742d6, 0xcd5cc723,
+  0x2d218be7, 0xb91fbbb1, 0x9eb946d0, 0x1c180810, 0xfc81d602, 0x0b9c3f52,
+  0xc2ea456f, 0x1165b2c9, 0xabf4ad75, 0x0a56fc8c, 0x12e0f818, 0xcadbcba1,
+  0x2586be56, 0x952c9b46, 0x07c6a43c, 0x78967df3, 0x477b2e49, 0x2c5d7b6d,
+  0x8a637272, 0x59acbcb4, 0x74a0e447, 0xc1f8800f, 0x35c015dc, 0x230794c2,
+  0x4405f328, 0xec2adba5, 0xd832b845, 0x6e4ed287, 0x48e9f7a2, 0xa44be89f,
+  0x38cbb725, 0xbf6ef4e6, 0xdc0e83fa, 0x54238d12, 0xf4f0c1e3, 0xa60857fd,
+  0xc43c64b9, 0x00c851ef, 0x33d75f36, 0x5fd39866, 0xd1efa08a, 0xa0640089,
+  0x877a978b, 0x99175d86, 0x57dfacbb, 0xceb02de9, 0xcf4d5c09, 0x3a8813d4,
+  0xb7448816, 0x63fa5568, 0x06be014b, 0xd642fa7b, 0x10aa7c90, 0x8082c88e,
+  0x1afcba79, 0x7519549d, 0x490a87ff, 0x8820c3a0,
+&#125;;
+/* how the values of gencrc[] were derived */
+void build_table()
+&#123;
+  ub4 tab[256];
+  ub4 i;
+  /* fill tab[] with random permutations of 0..255 in each byte */
+  for (i=0; i&lt;256; ++i) &#123;
+    ub4 j;
+    ub1 x=i;
+    for (j=0; j&lt;5; ++j) &#123;x+=1; x += x&lt;&lt;1; x ^= x&gt;&gt;1;&#125;
+    tab[i] = x;
+    for (j=0; j&lt;5; ++j) &#123;x+=2; x += x&lt;&lt;1; x ^= x&gt;&gt;1;&#125;
+    tab[i] ^= (((ub4)x)&lt;&lt;8);
+    for (j=0; j&lt;5; ++j) &#123;x+=3; x += x&lt;&lt;1; x ^= x&gt;&gt;1;&#125;
+    tab[i] ^= (((ub4)x)&lt;&lt;16);
+    for (j=0; j&lt;5; ++j) &#123;x+=4; x += x&lt;&lt;1; x ^= x&gt;&gt;1;&#125;
+    tab[i] ^= (((ub4)x)&lt;&lt;24);
+  &#125;
+  /* verify that 0..255 appears in each byte exactly once */
+  for (i=0; i&lt;256; ++i) &#123;
+    ub4 count, j;
+    for (count=0, j=0; j&lt;256; ++j) if ((tab[j]&amp;0xff)==i) ++count;
+    if (count != 1) printf(&quot;bad1!  %d %d\n&quot;, i, count);
+    for (count=0, j=0; j&lt;256; ++j) if (((tab[j]&gt;&gt;8)&amp;0xff)==i) ++count;
+    if (count != 1) printf(&quot;bad2!  %d %d\n&quot;, i, count);
+    for (count=0, j=0; j&lt;256; ++j) if (((tab[j]&gt;&gt;16)&amp;0xff)==i) ++count;
+    if (count != 1) printf(&quot;bad3!  %d %d\n&quot;, i, count);
+    for (count=0, j=0; j&lt;256; ++j) if (((tab[j]&gt;&gt;24)&amp;0xff)==i) ++count;
+    if (count != 1) printf(&quot;bad4!  %d %d\n&quot;, i, count);
+  &#125;
+  /* print out the table */
+  for (i=0; i&lt;256; ++i) &#123;
+    printf(&quot;0x%.8lx, &quot;, tab[i]);
+    if (i%6 == 5) printf(&quot;\n&quot;);
+  &#125;
+&#125;
+/* the actual hash function */
+ub4 gencrc(const void *key, ub4 len, ub4 hash)
+&#123;
+  ub4  i;
+  const ub1 *k = key;
+  for (hash=len, i=0; i&lt;len; ++i)
+    hash = (hash &gt;&gt; 8) ^ gencrctab[(hash &amp; 0xff) ^ k[i]];
+  return hash;
+&#125;
+/* To use, try &quot;gcc -O gencrc.c -o gencrc; gencrc &lt; gencrc.c&quot; */
+int main()
+&#123;
+  char s[1000];
+  while (gets(s)) printf(&quot;%.8lx\n&quot;, gencrc(s, strlen(s), 0));
+  return 0;
+&#125;
+</code></pre>
+<ol start="6">
+<li>混合Hash</li>
+</ol>
+<p>混合Hash算法利用了以上各种方式。各种常见的Hash算法，比方MD5、Tiger都属于这个范围。它们一般非常少在面向查找的Hash函数里面使用。</p>
+<p>7、其他未整理的Hash算法</p>
+<p>MurmurHash</p>
+<p>###3.Hash算法冲突###</p>
+<p>       比方我们存储70个元素，但我们可能为这70个元素申请了100个元素的空间。70/100=0.7，这个数字称为负载因子。我们之所以这样做，也是为了“高速存取”的目的。我们基于一种结果尽可能随机平均分布的固定函数H为每一个元素安排存储位置，这样就能够避免遍历性质的线性搜索，以达到高速存取。可是因为此随机性，也必定导致一个问题就是冲突。所谓冲突，即两个元素通过散列函数H得到的地址同样，那么这两个元素称为“同义词”。这类似于70个人去一个有100个椅子的饭店吃饭。散列函数的计算结果是一个存储单位地址，每一个存储单位称为“桶”。设一个散列表有m个桶，则散列函数的值域应为[0,m-1]。</p>
+<p>解决冲突是一个复杂问题。冲突主要取决于：<br>（1）散列函数，一个好的散列函数的值应尽可能平均分布。<br>（2）处理冲突方法。<br>（3）负载因子的大小。太大不一定就好，并且浪费空间严重，负载因子和散列函数是联动的。</p>
+<p>处理冲突的方法：</p>
+<p>1.开放寻址法<br>开放寻址法的最简单的一种实现就是线性探查（Linear Probing），步骤如下：<br>①、当插入新的元素时，使用哈希函数在哈希表中定位元素位置；<br>②、检查哈希表中该位置是否已经存在元素。如果该位置内容为空，则插入并返回，否则转向步骤 3。<br>③、如果该位置为 i，则检查 i+1 是否为空，如果已被占用，则检查 i+2，依此类推，直到找到一个内容为空的位置。<br>缺点：<br>我们可以看到一个现象：当表中i,i+1,i+2位置上已经填有记录时，下一个哈希地址为i,i+1,i+2和i+3的记录都将填入i+3的位置，这种在处理冲突过程中发生的两个第一个哈希地址不同的记录争夺同一个后继哈希地址的现象称为“二次聚集”，即在处理同义词的冲突过程中又添加了非同义词的冲突。但另一方面，用线性探测再散列处理冲突可以保证做到：只要哈希表未填满，总能找到一个不发生冲突的地址Hk。而二次探测再散列只有在哈希表长m为形如4j+3（j为整数）的素数时才可能。<br>即开放定址法会造成二次聚集的现象，对查找不利。</p>
+<p>2.再哈希法<br>Hi = RHi（key），i=1,2,…k<br>RHi均是不同的哈希函数，即在同义词产生地址冲突时计算另一个哈希函数地址，直到不发生冲突为止。这种方法不易产生聚集，但是增加了计算时间。<br>缺点：增加了计算时间。</p>
+<p>3.链地址法（拉链法）<br>将所有关键字为同义词的记录存储在同一线性链表中。<br>拉链法的优点:<br>①拉链法处理冲突简单，且无堆积现象，即非同义词决不会发生冲突，因此平均查找长度较短；<br>②由于拉链法中各链表上的结点空间是动态申请的，故它更适合于造表前无法确定表长的情况；<br>③开放定址法为减少冲突，要求装填因子α较小，故当结点规模较大时会浪费很多空间。而拉链法中可取α≥1，且结点较大时，拉链法中增加的指针域可忽略不计，因此节省空间；<br>④在用拉链法构造的散列表中，删除结点的操作易于实现。只要简单地删去链表上相应的结点即可。而对开放地址法构造的散列表，删除结点不能简单地将被删结 点的空间置为空，否则将截断在它之后填人散列表的同义词结点的查找路径。这是因为各种开放地址法中，空地址单元(即开放地址)都是查找失败的条件。因此在 用开放地址法处理冲突的散列表上执行删除操作，只能在被删结点上做删除标记，而不能真正删除结点<br>拉链法的缺点：<br>拉链法的缺点是：指针需要额外的空间，故当结点规模较小时，开放定址法较为节省空间，而若将节省的指针空间用来扩大散列表的规模，可使装填因子变小，这又减少了开放定址法中的冲突，从而提高平均查找速度</p>
+<p>4.建立一个公共溢出区<br>假设哈希函数的值域为[0,m-1]，则设向量HashTable[0…m-1]为基本表，每个分量存放一个记录，另设立向量OverTable[0….v]为溢出表。所有关键字和基本表中关键字为同义词的记录，不管他们由哈希函数得到的哈希地址是什么，一旦发生冲突，都填入溢出表。<br>查找过程中，关键码的比较次数，取决于产生冲突的多少，产生的冲突少，查找效率就高，产生的冲突多，查找效率就低。因此，影响产生冲突多少的因素，也就是影响查找效率的因素。影响产生冲突多少有下面三个因素：1. 散列函数是否均匀；2. 处理冲突的方法；3. 散列表的装填因子。</p>
+<p>散列表的装填因子定义为：α= 填入表中的元素个数 / 散列表的长度<br>α是散列表装满程度的标志因子。因为表长是定值，α与“填入表中的元素个数”成正比，所以，α越大，填入表中的元素较多，产生冲突的可能性就越大；α越小，填入表中的元素较少，产生冲突的可能性就越小。<br>实际上，散列表的平均查找长度是装填因子α的函数，仅仅是不同处理冲突的方法有不同的函数。</p>
+<h3 id="4-查找"><a href="#4-查找" class="headerlink" title="4.查找"></a>4.查找</h3><p>从哈希表的查找过程可见：<br>          1）虽然哈希表在关键字与记录的存储位置直接建立了直接映像，但是由于“冲突”的产生，使得哈希表的查找过程仍然是一个给定值和关键字进行比较的过程。因此仍需以平均查找长度作为衡量哈希表的查找效率的量度。</p>
+<p>2)查找过程中需和给定值进行比较的关键字的个数取决于下列三个因素：哈希函数，处理冲突的方法和哈希表的装填因子。</p>
+<p>在一般情况下，处理冲突方法相同的哈希表，其平均查找长度依赖于哈希表的装填因子。</p>
+<pre><code>装填因子=（表中填入的记录数）/(哈希表的长度). 
+</code></pre>
+<p>装填因子越小，发生冲突的可能性就越小；反之，装填因子越大，表中已经填入的记录越多，再填记录时，发生冲突的可能性就越大，则查找时，给定值需与之进行比较的关键字的个数也就越多。
+          </p>
+<h3 id="5-关于Hash使用与学习"><a href="#5-关于Hash使用与学习" class="headerlink" title="5.关于Hash使用与学习"></a>5.关于Hash使用与学习</h3><p>首先一定要明白Hash表的拉链法。因为很多应用都是采用Hash表的拉链法。对于拉链法，我们可以理解为是一个链表的数组。1）数组的每一个元素都是一个链表。2）一个链表中的所有结点都具有相同的Hash值，其Hash值就是这个数组元素的下标。</p>
+<h3 id="6-HASH进阶-PHP底层Hash设计"><a href="#6-HASH进阶-PHP底层Hash设计" class="headerlink" title="6.HASH进阶(PHP底层Hash设计)"></a>6.HASH进阶(PHP底层Hash设计)</h3><p>查看PHP的hash底层源码：<br>PHP的Hash采用的是目前最为普遍的DJBX33A (Daniel J. Bernstein, Times 33 with Addition), 这个算法被广泛运用与多个软件项目,Apache, Perl和Berkeley DB等。对于字符串而言这是目前所知道的最好的哈希算法，原因在于该算法的速度非常快，而且分类非常好(冲突小,分布均匀)</p>
+<p>PHP的HashTable采用的拉链法来解决冲突。<br>PHP的Hash采用的是目前最为普遍的DJBX33A (Daniel J. Bernstein, Times 33 with Addition), 这个算法被广泛运用与多个软件项目,Apache, Perl和Berkeley DB等. 对于字符串而言这是目前所知道的最好的哈希算法，原因在于该算法的速度非常快，而且分类非常好(冲突小,分布均匀).<br>算法的核心思想就是:</p>
+<pre><code>hash(i) = hash(i-1) * 33 + str[i]
+在zend_hash.h中,我们可以找到在PHP中的这个算法:
+static inline ulong zend_inline_hash_func(char *arKey, uint nKeyLength)
+&#123;
+    register ulong hash = 5381;
+​
+    /* variant with the hash unrolled eight times */
+    for (; nKeyLength &gt;= 8; nKeyLength -=  &#123;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+    &#125;
+    switch (nKeyLength) &#123;
+        case 7: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 6: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 5: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 4: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 3: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 2: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 1: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; break;
+        case 0: break;
+EMPTY_SWITCH_DEFAULT_CASE()
+    &#125;
+    return hash;
+&#125;
+</code></pre>
+<p>相比在Apache和Perl中直接采用的经典Times 33算法:</p>
+<p>hashing function used in Perl 5.005:</p>
+<pre><code># Return the hashed value of a string: $hash = perlhash(&quot;key&quot;)
+# (Defined by the PERL_HASH macro in hv.h)
+sub perlhash
+&#123;
+  $hash = 0;
+  foreach (split //, shift) &#123;
+      $hash = $hash*33 + ord($_);
+  &#125;
+  return $hash;
+&#125;
+</code></pre>
+<p>在PHP的hash算法中, 我们可以看出很处细致的不同.<br>首先, 最不一样的就是, PHP中并没有使用直接乘33, 而是采用了:<br><code>hash &lt;&lt; 5 + hash</code></p>
+<p>这样当然会比用乘快了.<br>然后, 特别要主意的就是使用的unrolled, 我前几天看过一片文章讲Discuz的缓存机制, 其中就有一条说是Discuz会根据帖子的热度不同采用不同的缓存策略, 根据用户习惯,而只缓存帖子的第一页(因为很少有人会翻帖子).<br>于此类似的思想, PHP鼓励8位一下的字符索引, 他以8为单位使用unrolled来提高效率, 这不得不说也是个很细节的,很细致的地方.<br>另外还有inline, register变量 … 可以看出PHP的开发者在hash的优化上也是煞费苦心<br>最后就是, hash的初始值设置成了5381, 相比在Apache中的times算法和Perl中的Hash算法(都采用初始hash为0)。</p>
+<p>根据PHP源码的hash设计<br>获取需求<br>1.在项目中，很多情况下HashTable的key和value都是内置基础类型（如int、double），字符串的情况也比较多，其他的复杂情况极少。即我们的HashTable更多的是处理内置类型数据或者字符串数据。</p>
+<p>2.需要支持对key、value按照插入顺序进行遍历。</p>
+<p>方案：<br>考虑到内置类型的size最大只有8Byte，而且所有指针本身的大小也是8Byte（64bit 的机器），因此我们只需要一个8Byte的空间来存错所有的基础类型的值，或者指针（一般是char*）。这样当面对基础类型的时候，不需要malloc额外的空间来存储，在遇到字符串类型（char *）的数据时，使用malloc申请内存空间存储字符串内容，并将指针存在这个8Byte的空间中。<br>同时HashTable要维护当前key和value的类型是什么，需要在插入数据和查找数据时根据key和value的类型做对应的类型转换。<br>key和value都支持有限的类型：key的类型只支持int、long、char*；value的类型支持char、short、int、long、float、double、char*。<br>至于按照插入顺序进行遍历，则只需要对插入的每个元素维护一个全局的指针域即可，这个可以参考Java中LinkedHashMap的实现。</p>
+<p>数据结构设计：<br> <br>考虑到PHP的Hash情况，我们对HashTable的结构设计如下：</p>
+<pre><code>#define VLEN       8  
+#define TNLEN     32  
+  
+  
+typedef unsigned long ulong;  
+typedef unsigned int  uint;  
+  
+typedef struct _bucket &#123;  
+    ulong h;          /* hash value of key, keyvalue if key is a uint or ulong */  
+    char * key;       /* the point to key , if key is a string */  
+    char value[VLEN]; /* store a var of builtin type in a 8Byte buffer */  
+    struct _bucket *pListNext;  
+    struct _bucket *pListLast;  
+    struct _bucket *pNext;  
+    struct _bucket *pLast;  
+&#125; Bucket;  
+  
+typedef struct _hashtable&#123;  
+    int nTableSize;  
+    int nTableMask;  
+    int nNumOfElements;  
+    char keyType[TNLEN];     /* can be &quot;int&quot;,&quot;long&quot;,&quot;char*&quot; */  
+    char valueType[TNLEN];   /* can be &quot;char&quot;,&quot;short&quot;,&quot;int&quot;,&quot;long&quot;,&quot;float&quot;,&quot;double&quot;,&quot;char*&quot; */  
+    Bucket * pInternalPointer;  
+    Bucket * pListHead;  
+    Bucket * pListTail;  
+    Bucket ** arBuckets;  
+&#125; HashTable; 
+</code></pre>
+<p>内存结构：<br>假设我们创建一个size（桶数）为6的HashTable，并且尝试插入4个元素，其中第一个元素和第四个元素hash冲突，第二个元素与第三个元素hash冲突。那么按照设计，该HashTable在内存中的结构如下图所示：</p>
+<p><img src="Hash_Bucket.png" alt=" "></p>
+<p> 在按键查找时，先通过计算hash值，并计算hash值对应的桶的索引[0,6]，然后按照蓝色箭头pNext（指针）的指向即可找到对应的元素（或者找不到）。<br>在按照插入顺序遍历时，从head指针开始，按照墨色箭头pListNext（指针） 的指向即可完成元素的遍历。<br> <br>接口需求：<br>我们希望这个HashTable能够支持多种数据类型，而且在使用的时候尽可能的方便。<br>用户在创建HashTable的实例时指定key和value的类型，在进行增、删、改、查以及遍历操作时直接使用对应的类型操作即可。<br>假设用户系统通过如下方式访问该HashTable：</p>
+<pre><code>/*创建HashTable实例*/  
+HashTable * ht = create_hashtable(100,char*,double);  /*key：char*，value：double*/  
+  
+/*插入元素&quot;xiaoqiang&quot; =&gt; 1234.567 */  
+hash_add(&quot;xiaoqiang&quot;,1234.567);   
+  
+/*插入元素&quot;helloworld&quot; =&gt; 234567.891 */   
+hash_add(&quot;helloworld&quot;,234567.891);    
+  
+/*遍历元素*/   
+char * key = NULL;    
+double value = 0.0;    
+for (reset(ht);isnotend(ht);next(ht))&#123;     
+    key = skey(ht);              /*获取当前字符串key*/    
+    value = *(double*)value(ht); /*获取当前double类型的value值，需要做类型转换*/    
+    printf(&quot;key: %s, value:%lf\n&quot;,key,value);    
+&#125;  
+</code></pre>
+<p>接口设计：<br> <br>为了向用户提供上述访问HashTable内容的方式，我们对HashTable的访问接口设计如下：</p>
+<pre><code>#define create_hashtable(size, ...)           \  
+       _create_hashtable(size, #__VA_ARGS__)  
+  
+#define hash_add(ht,key,value)                \  
+       _hash_add((ht),(key),(value))  
+  
+#define hash_find(ht,key,value)               \  
+       _hash_find((ht),(key),(value))  
+  
+#define hash_del(ht,key)                      \  
+       _hash_del((ht),(key))  
+  
+#define hash_exists(ht,key)                   \  
+       _hash_exists((ht),(key))  
+  
+#define reset(ht)       ((ht)-&gt;pInternalPointer = (ht)-&gt;pListHead)  
+#define next(ht)        ((ht)-&gt;pInternalPointer = (ht)-&gt;pInternalPointer-&gt;pListNext)  
+#define isnotend(ht)    ((ht)-&gt;pInternalPointer != NULL)  
+#define nkey(ht)        ((ht)-&gt;pInternalPointer-&gt;h)  
+#define skey(ht)        ((ht)-&gt;pInternalPointer-&gt;key)  
+#define value(ht)       ((ht)-&gt;pInternalPointer-&gt;value)  
+  
+  
+HashTable * _create_hashtable(uint size, const char* s_typename);  
+int _hash_add(HashTable * ht, ...);  
+int _hash_find(HashTable * ht, ...);  
+int _hash_del(HashTable * ht, ...);  
+int _hash_exists(HashTable * ht, ...);  
+int  hash_num_elements(HashTable * ht);  
+void hash_free(HashTable * ht);  
+</code></pre>
+<p>上述结构设计和接口设计共同构成了我们HashTable的头文件hashtable.h</p>
+<p> </p>
+<p>剩下的就是实现_create_hashtable、_hash_add、_hash_add、_hash_find、_hash_del、_hash_exists、hash_num_elements和hash_free函数了。</p>
+<p>下面贴源码</p>
+<pre><code>/* ========================================================
+ *   Copyright (C) 2013 All rights reserved.
+ *   
+ *   filename : hashtable.c
+ *   info     : 
+ * ======================================================== */
+​
+#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &quot;str.h&quot;
+#include &quot;hashtable.h&quot;
+​
+​
+#define CONNECT_TO_BUCKET_DLLIST(element, list_head) do&#123;    \
+    (element)-&gt;pNext = (list_head);                         \
+    (element)-&gt;pLast = NULL;                                \
+    if ((element)-&gt;pNext) &#123;                                 \
+        (element)-&gt;pNext-&gt;pLast = (element);                \
+    &#125;                                                       \
+&#125;while(0);
+​
+#define DECONNECT_FROM_BUCKET_DLLIST(element,list_head) do&#123; \
+    if((element)-&gt;pLast)&#123;                                   \
+        (element)-&gt;pLast-&gt;pNext = (element)-&gt;pNext;         \
+    &#125;                                                       \
+    else&#123;                                                   \
+        (list_head) = (element)-&gt;pNext;                     \
+    &#125;                                                       \
+    if ((element)-&gt;pNext)&#123;                                  \
+        (element)-&gt;pNext-&gt;pLast = (element)-&gt;pLast;         \
+    &#125;                                                       \
+&#125;while(0);
+​
+#define CONNECT_TO_GLOBAL_DLLIST(element, ht)    do&#123;        \
+    (element)-&gt;pListLast = (ht)-&gt;pListTail;                 \
+    (ht)-&gt;pListTail = (element);                            \
+    (element)-&gt;pListNext = NULL;                            \
+    if ((element)-&gt;pListLast != NULL) &#123;                     \
+        (element)-&gt;pListLast-&gt;pListNext = (element);        \
+    &#125;                                                       \
+    if (!(ht)-&gt;pListHead) &#123;                                 \
+        (ht)-&gt;pListHead = (element);                        \
+    &#125;                                                       \
+    if ((ht)-&gt;pInternalPointer == NULL) &#123;                   \
+        (ht)-&gt;pInternalPointer = (element);                 \
+    &#125;                                                       \
+&#125;while(0);
+​
+#define DECONNECT_FROM_GLOBAL_DLLIST(element,ht)  do&#123;            \
+    if ((element)-&gt;pListNext)&#123;                                   \
+        (element)-&gt;pListNext-&gt;pListLast = (element)-&gt;pListLast;  \
+    &#125;                                                            \
+    else&#123;                                                        \
+        (ht)-&gt;pListTail = (element)-&gt;pListLast;                  \
+    &#125;                                                            \
+    if ((element)-&gt;pListLast)&#123;                                   \
+        (element)-&gt;pListLast-&gt;pListNext = (element)-&gt;pListNext;  \
+    &#125;                                                            \
+    else&#123;                                                        \
+        (ht)-&gt;pListHead = (element)-&gt;pListNext;                  \
+        (ht)-&gt;pInternalPointer = (element)-&gt;pListNext;           \
+    &#125;                                                            \
+&#125;while(0);
+​
+​
+static ulong hash_func(char *arKey)
+&#123;
+    register ulong hash = 5381;
+    int      nKeyLength = strlen(arKey);
+​
+    for (; nKeyLength &gt;= 8; nKeyLength -= 8) &#123;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+        hash = ((hash &lt;&lt; 5) + hash) + *arKey++;
+    &#125;
+    switch (nKeyLength) &#123;
+        case 7: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 6: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 5: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 4: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 3: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 2: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; /* fallthrough... */
+        case 1: hash = ((hash &lt;&lt; 5) + hash) + *arKey++; break;
+        case 0: break;
+        default:
+                break;
+    &#125;
+    return hash;
+&#125;
+​
+​
+HashTable * _create_hashtable(uint size, const char* s_typename)&#123;
+    if (!s_typename || strlen(s_typename) == 0 || strlen(s_typename) &gt;= TNLEN)
+        return NULL;
+    int  count;
+    char types[TNLEN];
+    strcpy(types,s_typename);
+    char ** str_array = split(trim(types,3),&#39;,&#39;,&amp;count);
+    if (count != 2)&#123;
+        free(str_array[0]);
+        free(str_array);
+        return NULL;
+    &#125;
+​
+    if (strcmp(trim(str_array[0],3),&quot;int&quot;)  &amp;&amp; 
+        strcmp(trim(str_array[0],3),&quot;long&quot;) &amp;&amp; 
+        strcmp(trim(str_array[0],3),&quot;char*&quot;))&#123;
+        free(str_array[0]);
+        free(str_array);
+        return NULL;
+    &#125;
+​
+    if (strcmp(trim(str_array[1],3),&quot;int&quot;   )   &amp;&amp;
+        strcmp(trim(str_array[1],3),&quot;long&quot;  )   &amp;&amp;
+        strcmp(trim(str_array[1],3),&quot;double&quot;)   &amp;&amp;
+        strcmp(trim(str_array[1],3),&quot;float&quot; )   &amp;&amp;
+        strcmp(trim(str_array[1],3),&quot;short&quot; )   &amp;&amp;
+        strcmp(trim(str_array[1],3),&quot;char*&quot; )   &amp;&amp;
+        strcmp(trim(str_array[1],3),&quot;char&quot;))&#123;
+        free(str_array[0]);
+        free(str_array);
+        return NULL;
+    &#125;
+​
+​
+    HashTable * ht = (HashTable*)malloc(sizeof(HashTable));
+    if (!ht)&#123;
+        free(str_array[0]);
+        free(str_array);
+        return NULL;
+    &#125;
+    strcpy(ht-&gt;keyType,  trim(str_array[0],3));
+    strcpy(ht-&gt;valueType,trim(str_array[1],3));
+    free(str_array[0]);
+    free(str_array);
+​
+    uint i = 3;
+    if (size&gt;= 0x80000000) &#123;
+        ht-&gt;nTableSize = 0x80000000;
+    &#125; else &#123;
+        while ((1U &lt;&lt; i) &lt; size) &#123;
+            i++;
+        &#125;
+        ht-&gt;nTableSize = 1 &lt;&lt; i;
+    &#125;
+    ht-&gt;arBuckets = (Bucket **) malloc(ht-&gt;nTableSize * sizeof(Bucket *));
+    if (!ht-&gt;arBuckets)
+        return NULL;
+    memset(ht-&gt;arBuckets,0,ht-&gt;nTableSize * sizeof(Bucket *));
+    ht-&gt;nTableMask = ht-&gt;nTableSize - 1;                        
+    ht-&gt;pListHead = NULL;
+    ht-&gt;pListTail = NULL;
+    ht-&gt;pInternalPointer = NULL;
+    ht-&gt;nNumOfElements = 0;
+    return ht;
+&#125;
+​
+​
+int _hash_add(HashTable * ht, ...)&#123;
+    ulong h;
+    char * key = NULL;
+    int keylen = 0;
+    char value[8];
+    uint nIndex;
+    Bucket *p;
+​
+    va_list vlist;
+    va_start(vlist,ht);
+    if(strcmp(ht-&gt;keyType,&quot;int&quot;) == 0)&#123;
+        int k = va_arg(vlist,int);
+        h = k;
+    &#125;
+    else if(strcmp(ht-&gt;keyType,&quot;long&quot;) == 0)&#123;
+        long k = va_arg(vlist,long);
+        h = k;
+    &#125;
+    else if (strcmp(ht-&gt;keyType, &quot;char*&quot;) == 0)&#123;
+        char* k = va_arg(vlist,char*);
+        h = hash_func(k);
+        key = k;
+        keylen = strlen(key);
+    &#125;
+    else &#123;
+        return FAILURE;
+    &#125;
+    if  (strcmp(ht-&gt;valueType, &quot;char&quot;) == 0)
+        (*value) = (char)va_arg(vlist,int);
+    else if (strcmp(ht-&gt;valueType, &quot;short&quot;) == 0)
+        (*(short*)value) = (short)va_arg(vlist,int);
+    else if(strcmp(ht-&gt;valueType, &quot;int&quot;) == 0)
+        (*(int*)value) = va_arg(vlist,int);
+    else if (strcmp(ht-&gt;valueType, &quot;long&quot;) == 0)
+        (*(long*)value) = va_arg(vlist,long);
+    else if (strcmp(ht-&gt;valueType, &quot;float&quot;) == 0)
+        (*(float*)value) = (float)va_arg(vlist,double);
+    else if (strcmp(ht-&gt;valueType, &quot;double&quot;) == 0)
+        (*(double*)value) = va_arg(vlist,double);
+    else if (strcmp(ht-&gt;valueType, &quot;char*&quot;) == 0)&#123;
+        char * tmp_str = va_arg(vlist,char*);
+        char * new_str = (char*)malloc(strlen(tmp_str)+1);
+        strcpy(new_str,tmp_str);
+        new_str[strlen(tmp_str)] = &#39;\0&#39;;
+        (*(char**)value) = new_str;
+    &#125;
+    else 
+        return FAILURE;
+    va_end(vlist);
+​
+    nIndex = h &amp; ht-&gt;nTableMask;
+    p = ht-&gt;arBuckets[nIndex];
+​
+    while (p!= NULL)&#123;
+        if (p-&gt;h == h)&#123;
+            if ((strcmp(ht-&gt;keyType,&quot;char*&quot;) != 0))&#123;
+                memcpy(p-&gt;value, value, 8);
+                return SUCCESS;
+            &#125;
+            else if(strcmp(p-&gt;key,key) == 0)&#123;
+                free(*(char**)p-&gt;value);
+                memcpy(p-&gt;value, value, 8);
+                return SUCCESS;
+            &#125;
+        &#125;
+        p = p-&gt;pNext;
+    &#125;
+    p = (Bucket *) malloc(sizeof(Bucket));
+    if (!p )&#123;
+        if (strcmp(ht-&gt;valueType, &quot;char*&quot;) == 0)&#123;
+            free(*(char**)value);
+        &#125;
+        return FAILURE;
+    &#125;
+​
+    p-&gt;h = h;
+    p-&gt;key = NULL;
+    memcpy(p-&gt;value,value,8);
+    if (0 == strcmp(ht-&gt;keyType,&quot;char*&quot;))&#123;
+        p-&gt;key = (char*)malloc(keylen +1);
+        memcpy(p-&gt;key,key,keylen);
+        p-&gt;key[keylen] = &#39;\0&#39;;
+    &#125;
+​
+    CONNECT_TO_BUCKET_DLLIST(p, ht-&gt;arBuckets[nIndex]);
+    CONNECT_TO_GLOBAL_DLLIST(p, ht);
+    ht-&gt;arBuckets[nIndex] = p;
+    ht-&gt;nNumOfElements+=1;
+    return SUCCESS;
+&#125;
+​
+​
+int _hash_find(HashTable * ht, ...)&#123;
+    ulong h;
+    char * key = NULL;
+    int keylen = 0;
+    uint nIndex = 0;
+    Bucket *p = NULL;
+​
+    va_list vlist;
+    va_start(vlist,ht);
+    if (strcmp(ht-&gt;keyType,&quot;int&quot;) == 0)&#123;
+        int k = va_arg(vlist,int);
+        h = k;
+    &#125;
+    else if(strcmp(ht-&gt;keyType, &quot;long&quot;) == 0)&#123;
+        long k = va_arg(vlist,long);
+        h = k;
+    &#125;
+    else if (strcmp(ht-&gt;keyType, &quot;char*&quot;) == 0)&#123;
+        char * k = va_arg(vlist,char*);
+        h = hash_func(k);
+        key = k;
+        keylen = strlen(key);
+    &#125;
+    else&#123;
+        return FAILURE;
+    &#125;
+​
+    nIndex = h &amp; ht-&gt;nTableMask;
+    p = ht-&gt;arBuckets[nIndex];
+    while (NULL != p)&#123;
+        if (p-&gt;h == h)&#123;
+            if ((strcmp(ht-&gt;keyType, &quot;char*&quot;) != 0)|| 
+                (strcmp(ht-&gt;keyType, &quot;char*&quot;) == 0 &amp;&amp; strcmp(p-&gt;key,key) == 0))&#123;
+                if (strcmp(ht-&gt;valueType, &quot;char&quot;) == 0)&#123;
+                    char * value = va_arg(vlist,char*);
+                    *value = (char)(*(p-&gt;value));
+                &#125;
+                else if (strcmp(ht-&gt;valueType, &quot;short&quot;) == 0)&#123;
+                    short * value = va_arg(vlist,short*);
+                    *value = *((short*)p-&gt;value);
+                &#125;
+                else if (strcmp(ht-&gt;valueType, &quot;int&quot;)   == 0)&#123;
+                    int * value = va_arg(vlist,int*);
+                    *value = *((int*)p-&gt;value);
+                &#125;
+                else if (strcmp(ht-&gt;valueType, &quot;long&quot;)  == 0)&#123;
+                    long * value = va_arg(vlist,long*);
+                    *value = *((long*)p-&gt;value);
+                &#125;
+                else if (strcmp(ht-&gt;valueType, &quot;float&quot;) == 0)&#123;
+                    float * value = va_arg(vlist,float*);
+                    *value = *((float*)p-&gt;value);
+                &#125;
+                else if (strcmp(ht-&gt;valueType, &quot;double&quot;)== 0)&#123;
+                    double * value = va_arg(vlist,double*);
+                    *value = *((double*)p-&gt;value);
+                &#125;
+                else if (strcmp(ht-&gt;valueType, &quot;char*&quot;) == 0)&#123;
+                    char ** value = va_arg(vlist,char**);
+                    *value = *((char**)p-&gt;value);
+                &#125;
+                else &#123;
+                    va_end(vlist);
+                    return FAILURE;
+                &#125;
+                va_end(vlist);
+                return SUCCESS;
+            &#125;
+        &#125;
+        p = p-&gt;pNext;
+    &#125;
+    va_end(vlist);
+    return NOTEXISTS;
+&#125;
+​
+​
+int _hash_del(HashTable * ht, ...)&#123;
+    ulong h;
+    char * key = NULL;
+    int keylen = 0;
+    uint nIndex = 0;
+    Bucket *p = NULL;
+​
+    va_list vlist;
+    va_start(vlist,ht);
+    if (strcmp(ht-&gt;keyType,&quot;int&quot;) == 0)&#123;
+        int k = va_arg(vlist,int);
+        h = k;
+    &#125;
+    else if(strcmp(ht-&gt;keyType, &quot;long&quot;) == 0)&#123;
+        long k = va_arg(vlist,long);
+        h = k;
+    &#125;
+    else if (strcmp(ht-&gt;keyType, &quot;char*&quot;) == 0)&#123;
+        char * k = va_arg(vlist,char*);
+        h = hash_func(k);
+        key = k;
+        keylen = strlen(key);
+    &#125;
+    else&#123;
+        return FAILURE;
+    &#125;
+    va_end(vlist);
+​
+    nIndex = h &amp; ht-&gt;nTableMask;
+    p = ht-&gt;arBuckets[nIndex];
+    while (NULL != p)&#123;
+        if (p-&gt;h == h)&#123;
+            if ((strcmp(ht-&gt;keyType, &quot;char*&quot;) != 0)|| 
+                (strcmp(ht-&gt;keyType, &quot;char*&quot;) == 0 &amp;&amp; strcmp(p-&gt;key,key) == 0))&#123;
+                DECONNECT_FROM_BUCKET_DLLIST(p,ht-&gt;arBuckets[nIndex]);
+                DECONNECT_FROM_GLOBAL_DLLIST(p,ht);
+                if (p-&gt;key) &#123;free(p-&gt;key);p-&gt;key = NULL;&#125;
+                if (strcmp(ht-&gt;valueType, &quot;char*&quot;) == 0) free(*(char**)p-&gt;value);
+                free(p); p = NULL;
+                ht-&gt;nNumOfElements -= 1;
+                return SUCCESS;
+            &#125;
+        &#125;
+        p = p-&gt;pNext;
+    &#125;
+​
+    return SUCCESS;
+&#125;
+​
+​
+int _hash_exists(HashTable * ht, ...)&#123;
+    ulong h;
+    char * key = NULL;
+    int keylen = 0;
+    uint nIndex = 0;
+    Bucket *p = NULL;
+​
+    va_list vlist;
+    va_start(vlist,ht);
+    if (strcmp(ht-&gt;keyType,&quot;int&quot;) == 0)&#123;
+        int k = va_arg(vlist,int);
+        h = k;
+    &#125;
+    else if(strcmp(ht-&gt;keyType, &quot;long&quot;) == 0)&#123;
+        long k = va_arg(vlist,long);
+        h = k;
+    &#125;
+    else if (strcmp(ht-&gt;keyType, &quot;char*&quot;) == 0)&#123;
+        char * k = va_arg(vlist,char*);
+        h = hash_func(k);
+        key = k;
+        keylen = strlen(key);
+    &#125;
+    else&#123;
+        return FAILURE;
+    &#125;
+    va_end(vlist);
+​
+    nIndex = h &amp; ht-&gt;nTableMask;
+    p = ht-&gt;arBuckets[nIndex];
+    while (NULL != p)&#123;
+        if (p-&gt;h == h)&#123;
+            if ((strcmp(ht-&gt;keyType, &quot;char*&quot;) != 0)|| 
+                (strcmp(ht-&gt;keyType, &quot;char*&quot;) == 0 &amp;&amp; strcmp(p-&gt;key,key) == 0))&#123;
+                return EXISTS;
+            &#125;
+        &#125;
+        p = p-&gt;pNext;
+    &#125;
+    return NOTEXISTS;
+&#125;
+​
+​
+int hash_num_elements(HashTable *ht)
+&#123;
+    return ht-&gt;nNumOfElements;
+&#125;
+​
+​
+void hash_free(HashTable * ht)&#123;
+    Bucket *p, *q;
+    p = ht-&gt;pListHead;
+    while (p != NULL) &#123;
+        q = p;
+        p = p-&gt;pListNext;
+        if (strcmp(ht-&gt;keyType,&quot;char*&quot;) == 0 &amp;&amp;
+            q-&gt;key)&#123;
+            free(q-&gt;key);
+            q-&gt;key = NULL;
+        &#125;
+        if (strcmp(ht-&gt;valueType,&quot;char*&quot;) == 0)&#123;
+            free(*(char**)q-&gt;value);
+        &#125;
+        free(q);
+        q = NULL;
+    &#125;
+​
+    if (ht-&gt;arBuckets) &#123;
+        free(ht-&gt;arBuckets);
+        ht-&gt;arBuckets = NULL;
+    &#125;
+    free(ht);
+&#125;
+
+/* ========================================================
+ *   Copyright (C) 2013 All rights reserved.
+ *   
+ *   filename : hashtable.h
+ *   info     : key    : int|long|char*
+ *              value  : char|short|int|long|float|double|char*
+ *
+ * ======================================================== */
+​
+#ifndef _HASHTABLE_H
+#define _HASHTABLE_H
+​
+#define SUCCESS    0
+#define FAILURE   -1
+#define EXISTS     1
+#define NOTEXISTS -2
+#define VLEN       8
+#define TNLEN     32
+​
+#define create_hashtable(size, ...)           \
+       _create_hashtable(size, #__VA_ARGS__)
+​
+#define hash_add(ht,key,value)                \
+       _hash_add((ht),(key),(value))
+​
+#define hash_find(ht,key,value)               \
+       _hash_find((ht),(key),(value))
+​
+#define hash_del(ht,key)                      \
+       _hash_del((ht),(key))
+​
+#define hash_exists(ht,key)                   \
+       _hash_exists((ht),(key))
+​
+#define reset(ht)       ((ht)-&gt;pInternalPointer = (ht)-&gt;pListHead)
+#define next(ht)        ((ht)-&gt;pInternalPointer = (ht)-&gt;pInternalPointer-&gt;pListNext)
+#define isnotend(ht)    ((ht)-&gt;pInternalPointer != NULL)
+#define nkey(ht)        ((ht)-&gt;pInternalPointer-&gt;h)
+#define skey(ht)        ((ht)-&gt;pInternalPointer-&gt;key)
+#define value(ht)       ((ht)-&gt;pInternalPointer-&gt;value)
+​
+​
+​
+typedef unsigned long ulong;
+typedef unsigned int  uint;
+​
+typedef struct _bucket &#123;
+    ulong h;          /* hash value of key, keyvalue if key is a uint or ulong */
+    char * key;       /* the point to key , if key is a string */
+    char value[VLEN]; /* store a var of builtin type in a 8bit buffer */
+    struct _bucket *pListNext;
+    struct _bucket *pListLast;
+    struct _bucket *pNext;
+    struct _bucket *pLast;
+&#125; Bucket;
+​
+typedef struct _hashtable&#123;
+    int nTableSize;
+    int nTableMask;
+    int nNumOfElements;
+    char keyType[TNLEN];
+    char valueType[TNLEN];
+    Bucket * pInternalPointer;
+    Bucket * pListHead;
+    Bucket * pListTail;
+    Bucket ** arBuckets;
+&#125; HashTable;
+​
+​
+HashTable * _create_hashtable(uint size, const char* s_typename);
+int _hash_add(HashTable * ht, ...);
+int _hash_find(HashTable * ht, ...);
+int _hash_del(HashTable * ht, ...);
+int _hash_exists(HashTable * ht, ...);
+int  hash_num_elements(HashTable * ht);
+void hash_free(HashTable * ht);
+​
+​
+​
+#endif //HASHTABLE_H
+
+/* ========================================================
+ *   Copyright (C) 2013 All rights reserved.
+ *   
+ *   filename : str.c
+ *
+ * ======================================================== */
+​
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &quot;str.h&quot;
+​
+static inline int php_charmask(unsigned char *input, int len, char *mask)
+&#123;
+    unsigned char *end;
+    unsigned char c;
+    int result = 0;
+​
+    memset(mask, 0, 256);
+    for (end = input+len; input &lt; end; input++) &#123;
+        c=*input;
+        if ((input+3 &lt; end) &amp;&amp; input[1] == &#39;.&#39; &amp;&amp; input[2] == &#39;.&#39;
+                &amp;&amp; input[3] &gt;= c) &#123;
+            memset(mask+c, 1, input[3] - c + 1);
+            input+=3;
+        &#125; else if ((input+1 &lt; end) &amp;&amp; input[0] == &#39;.&#39; &amp;&amp; input[1] == &#39;.&#39;) &#123;
+            if (end-len &gt;= input) &#123; 
+                result = -1;
+                continue;
+            &#125;
+            if (input+2 &gt;= end) &#123; 
+                result = -1;
+                continue;
+            &#125;
+            if (input[-1] &gt; input[2]) &#123; 
+                result = -1;
+                continue;
+            &#125;
+            result = -1;
+            continue;
+        &#125; else &#123;
+            mask[c]=1;
+        &#125;
+    &#125;
+    return result;
+&#125;
+​
+char * trim(char *c,int mode)&#123;
+    if (!c)
+        return NULL;
+    register int i;
+    int len = strlen(c) + 1;
+    int trimmed = 0;
+    char mask[256];
+    php_charmask((unsigned char*)&quot; \n\r\t\v\0&quot;, 6, mask);
+    if (mode &amp; 1) &#123;
+        for (i = 0; i &lt; len; i++) &#123;
+            if (mask[(unsigned char)c[i]]) &#123;
+                trimmed++;
+            &#125; else &#123;
+                break;
+            &#125;
+        &#125;
+        len -= trimmed;
+        c += trimmed;
+    &#125;
+    if (mode &amp; 2) &#123;
+        for (i = len - 1; i &gt;= 0; i--) &#123;
+            if (mask[(unsigned char)c[i]]) &#123;
+                len--;
+            &#125; else &#123;
+                break;
+            &#125;
+        &#125;
+    &#125;
+    c[len] = &#39;\0&#39;;
+    return c;
+&#125;
+​
+char** split(const char* string, char delim, int* count)&#123;
+    if (!string )
+        return 0;
+    int i,j,c;
+    i = 0; j = c = 1;
+    int length = strlen(string);
+    char * copy_str = (char*) malloc(length + 1);
+    memmove(copy_str,string,length);
+    copy_str[length] = &#39;\0&#39;;
+    for (; i&lt;length; i++)&#123;
+        if (copy_str[i] == delim)&#123;
+            c += 1;
+        &#125;
+    &#125;
+    (*count) = c;
+    char ** str_array = malloc(sizeof(char*) * c);
+    str_array[0] = copy_str;
+    for (i = 0; i &lt; length; i++)&#123;
+        if (copy_str[i] == delim)&#123;
+            copy_str[i] = &#39;\0&#39;;
+            str_array[j++] = copy_str + i + 1;
+        &#125;
+    &#125;
+    return str_array;
+&#125;
+/* ========================================================
+ *   Copyright (C) 2013 All rights reserved.
+ *   
+ *   filename : str.h
+ *
+ * ======================================================== */
+#ifndef STR_H
+#define STR_H
+char * trim(char *c,int mode);
+char** split(const char* string, char delim, int* count);
+#endif
+/* ========================================================
+ *   Copyright (C) 2013 All rights reserved.
+ *   
+ *   filename : test.c
+ *   info     : 
+ * ======================================================== */
+​
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &quot;hashtable.h&quot;
+​
+​
+int main()&#123;
+    printf(&quot;\n&lt;int,double&gt;\n&quot;);
+    HashTable *ht = create_hashtable(100,int,double);
+    double t = 2000000000.0;
+    hash_add(ht,100,t);
+    hash_add(ht,20,15.0);
+    double v;
+    hash_find(ht,20,&amp;v);
+    printf(&quot;\t20  :%lf\n&quot;,v);
+    hash_find(ht,100,&amp;v);
+    printf(&quot;\t100 :%lf\n&quot;,v);
+    printf(&quot;\tset 100&#39;s value  = 200.0\n&quot;);
+    hash_add(ht,100,200.0);
+    hash_find(ht,100,&amp;v);
+    printf(&quot;\t100 :%lf\n&quot;,v);
+    int key;
+    double tvalue;
+    printf(&quot;\n\t[itering...]\n&quot;);
+    for (reset(ht);isnotend(ht);next(ht))&#123;
+        key = nkey(ht);
+        tvalue = *(double*)value(ht);
+        printf(&quot;\tkey: %d, value:%lf\n&quot;,key,tvalue);
+    &#125;
+    hash_free(ht);
+    ht = NULL;
+​
+    printf(&quot;\n&lt;char*,int&gt;\n&quot;);
+    HashTable *ht1 = create_hashtable(100,char*,int);
+    hash_add(ht1,&quot;song&quot;,1000);
+    hash_add(ht1,&quot;abcd&quot;,1235451254);
+    int value;
+    hash_find(ht1,&quot;song&quot;,&amp;value);
+    printf(&quot;\tsong: %d\n&quot;,value);
+    hash_find(ht1,&quot;abcd&quot;,&amp;value);
+    printf(&quot;\tabcd: %d\n&quot;,value);
+    char * t_key;
+    printf(&quot;\n\t[itering...]\n&quot;);
+    for (reset(ht1);isnotend(ht1);next(ht1))&#123;
+        t_key = skey(ht1);
+        value = *(int*)value(ht1);
+        printf(&quot;\tkey: %s, value:%d\n&quot;,t_key,value);
+    &#125;
+    free(ht1);
+    ht1 = NULL;
+​
+    printf(&quot;\n&lt;char*,double&gt;\n&quot;);
+​
+    HashTable *ht2 = create_hashtable(100, char*, double);
+    hash_add(ht2,&quot;whatafuck&quot;,12314524.1235);
+    hash_add(ht2,&quot;xiaoqiang&quot;,123.123);
+    double b;
+    hash_find(ht2,&quot;whatafuck&quot;, &amp;b);
+    printf(&quot;\twhatafuck: %lf\n&quot;,b);
+    hash_find(ht2,&quot;xiaoqiang&quot;, &amp;b);
+    printf(&quot;\txiaoqiang: %lf\n&quot;,b);
+    if(hash_exists(ht2,&quot;xiaoqiang&quot;) == EXISTS)&#123;
+        printf(&quot;\texists xiaoqiang\n&quot;);
+    &#125;
+    printf(&quot;\thash element counts: %d\n&quot;,hash_num_elements(ht2));
+    printf(&quot;\tdel xiaoqiang...\n&quot;);
+    hash_del(ht2,&quot;xiaoqiang&quot;);
+    if(hash_exists(ht2,&quot;xiaoqiang&quot;) == NOTEXISTS)&#123;
+        printf(&quot;\tnot exists xiaoqiang\n&quot;);
+    &#125;
+    else if (hash_exists(ht2,&quot;xiaoqiang&quot;) == EXISTS)&#123;
+        printf(&quot;\tstill exists xiaoqiang\n&quot;);
+    &#125;
+    printf(&quot;\thash element counts: %d\n&quot;,hash_num_elements(ht2));
+    hash_free(ht2);
+    ht2= NULL;
+​
+    printf(&quot;\n&lt;char*,char*&gt;\n&quot;);
+​
+    HashTable * ht3 = create_hashtable(100,char*,char*);
+    hash_add(ht3,&quot;fuck&quot;,&quot;make love&quot;);
+    hash_add(ht3,&quot;like&quot;,&quot;not love&quot;);
+    char * v_tmp;
+    hash_find(ht3,&quot;fuck&quot;,&amp;v_tmp);
+    printf(&quot;\tfuck: %s\n&quot;, v_tmp);
+    hash_find(ht3,&quot;like&quot;, &amp;v_tmp);
+    printf(&quot;\tlike: %s\n&quot;,v_tmp);
+    printf(&quot;\n\t[itering...]\n&quot;);
+    for(reset(ht3);isnotend(ht3);next(ht3))&#123;
+        t_key = skey(ht3);
+        v_tmp = *(char**)value(ht3);
+        printf(&quot;\tkey: %s, value:%s\n&quot;,t_key,v_tmp);
+    &#125;
+    hash_free(ht3);
+    ht3 = NULL;
+    return 0;
+&#125;
+</code></pre>
+<h3 id="7-对Hash算法的评价"><a href="#7-对Hash算法的评价" class="headerlink" title="7.对Hash算法的评价"></a>7.对Hash算法的评价</h3><p> 这个页面提供了对几种流行Hash算法的评价。</p>
+<h3 id="8-简单hash链表代码"><a href="#8-简单hash链表代码" class="headerlink" title="8.简单hash链表代码"></a>8.简单hash链表代码</h3><p>简单的hash就是用数组加链表的组合来实现。<br>代码如下：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: hashmap.h
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 08 Mar 2017 02:28:52 PM CST
+ ************************************************************************/
+​
+#ifndef _HASHMAP_H
+#define _HASHMAP_H
+typedef struct _listnode_
+&#123;
+    struct _listnode_ *prev;
+    struct _listnode_ *next;
+    void *data;
+&#125;list_node_t;
+​
+typedef list_node_t *list_t;
+typedef list_node_t *position_t;
+​
+typedef struct _hash_table_
+&#123;
+    int table_size;
+    list_t *hash_list;
+&#125;hash_table_t;
+​
+int hash(void *key,int table_size);
+hash_table_t *init_hash(int table_size);
+void insert(void *key,hash_table_t *ht);
+position_t search(void *key,hash_table_t *ht);
+void destory(hash_table_t *ht);\
+void *show(position_t p);
+#endif
+</code></pre>
+<p>main.c</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &quot;hashmap.h&quot;
+​
+​
+int hash(void *key,int table_size)
+&#123;
+    char c;
+    int i,hval = 0;
+    for(i = 1;(c = *(char *)key++) != 0;i++)
+    &#123;
+        hval += c * i;
+    &#125;
+    return (hval % table_size);
+&#125;
+​
+hash_table_t *init_hash(int table_size)
+&#123;
+    int i;
+    int j;
+    hash_table_t *ht;
+    ht = malloc(sizeof(hash_table_t));
+    if(NULL == ht)
+    &#123;
+        printf(&quot;init hash malloc failed.\n&quot;);
+        goto E1;
+    &#125;
+    ht-&gt;table_size = table_size;
+    ht-&gt;hash_list = malloc(sizeof(list_node_t) * table_size);
+    if(ht-&gt;hash_list == NULL)
+    &#123;
+        printf(&quot;init hash_list malloc failed.\n&quot;);
+        goto E2;
+    &#125;
+​
+    for(i = 0;i &lt; table_size;i++)
+    &#123;
+        ht-&gt;hash_list[i] = malloc(sizeof(list_node_t));
+        if(NULL == ht-&gt;hash_list[i])
+        &#123;
+            printf(&quot;arry hash_list malloc failed.\n&quot;);
+            goto E3;
+        &#125;
+    &#125;
+    return ht;
+    E3:
+​
+    for(j = 0;j &lt; i;j++)
+    &#123;
+        free(ht-&gt;hash_list[j]);
+    &#125;
+    free(ht-&gt;hash_list);
+    E2:
+    free(ht);
+    E1:
+    return NULL;
+&#125;
+​
+void insert(void *key,hash_table_t *ht)
+&#123;
+    position_t p,tmp;
+    list_t l;
+    p = search(key,ht);
+    if(p == NULL)
+    &#123;
+        tmp = malloc(sizeof(list_node_t));
+        if(tmp == NULL)
+        &#123;
+            printf(&quot;insert tmp malloc failed.\n&quot;);
+            return;
+        &#125;
+        l = ht-&gt;hash_list[hash(key,ht-&gt;table_size)];
+        tmp-&gt;data = key;
+        tmp-&gt;next = l-&gt;next;
+        if(l-&gt;next != NULL)
+            l-&gt;next-&gt;prev = tmp;
+        tmp-&gt;prev = l;
+        l-&gt;next = tmp;
+    &#125;
+    else
+    &#123;
+        printf(&quot;the key already exist.\n&quot;);
+    &#125;
+&#125;
+position_t search(void *key,hash_table_t *ht)
+&#123;
+    int i,j;
+    list_t l;
+    position_t p;
+    i = hash(key,ht-&gt;table_size);
+    l = ht-&gt;hash_list[i];
+    p = l-&gt;next;
+    while(p != NULL &amp;&amp; p-&gt;data != key)
+        p = p-&gt;next;
+    return p;
+&#125;
+void destory(hash_table_t *ht)
+&#123;
+    int i;
+    list_t l;
+    position_t p1,p2;
+    for(i = 0;i &lt; ht-&gt;table_size;i++)
+    &#123;
+        l = ht-&gt;hash_list[i];
+        p1 = l-&gt;next;
+        while(p1-&gt;next != NULL)
+        &#123;
+            p2 = p1-&gt;next;
+            free(p1);
+            p1 = p2;
+        &#125;
+        free(l);
+    &#125;
+    free(ht);
+&#125;
+void *show(position_t p)
+&#123;
+    return p-&gt;data;
+&#125;
+​
+​
+int main(void)
+&#123;
+    hash_table_t *ht;
+    ht = init_hash(32);
+    insert(&quot;abc&quot;,ht);
+    insert(&quot;bcd&quot;,ht);
+    insert(&quot;abcde&quot;,ht);
+    insert(&quot;bcd&quot;,ht);
+    position_t p;
+    p = search(&quot;abc&quot;,ht);
+    printf(&quot;data:%s\n&quot;,(char *)show(p));
+​
+    return 0;
+&#125;
+</code></pre>
+<h3 id="9-多阶hash"><a href="#9-多阶hash" class="headerlink" title="9.多阶hash"></a>9.多阶hash</h3><pre><code>//hash_shm.h
+​
+/*
+一个锯齿数组，每一行都是素数，从多到少
+* * * * * *
+* * * * *
+* * * *
+* * *
+* *
+*
+*/
+​
+#ifndef _STORMLI_HASH_SHM_H_
+#define _STORMLI_HASH_SHM_H_
+​
+#include&lt;iostream&gt;
+#include&lt;cstdlib&gt;
+#include&lt;cmath&gt;
+#include&lt;string.h&gt;
+//#include&lt;sys/shm.h&gt;
+using namespace std;
+​
+template&lt;typename valueType,unsigned long maxLine,int lines&gt;
+class hash_shm
+&#123;
+public:    
+    int find(unsigned long _key);    //if _key in the table,return 0,and set lastFound the position,otherwise return -1
+    int remove(unsigned long _key);    //if _key not in the table,return-1,else remove the node,set the node key 0 and return 0
+​
+    //insert node into the table,if the _key exists,return 1,if insert success,return 0;and if fail return -1
+    int insert(unsigned long _key,const valueType &amp;_value);
+    void clear();        //remove all the data
+​
+public:    //some statistic function
+    double getFullRate()const;        //the rate of the space used
+    
+public:
+    //constructor,with the share memory start position and the space size,if the space is not enough,the program will exit
+    hash_shm(void *startShm,unsigned long shmSize=sizeof(hash_node)*maxLine*lines);
+​
+    //constructor,with the share memory key,it will get share memory,if fail,exit
+    //hash_shm(key_t shm_key);
+    ~hash_shm()&#123;&#125;    //destroy the class
+    
+    void foreach(void (*fn)(unsigned long _key,valueType &amp;_value));
+private:
+    void *mem;        //the start position of the share memory  // the mem+memSize  space used to storage the runtime data:currentSize
+    unsigned long memSize;    //the size of the share memory
+    unsigned long modTable[lines];    //modtable,the largest primes, hash表的阶，为每一阶产生一个素数
+    unsigned long modTotal[lines];    //modTotal[i] is the summary of the modTable
+    unsigned long maxSize;        //the size of the table
+    unsigned long *currentSize;    //current size of the table ,the pointer of the shm mem+memSize
+    void *lastFound;        //write by the find function,record the last find place
+    
+    struct hash_node&#123;        //the node of the hash table
+        unsigned long key;    //when key==0,the node is empty
+        valueType value;    //name-value pair
+    &#125;;
+    
+    
+    
+private:
+    //bool getShm(key_t shm_key);    //get share memory,used by the constructor
+    void getMode();        //get the largest primes blow maxLine,use by the constructor
+    void *getPos(unsigned int _row,unsigned long _col);//get the positon with the (row,col)
+&#125;;
+​
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+hash_shm&lt;vT,maxLine,lines&gt;::hash_shm(void *startShm,unsigned long shmSize)
+&#123;
+    if(startShm!=NULL)&#123;
+        cerr&lt;&lt;&quot;Argument error\n Please check the shm address\n&quot;;
+        exit(-1);
+    &#125;
+    getMode();
+    maxSize=0;
+    int i;
+    for(i=0;i&lt;lines;i++)    //count the maxSize
+    &#123;
+        maxSize+=modTable[i];  //HASH存储的元素个数，就是把每一阶的元素个数加起来
+        if(i!=0)modTotal[i]=modTotal[i-1]+modTable[i-1];
+        else modTotal[i]=0;    //caculate the modTotal
+    &#125;
+    if(shmSize&lt;sizeof(hash_node)*(maxSize+1))&#123;    //check the share memory size
+        cerr&lt;&lt;&quot;Not enough share memory space\n&quot;;
+        exit(-1);
+    &#125;
+    memSize=shmSize;
+    if(*(currentSize=(unsigned long *)((long)mem+memSize))&lt;0)
+        *currentSize=0;;
+&#125;
+​
+/*
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+hash_shm&lt;vT,maxLine,lines&gt;::hash_shm(key_t shm_key)
+&#123;    //constructor with get share memory
+    getMode();
+    maxSize=0;
+    for(int i=0;i&lt;lines;i++)
+    &#123;
+        maxSize+=modTable[i];
+        if(i!=0)modTotal[i]=modTotal[i-1]+modTable[i-1];
+        else modTotal[i]=0;
+    &#125;
+    memSize=sizeof(hash_node)*maxSize;    
+    if(!getShm(shm_key))&#123;
+        exit(-1);
+    &#125;
+//    memset(mem,0,memSize);
+    if(*(currentSize=(unsigned long *)((long)mem+memSize))&lt;0)
+        *currentSize=0;
+    
+&#125;    
+*/
+​
+​
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+int hash_shm&lt;vT,maxLine,lines&gt;::find(unsigned long _key)
+&#123;
+    unsigned long hash;
+    hash_node *pH=NULL;
+    for(int i=0;i&lt;lines;i++)  //查找元素的时候，在每一阶上去查找
+    &#123;
+        hash=(_key+maxLine)%modTable[i];    //calculate the col position,  key加上最大的元素个数，可以避免key太小
+        //以上计算得到列
+        pH=(hash_node *)getPos(i,hash);
+//        if(pH==NULL)return -2;    //almost not need
+        if(pH-&gt;key==_key)&#123;
+            lastFound=pH;
+            return 0;
+        &#125;
+        //如果hash冲突，继续在下一阶查找
+    &#125;
+    return -1;
+&#125;
+​
+/// 删除一个元素，仅仅标记这个节点的key为0即可
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+int hash_shm&lt;vT,maxLine,lines&gt;::remove(unsigned long _key)
+&#123;
+    if(find(_key)==-1)return -1;    //not found
+    hash_node *pH=(hash_node *)lastFound;
+    pH-&gt;key=0;        //only set the key 0
+    (*currentSize)--;
+    return 0;
+&#125;
+​
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+int hash_shm&lt;vT,maxLine,lines&gt;::insert(unsigned long _key,const vT &amp;_value)
+&#123;
+    if(find(_key)==0)return 1;    //if the key exists
+    unsigned long hash;
+    hash_node *pH=NULL;
+    for(int i=0;i&lt;lines;i++)
+    &#123;    
+        hash=(_key+maxLine)%modTable[i];
+        pH=(hash_node *)getPos(i,hash);
+        if(pH-&gt;key==0)&#123;        //find the insert position,insert the value
+            pH-&gt;key=_key;
+            pH-&gt;value=_value;
+            (*currentSize)++;
+            return 0;
+        &#125;
+    &#125;
+    return -1;    //all the appropriate position filled
+&#125;
+​
+​
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+void hash_shm&lt;vT,maxLine,lines&gt;::clear()
+&#123;
+    memset(mem,0,memSize);
+    *currentSize=0;
+&#125;
+​
+/*
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+bool hash_shm&lt;vT,maxLine,lines&gt;::getShm(key_t shm_key)
+&#123;
+    int shm_id=shmget(shm_key,memSize,0666);
+    if(shm_id==-1)    //check if the shm exists
+    &#123;
+        shm_id=shmget(shm_key,memSize,0666|IPC_CREAT);//create the shm
+        if(shm_id==-1)&#123;
+            cerr&lt;&lt;&quot;Share memory get failed\n&quot;;
+            return false;
+        &#125;
+    &#125;
+    mem=shmat(shm_id,NULL,0);    //mount the shm
+    if(int(mem)==-1)&#123;
+        cerr&lt;&lt;&quot;shmat system call failed\n&quot;;
+        return false;
+    &#125;
+    return true;
+&#125;
+*/
+​
+/// vT value的数据类型
+/// maxLine 每阶的最大元素个数
+/// lines hash的阶
+/// 为每一阶产生一个素数
+/// 素数从大到小的排列
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+void hash_shm&lt;vT,maxLine,lines&gt;::getMode()
+&#123;        //采用 6n+1 6n-1 素数集中原理
+    // 每阶至少5个元素
+    if(maxLine&lt;5)&#123;exit(-1);&#125;
+    
+    unsigned long t,m,n,p;
+    int i,j,a,b,k;
+    int z=0;
+    
+    // 1000/6 = 166
+    // 找166到0之间的所有素数吗？
+    for(t=maxLine/6;t&gt;=0,z&lt;lines;t--)  //逗号是什么意思？or吗
+    &#123;
+        i=1;j=1; k=t%10;
+        m=6*t;                                        /**i,j的值 是是否进行验证的标志也是对应的6t-1和6t+1的素性标志**/
+        if(((k-4)==0)||((k-9)==0)||((m+1)%3==0))j=0;/*此处是简单验证6*t-1,6*t+1 是不是素数，借以提高素数纯度**/
+        if(((k-6)==0)||((m-1)%3==0))i=0;            /***先通过初步判断去除末尾是5，及被3整除的数***/
+        for(p=1;p*6&lt;=sqrt(m+1)+2;p++ )
+        &#123;
+            n=p*6;                                    /**将6*p-1和6*p+1看作伪素数来试除*****/
+            k=p%10;
+            a=1;b=1;                                /**同样此处a,b的值也是用来判断除数是否为素数提高除数的素数纯度**/
+            if(((k-4)==0)||((k-9)==0))a=0;
+            if(((k-6)==0))b=0;
+            if(i)&#123;                            /*如果i非零就对m-1即所谓6*t-1进行验证，当然还要看除数n+1,n-1,素性纯度*/
+                if(a)&#123;if((m-1)%(n+1)==0)i=0;&#125;        /***一旦被整除就说明不是素数故素性为零即将i 赋值为零***/
+                if(b)&#123;if((m-1)%(n-1)==0)i=0;&#125;
+            &#125;
+            if(j)&#123;                           /**如果j非零就对m+1即所谓6*t+1进行验证，当然还要看除数n+1,n-1,素性纯度*/
+                if(a)&#123;if((m+1)%(n+1)==0)j=0;&#125;         /***一旦被整除就说明不是素数故素性为零即将j 赋值为零***/
+                if(b)&#123;if((m+1)%(n-1)==0)j=0;&#125;
+            &#125;
+            if((i+j)==0)break;                     /**如果已经知道6*t-1,6*t+1都不是素数了那就结束试除循环***/
+        &#125;
+        if(j)&#123;modTable[z++]=m+1;if(z&gt;= lines)return;&#125;
+        if(i)&#123;modTable[z++]=m-1;if(z&gt;= lines)return;&#125;
+    &#125;
+&#125;
+​
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+void *hash_shm&lt;vT,maxLine,lines&gt;::getPos(unsigned int _row,unsigned long _col)
+&#123;
+    //unsigned long pos=0UL;
+    //for(int i=0;i&lt;_row;i++)    //calculate the positon from the start
+    //    pos+=modTable[i];
+    //pos+=_col;    
+    unsigned long pos=_col+modTotal[_row];
+        
+    if(pos&gt;=maxSize)return NULL;
+    return (void *)((long)mem+pos*sizeof(hash_node));
+&#125;
+​
+/// 占用百分比
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+double hash_shm&lt;vT,maxLine,lines&gt;::getFullRate()const
+&#123;
+    return double(*currentSize)/maxSize;
+&#125;
+​
+template&lt;typename vT,unsigned long maxLine,int lines&gt;
+void hash_shm&lt;vT,maxLine,lines&gt;::foreach(void (*fn)(unsigned long _key,vT &amp;_value))
+&#123;
+    typedef  unsigned long u_long;
+    u_long beg=(u_long)mem;
+    u_long end=(u_long)mem+sizeof(hash_node)*(modTable[lines-1]+modTotal[lines-1]);
+    hash_node *p=NULL;
+    for(u_long pos=beg;pos&lt;end;pos+=sizeof(hash_node))
+    &#123;
+        p=(hash_node *)pos;
+        if(p-&gt;key!=0)fn(p-&gt;key,p-&gt;value);
+    &#125;
+&#125;
+​
+#endif
+​
+/*
+g++ -o hash_shm_1.h.gch -x c++-header -c hash_shm_1.h -g
+*/
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/04-Algorithm/">04. Algorithm</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Hash/">Hash</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

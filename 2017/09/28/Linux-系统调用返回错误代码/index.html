@@ -1,0 +1,343 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux 系统调用返回错误代码 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="只是方便查看而已">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux 系统调用返回错误代码"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-09-28T09:56:55.000Z"><a href="/2017/09/28/Linux-系统调用返回错误代码/">2017-09-28</a></time>
+        
+  
+    <h1 class="title">Linux 系统调用返回错误代码</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        
+    </div>
+
+        <p>只是方便查看而已</p>
+<span id="more"></span>
+<p>位置：</p>
+<p><strong>/usr/include/asm-generic/errno.h</strong></p>
+<pre><code>#ifndef _ASM_GENERIC_ERRNO_H
+#define _ASM_GENERIC_ERRNO_H
+
+#include &lt;asm-generic/errno-base.h&gt;
+
+#define    EDEADLK        35    /* Resource deadlock would occur */
+#define    ENAMETOOLONG    36    /* File name too long */
+#define    ENOLCK        37    /* No record locks available */
+#define    ENOSYS        38    /* Function not implemented */
+#define    ENOTEMPTY    39    /* Directory not empty */
+#define    ELOOP        40    /* Too many symbolic links encountered */
+#define    EWOULDBLOCK    EAGAIN    /* Operation would block */
+#define    ENOMSG        42    /* No message of desired type */
+#define    EIDRM        43    /* Identifier removed */
+#define    ECHRNG        44    /* Channel number out of range */
+#define    EL2NSYNC    45    /* Level 2 not synchronized */
+#define    EL3HLT        46    /* Level 3 halted */
+#define    EL3RST        47    /* Level 3 reset */
+#define    ELNRNG        48    /* Link number out of range */
+#define    EUNATCH        49    /* Protocol driver not attached */
+#define    ENOCSI        50    /* No CSI structure available */
+#define    EL2HLT        51    /* Level 2 halted */
+#define    EBADE        52    /* Invalid exchange */
+#define    EBADR        53    /* Invalid request descriptor */
+#define    EXFULL        54    /* Exchange full */
+#define    ENOANO        55    /* No anode */
+#define    EBADRQC        56    /* Invalid request code */
+#define    EBADSLT        57    /* Invalid slot */
+
+#define    EDEADLOCK    EDEADLK
+
+#define    EBFONT        59    /* Bad font file format */
+#define    ENOSTR        60    /* Device not a stream */
+#define    ENODATA        61    /* No data available */
+#define    ETIME        62    /* Timer expired */
+#define    ENOSR        63    /* Out of streams resources */
+#define    ENONET        64    /* Machine is not on the network */
+#define    ENOPKG        65    /* Package not installed */
+#define    EREMOTE        66    /* Object is remote */
+#define    ENOLINK        67    /* Link has been severed */
+#define    EADV        68    /* Advertise error */
+#define    ESRMNT        69    /* Srmount error */
+#define    ECOMM        70    /* Communication error on send */
+#define    EPROTO        71    /* Protocol error */
+#define    EMULTIHOP    72    /* Multihop attempted */
+#define    EDOTDOT        73    /* RFS specific error */
+#define    EBADMSG        74    /* Not a data message */
+#define    EOVERFLOW    75    /* Value too large for defined data type */
+#define    ENOTUNIQ    76    /* Name not unique on network */
+#define    EBADFD        77    /* File descriptor in bad state */
+#define    EREMCHG        78    /* Remote address changed */
+#define    ELIBACC        79    /* Can not access a needed shared library */
+#define    ELIBBAD        80    /* Accessing a corrupted shared library */
+#define    ELIBSCN        81    /* .lib section in a.out corrupted */
+#define    ELIBMAX        82    /* Attempting to link in too many shared libraries */
+#define    ELIBEXEC    83    /* Cannot exec a shared library directly */
+#define    EILSEQ        84    /* Illegal byte sequence */
+#define    ERESTART    85    /* Interrupted system call should be restarted */
+#define    ESTRPIPE    86    /* Streams pipe error */
+#define    EUSERS        87    /* Too many users */
+#define    ENOTSOCK    88    /* Socket operation on non-socket */
+#define    EDESTADDRREQ    89    /* Destination address required */
+#define    EMSGSIZE    90    /* Message too long */
+#define    EPROTOTYPE    91    /* Protocol wrong type for socket */
+#define    ENOPROTOOPT    92    /* Protocol not available */
+#define    EPROTONOSUPPORT    93    /* Protocol not supported */
+#define    ESOCKTNOSUPPORT    94    /* Socket type not supported */
+#define    EOPNOTSUPP    95    /* Operation not supported on transport endpoint */
+#define    EPFNOSUPPORT    96    /* Protocol family not supported */
+#define    EAFNOSUPPORT    97    /* Address family not supported by protocol */
+#define    EADDRINUSE    98    /* Address already in use */
+#define    EADDRNOTAVAIL    99    /* Cannot assign requested address */
+#define    ENETDOWN    100    /* Network is down */
+#define    ENETUNREACH    101    /* Network is unreachable */
+#define    ENETRESET    102    /* Network dropped connection because of reset */
+#define    ECONNABORTED    103    /* Software caused connection abort */
+#define    ECONNRESET    104    /* Connection reset by peer */
+#define    ENOBUFS        105    /* No buffer space available */
+#define    EISCONN        106    /* Transport endpoint is already connected */
+#define    ENOTCONN    107    /* Transport endpoint is not connected */
+#define    ESHUTDOWN    108    /* Cannot send after transport endpoint shutdown */
+#define    ETOOMANYREFS    109    /* Too many references: cannot splice */
+#define    ETIMEDOUT    110    /* Connection timed out */
+#define    ECONNREFUSED    111    /* Connection refused */
+#define    EHOSTDOWN    112    /* Host is down */
+#define    EHOSTUNREACH    113    /* No route to host */
+#define    EALREADY    114    /* Operation already in progress */
+#define    EINPROGRESS    115    /* Operation now in progress */
+#define    ESTALE        116    /* Stale file handle */
+#define    EUCLEAN        117    /* Structure needs cleaning */
+#define    ENOTNAM        118    /* Not a XENIX named type file */
+#define    ENAVAIL        119    /* No XENIX semaphores available */
+#define    EISNAM        120    /* Is a named type file */
+#define    EREMOTEIO    121    /* Remote I/O error */
+#define    EDQUOT        122    /* Quota exceeded */
+
+#define    ENOMEDIUM    123    /* No medium found */
+#define    EMEDIUMTYPE    124    /* Wrong medium type */
+#define    ECANCELED    125    /* Operation Canceled */
+#define    ENOKEY        126    /* Required key not available */
+#define    EKEYEXPIRED    127    /* Key has expired */
+#define    EKEYREVOKED    128    /* Key has been revoked */
+#define    EKEYREJECTED    129    /* Key was rejected by service */
+
+/* for robust mutexes */
+#define    EOWNERDEAD    130    /* Owner died */
+#define    ENOTRECOVERABLE    131    /* State not recoverable */
+
+#define ERFKILL        132    /* Operation not possible due to RF-kill */
+
+#define EHWPOISON    133    /* Memory page has hardware error */
+
+#endif
+</code></pre>
+<p>位置：</p>
+<p><strong>/usr/include/asm-generic/errno-base.h</strong></p>
+<pre><code>#ifndef _ASM_GENERIC_ERRNO_BASE_H
+#define _ASM_GENERIC_ERRNO_BASE_H
+
+#define    EPERM         1    /* Operation not permitted */
+#define    ENOENT         2    /* No such file or directory */
+#define    ESRCH         3    /* No such process */
+#define    EINTR         4    /* Interrupted system call */
+#define    EIO         5    /* I/O error */
+#define    ENXIO         6    /* No such device or address */
+#define    E2BIG         7    /* Argument list too long */
+#define    ENOEXEC         8    /* Exec format error */
+#define    EBADF         9    /* Bad file number */
+#define    ECHILD        10    /* No child processes */
+#define    EAGAIN        11    /* Try again */
+#define    ENOMEM        12    /* Out of memory */
+#define    EACCES        13    /* Permission denied */
+#define    EFAULT        14    /* Bad address */
+#define    ENOTBLK        15    /* Block device required */
+#define    EBUSY        16    /* Device or resource busy */
+#define    EEXIST        17    /* File exists */
+#define    EXDEV        18    /* Cross-device link */
+#define    ENODEV        19    /* No such device */
+#define    ENOTDIR        20    /* Not a directory */
+#define    EISDIR        21    /* Is a directory */
+#define    EINVAL        22    /* Invalid argument */
+#define    ENFILE        23    /* File table overflow */
+#define    EMFILE        24    /* Too many open files */
+#define    ENOTTY        25    /* Not a typewriter */
+#define    ETXTBSY        26    /* Text file busy */
+#define    EFBIG        27    /* File too large */
+#define    ENOSPC        28    /* No space left on device */
+#define    ESPIPE        29    /* Illegal seek */
+#define    EROFS        30    /* Read-only file system */
+#define    EMLINK        31    /* Too many links */
+#define    EPIPE        32    /* Broken pipe */
+#define    EDOM        33    /* Math argument out of domain of func */
+#define    ERANGE        34    /* Math result not representable */
+
+#endif
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/错误代码/">错误代码</a>, <a href="/tags/系统调用/">系统调用</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

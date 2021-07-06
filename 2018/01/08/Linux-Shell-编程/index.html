@@ -1,0 +1,1045 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux Shell 编程 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="一、Shell脚本创建的流程">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux Shell 编程"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2018-01-08T13:04:31.000Z"><a href="/2018/01/08/Linux-Shell-编程/">2018-01-08</a></time>
+        
+  
+    <h1 class="title">Linux Shell 编程</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81Shell%E8%84%9A%E6%9C%AC%E5%88%9B%E5%BB%BA%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-text">一、Shell脚本创建的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81Shell%E8%AF%AD%E6%B3%95"><span class="toc-text">二、Shell语法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Shell%E5%8F%98%E9%87%8F"><span class="toc-text">2.1 Shell变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E3%80%81%E4%BD%8D%E7%BD%AE%E5%8F%98%E9%87%8F"><span class="toc-text">2.2、位置变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E3%80%81%E5%B8%B8%E7%94%A8shell%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="toc-text">2.3、常用shell环境变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E3%80%81%E5%B8%B8%E7%94%A8%E5%8A%9F%E8%83%BD%E6%80%A7%E8%AF%AD%E5%8F%A5"><span class="toc-text">2.3、常用功能性语句</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4%E3%80%81Shell%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8"><span class="toc-text">2.4、Shell函数的调用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%8D%95%E5%BC%95%E5%8F%B7%EF%BC%8C%E5%8F%8C%E5%BC%95%E5%8F%B7%EF%BC%8C%E5%8F%8D%E5%BC%95%E5%8F%B7"><span class="toc-text">二、单引号，双引号，反引号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%B8%B8%E7%94%A8%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8B%BC%E6%8E%A5"><span class="toc-text">三、常用字符串拼接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%93%8D%E4%BD%9Cmysql%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">四、操作mysql数据库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E8%84%9A%E6%9C%AC%E4%B8%AD%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">五、脚本中常用命令</span></a></li></ol>
+    </div>
+
+        <h2 id="一、Shell脚本创建的流程"><a href="#一、Shell脚本创建的流程" class="headerlink" title="一、Shell脚本创建的流程"></a>一、Shell脚本创建的流程</h2><span id="more"></span>
+
+
+<p>建立Shell文件</p>
+<pre><code># vi shell.sh
+</code></pre>
+<p>修改Shell权限</p>
+<pre><code># chmod a+x shell.sh
+</code></pre>
+<p>或者</p>
+<pre><code>#chmod 666 shell.sh
+</code></pre>
+<p>执行</p>
+<pre><code># ./shell.sh
+</code></pre>
+<p>一个简单Hello World脚本</p>
+<pre><code>#!/bin/bash 
+
+# 告诉os用种类型的shell来解释执行该程序
+
+echo &quot;Hello World&quot;
+echo &#39;Hello World&#39;
+hw1=&quot;Hello World&quot;
+hw2=&#39;Hello World&#39;
+
+echo $hw1
+echo $hw2
+</code></pre>
+<p>执行之后</p>
+<pre><code>Hello World
+Hello World
+Hello World
+Hello World
+</code></pre>
+<p>后面会讲解单引号与双引号的区别</p>
+<h2 id="二、Shell语法"><a href="#二、Shell语法" class="headerlink" title="二、Shell语法"></a>二、Shell语法</h2><h3 id="2-1-Shell变量"><a href="#2-1-Shell变量" class="headerlink" title="2.1 Shell变量"></a>2.1 Shell变量</h3><p>2.1.1、Shell脚本</p>
+<pre><code>#!/bin/bash
+
+# 赋值count，等号两边没有空格
+
+count=100
+echo count = $count
+
+
+# 赋值Shell命令
+
+DATE=`date`
+
+echo &#39;#################&#39;
+echo DATE = $DATE
+echo &#39;#################&#39;
+
+echo &quot;###############&quot;
+echo &quot;date&quot; = `date`
+echo &quot;##############&quot;
+</code></pre>
+<p>运行</p>
+<pre><code># ./var.sh
+
+count = 100
+#################
+DATE = 2018年 01月 08日 星期一 22:02:13 CST
+#################
+###############
+date = 2018年 01月 08日 星期一 22:02:13 CST
+##############
+</code></pre>
+<h3 id="2-2、位置变量"><a href="#2-2、位置变量" class="headerlink" title="2.2、位置变量"></a>2.2、位置变量</h3><pre><code>$0   与输入的命令行一样，包含脚本文件名，包括路径
+$1，$2，... ...$9  分别包含第一个到第九个命令行参数（位置参数）【想要输出十个以上的参数需要$&#123;10&#125;，$&#123;11&#125; ... ...】
+$#   包含命令行参数的个数
+$@  包含所有命令行参数：“$1，$2， ... ... $9”
+$?  包含前一个命令的退出状态（成功为0，失败非0）
+$*   包含所有命令行参数：“$1，$2， ... ... $9”除了$0
+$$  包含正在执行进程的ID号
+
+
+#!/bin/bash
+
+###########################################################
+# &gt; File Name:position.sh
+# &gt; Author:   Lin
+###########################################################
+echo $0 $1 $2
+</code></pre>
+<p>运行结果</p>
+<pre><code># ./position.sh  123 456 789
+./position.sh 123 456
+</code></pre>
+<h3 id="2-3、常用shell环境变量"><a href="#2-3、常用shell环境变量" class="headerlink" title="2.3、常用shell环境变量"></a>2.3、常用shell环境变量</h3><ul>
+<li>HOME：  /etc/passwd文件中列出的用户主目录</li>
+<li>IFS： Internal Field Separator ,默认为空格，tab 及换行符</li>
+<li>PATH：shell搜索路径</li>
+<li>PS1，PS2：默认提示符（$）及换行提示符（&gt;）</li>
+<li>TERM:终端类型，常用的有vt100，ansi，vt200，xterm等</li>
+</ul>
+<p>运行一下</p>
+<pre><code># echo $PATH
+/home/linux/bin:/home/linux/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+</code></pre>
+<h3 id="2-3、常用功能性语句"><a href="#2-3、常用功能性语句" class="headerlink" title="2.3、常用功能性语句"></a>2.3、常用功能性语句</h3><blockquote>
+<p>read 从标准输入读入一行。以空格为分隔符。</p>
+</blockquote>
+<pre><code>#!/bin/bash
+
+###########################################################
+# &gt; File Name:read.sh
+# &gt; Author:   Lin
+###########################################################
+
+read var1 var2
+
+read -p &quot;请在30s内输入第三个参数:&quot; -t 30 var3
+
+
+echo $var1
+echo $var2
+echo $var3
+</code></pre>
+<p>运行之后结果：</p>
+<pre><code> ./read.sh 
+第一个参数 第二个参数
+请在30s内输入第三个参数:第三个参数
+第一个参数
+第二个参数
+第三个参数
+</code></pre>
+<blockquote>
+<p>expr是一个手工命令行计数器</p>
+</blockquote>
+<pre><code>#!/bin/bash
+
+###########################################################
+# &gt; File Name:expr.sh
+# &gt; Author:   Lin
+###########################################################
+
+
+
+
+# 计算字串长度
+
+
+echo &quot;计算字符串长度&quot;
+expr length &quot;this is a test&quot;
+
+
+# 抓取字串
+
+echo &quot;抓取字符串,从第4个到第10个&quot;
+
+expr substr &quot;this is a test&quot; 4 10
+
+
+# 抓取第一个字符数字串出现的位置
+expr index &quot;hello world&quot;  w 
+
+
+# 整数运算
+
+expr 14 % 9
+expr 10 + 10
+expr 1000 + 900
+expr 30 / 3 / 2
+expr 30 \* 3 
+</code></pre>
+<p>运行结果：</p>
+<pre><code>计算字符串长度
+14
+抓取字符串,从第4个到第10个
+s is a tes
+7
+5
+20
+1900
+5
+90
+</code></pre>
+<blockquote>
+<p>test可以测试三种对象：字符串，整数，文件属性</p>
+</blockquote>
+<p>【1】判断表达式 </p>
+<pre><code>if test  (表达式为真) 
+if test !表达式为假 
+test 表达式1 –a 表达式2                    两个表达式都为真 
+test 表达式1 –o 表达式2                    两个表达式有一个为真
+test 表达式1 !  表达式2                    条件求反 
+</code></pre>
+<p>【2】判断字符串</p>
+<pre><code>test –n 字符串                        字符串的长度非零 
+test –z 字符串                       字符串的长度是否为零 
+test 字符串1＝字符串2                    字符串是否相等，若相等返回true 
+test 字符串1 !＝字符串2                字符串是否不等 ,若不等反悔false
+</code></pre>
+<p>【3】判断整数 </p>
+<pre><code>test 整数1 –eq 整数2                        整数相等 
+test 整数1 –ge 整数2                        整数1大于等于整数2 
+test 整数1 –gt 整数2                        整数1大于整数2 
+test 整数1 –le 整数2                        整数1小于等于整数2 
+test 整数1 –lt 整数2                        整数1小于整数2 
+test 整数1 –ne 整数2                        整数1不等于整数2 
+</code></pre>
+<p>【4】判断文件 </p>
+<pre><code>test  File1 –nt  File2                    判断文件1是否比文件2 新 
+test  File1 –ot  File2                  判断文件1比是否文件2 旧 
+test –d File                               文件并且是目录 
+test –f File                            文件是否为普通文件 （常用）
+test –L File                            文件是否是一个符号链接 
+test –r File                            文件是否可读 
+test –s File                            文件是否是非空白文件 
+test –w File                            文件是否存在并可写 
+test –x File                            文件属否存在并可执行
+</code></pre>
+<blockquote>
+<p>结构性语句</p>
+</blockquote>
+<p>if</p>
+<pre><code>if  表达式
+       then 命令表
+fi 
+
+
+
+if 表达式
+then 命令表1
+else  命令表2
+fi
+</code></pre>
+<p>test命令的使用</p>
+<pre><code>if空格[空格-f $filename空格]
+then... ...
+fi
+
+
+
+
+#!/bin/bash
+
+###########################################################
+# &gt; File Name:score.sh
+# &gt; Author:   Lin
+###########################################################
+
+
+
+read var
+
+
+if [ $var -lt 0 -o $var -gt 100 ]
+then
+    echo &quot;请输入正确的成绩：&quot;
+    exit 1
+fi
+
+
+
+if [ $var -le 100 -a $var -gt 90  ]
+then
+    echo &quot;A&quot;
+elif [ $var -gt 80 ]
+then
+    echo &quot;B&quot;
+elif [ $var -gt 70 ]
+then
+    echo &quot;C&quot;
+elif [ $var -gt 60 ]
+then
+    echo &quot;D&quot;
+else
+    echo &quot;E&quot;
+fi
+</code></pre>
+<p>运行结果</p>
+<pre><code>./score.sh
+100
+A
+</code></pre>
+<p>case</p>
+<pre><code>case 字符串变量 in
+       模式1）
+               命令表1
+                 ;;
+       模式2）
+               命令表2
+                 ;;
+       ...   ...
+       模式n）
+               命令表n
+                 ;;
+esac
+</code></pre>
+<p>实例：</p>
+<pre><code>#!/bin/bash
+
+###########################################################
+# &gt; File Name:yes.sh
+# &gt; Author:   Lin
+###########################################################
+
+
+read var
+
+
+case $var in
+    yes | Y | Yes | YES )
+        echo &quot;yes&quot;
+        ;;
+    no | N | No | NO )
+        echo &quot;no&quot;
+        ;;
+
+    * )
+        echo &quot;error&quot;
+        ;;
+    esac
+</code></pre>
+<p>for</p>
+<pre><code>for 变量名   in   单词表
+do
+     命令表
+done
+</code></pre>
+<p>实例</p>
+<pre><code>#!/bin/bash
+
+###########################################################
+# &gt; File Name:for.sh
+# &gt; Author:   Lin
+###########################################################
+
+
+for ((i=0;i&lt;100;i=i+20))
+do
+    echo &quot;$i&quot;
+done
+</code></pre>
+<p>实例</p>
+<pre><code>#!/bin/bash
+
+###########################################################
+# &gt; File Name:dir.sh
+# &gt; Author:   Lin
+###########################################################
+
+
+
+
+if [ ! -d $HOME/back ]
+then
+    mkdir $HOME/back
+fi
+
+
+
+list=`ls /mnt/hgfs/share/shell/expr.sh`
+
+for name in $list
+
+do
+    if [ -f $name ]
+    then
+
+        cp $name $HOME/back
+    fi
+
+done
+</code></pre>
+<p>while</p>
+<pre><code>while 命令或表达式
+do
+    命令表
+done
+</code></pre>
+<p>until</p>
+<pre><code>until 命令或表达式
+do
+   命令表
+done
+</code></pre>
+<p>与while命令相反</p>
+<h3 id="2-4、Shell函数的调用"><a href="#2-4、Shell函数的调用" class="headerlink" title="2.4、Shell函数的调用"></a>2.4、Shell函数的调用</h3><p>函数定义格式：</p>
+<p>方式一：</p>
+<pre><code>function_name()
+&#123;
+    command1
+    ...  ...
+    commandn
+&#125;
+</code></pre>
+<p>方式二：</p>
+<pre><code>function function_name()
+&#123;
+   command1
+    ...  ...
+   commandn
+&#125;
+</code></pre>
+<p>函数的调用格式：</p>
+<p>方法1：</p>
+<pre><code>value_name=`function_name [arg1  arg2  . . . ]`
+</code></pre>
+<p>方法2：</p>
+<pre><code>function_name  [ arg1  arg2  arg3  . . .]
+</code></pre>
+<h2 id="二、单引号，双引号，反引号"><a href="#二、单引号，双引号，反引号" class="headerlink" title="二、单引号，双引号，反引号"></a>二、单引号，双引号，反引号</h2><p>1、单引号：<br>目的: 为了保护文字不被转换.除了他本身. 就是说除去单引号外, 在单引号内的所有文字都是原样输出.被单引号用括住的内容，将被视为单一字串。在引号内的代表变数的$符号，没有作用，也就是说，他被视为一般符号处理，防止任何变量替换。</p>
+<p>单引号字符串的限制：</p>
+<ul>
+<li>单引号里的任何字符都会原样输出，单引号字符串中的变量是无效的；</li>
+<li>单引号字串中不能出现单引号（对单引号使用转义符后也不行）。</li>
+</ul>
+<p>1、</p>
+<pre><code># echo &#39;$*&gt;!&lt;!&#39;
+$*&gt;!&lt;!
+</code></pre>
+<p>2、</p>
+<pre><code># echo &#39;she is crying: &quot;help&quot;&#39; 
+she is crying: &quot;help&quot;
+</code></pre>
+<p>3、</p>
+<pre><code># echo &#39;\\\\&#39;
+\\\\
+</code></pre>
+<p>4、</p>
+<pre><code># echo &#39;TT &#39;YY&#39;&#39;   
+TT YY #略去了所有&#39;
+</code></pre>
+<p>5、</p>
+<pre><code># echo &#39; today is `date`&#39;         
+ today is `date`
+# date
+Wed Feb 22 16:42:58 CST 2017 
+#反引号在此无法实现函数功能.
+</code></pre>
+<p>2、双引号</p>
+<p>目的: 为了包含文字或者函数段. 除了本身,反引号内的函数,$开头的变量和\开头反转换的字符外, 其余都是直接输出。被双引号用括住的内容，将被视为单一字串。它防止通配符扩展，但允许变量扩展。这点与单引数的处理方式不同。</p>
+<p>双引号的优点：</p>
+<ul>
+<li>双引号里可以有变量</li>
+<li>双引号里可以出现转义字符</li>
+</ul>
+<p>1、</p>
+<pre><code># echo &quot;today is `date`&quot;
+today is Wed Feb 22 16:45:18 CST 2017
+</code></pre>
+<p>2、</p>
+<pre><code># echo &quot;today is &#39;date&#39;&quot;
+today is &#39;date&#39;
+</code></pre>
+<p>3、</p>
+<pre><code># echo &quot;\\\\&quot;
+\\
+</code></pre>
+<p>4、</p>
+<pre><code># echo &quot;test &quot;test&quot;&quot;
+test test
+</code></pre>
+<p>3、反引号</p>
+<p>目的是为了在双引号内保持函数转换. 但单引号内其无作用.<br>1、</p>
+<pre><code># echo &quot;today is `date`&quot;
+today is Wed Feb 22 16:47:10 CST 2017
+</code></pre>
+<p>2、<br>    # echo ‘ today is <code>date</code>‘<br>     today is <code>date</code></p>
+<h2 id="三、常用字符串拼接"><a href="#三、常用字符串拼接" class="headerlink" title="三、常用字符串拼接"></a>三、常用字符串拼接</h2><p>常用字符串操作<br>1、时间格式化输出</p>
+<pre><code>$ date +&quot;%Y-%m-%d&quot;
+2018-01-09
+$ date +&quot;%Y:%m:%d&quot;
+2018:01:09
+</code></pre>
+<p> 
+ </p>
+<p>2、字符串拼接</p>
+<pre><code>tt=$(date  +&quot;%Y-%m-%d&quot;)
+path=&quot;/tmp/&quot;$&#123;tt&#125;&quot;-send.log&quot;
+​
+echo &quot;TEST&quot; &gt;&gt; $path
+</code></pre>
+<p>3、获取字符串长度</p>
+<pre><code>#!/bin/bash    
+string=&quot;abcdef&quot;
+echo $&#123;#string&#125;    
+</code></pre>
+<p>结果是</p>
+<pre><code>6
+</code></pre>
+<p>4、提取子字符串</p>
+<p>从左边第几个字符开始，及字符的个数</p>
+<pre><code>#!/bin/bash      
+string=&quot;wo jiu shi xiang ce shi yi xia&quot;
+echo $&#123;string:3:5&#125; 
+</code></pre>
+<p>结果</p>
+<pre><code>jiu s
+</code></pre>
+<p>一个脚本</p>
+<pre><code>#!/bin/bash
+​
+www=http://www.hao123.com/error.html
+​
+#   #号截取，删除左边字符，保留右边字符
+echo $&#123;www#*//&#125;
+#   www是变量名，#号是运算符，*//表示从左边开始删除第一个//号及左边的所有字符
+#   即删除http://
+#   结果是:www.hao123.com/error.html
+​
+​
+#   ##号截取，删除左边字符，保留右边字符
+echo $&#123;www##*/&#125;
+#   结果是error.html
+​
+​
+#   %号截取，删除右边字符，保留左边字符
+echo $&#123;www%/*&#125;
+#   结果是http://www.hao123.com
+​
+#   %%号截取，删除右边字符，保留左边字符
+echo $&#123;www%%/*&#125;
+#   结果是http:
+​
+​
+#   从右边第几个字符开始，一直到结束
+echo $&#123;www:7&#125;
+#   结果是www.hao123.com/error.html
+​
+​
+#   从右边第几个字符开始，一直到结果
+echo $&#123;www:0-10&#125;
+#   结果是error.html
+</code></pre>
+<h2 id="四、操作mysql数据库"><a href="#四、操作mysql数据库" class="headerlink" title="四、操作mysql数据库"></a>四、操作mysql数据库</h2><p>使用 mysql -e 参数可以执行各种 sql 的各种操作语句。不用在mysql的提示符下运行mysql，即可以在shell中操作mysql的方法。<br>格式：</p>
+<pre><code>mysql  -hhostname -Pport -uusername -ppassword  -e &quot;&quot;
+</code></pre>
+<p>脚本：</p>
+<pre><code>#!/bin/bash
+HostName=&quot;192.168.1.168&quot;
+Port=&quot;3306&quot;
+UserName=&quot;root&quot;
+PassWord=&quot;password&quot;
+​
+DBName=&quot;shell&quot;
+TableName=&quot;shell_name&quot;
+​
+#创建数据库
+Create_DB_SQL=&quot;CREATE DATABASE IF NOT EXISTS $&#123;DBName&#125;&quot;
+​
+mysql -h$&#123;HostName&#125; -u$&#123;UserName&#125; -p$&#123;PassWord&#125; -e &quot;$&#123;Create_DB_SQL&#125;&quot;
+#-p后面没有空格
+​
+#创建表
+Create_DB_Table=&quot;create table IF NOT EXISTS $&#123;TableName&#125;(name varchar(20),id int(11) default 0)&quot;
+mysql -h$&#123;HostName&#125; -P$&#123;Port&#125; -u$&#123;UserName&#125; -p$&#123;PassWord&#125; -D$&#123;DBName&#125; -e &quot;$&#123;Create_DB_Table&#125;&quot;
+​
+#插入数据
+Insert_Tables_SQL=&quot;INSERT INTO $&#123;TableName&#125; values(&#39;zhangsan&#39;,1)&quot;
+mysql -h$&#123;HostName&#125; -P$&#123;Port&#125; -u$&#123;UserName&#125; -p$&#123;PassWord&#125; -D$&#123;DBName&#125; -e &quot;$&#123;Insert_Tables_SQL&#125;&quot;
+​
+#查询数据
+Select_SQL=&quot;SELECT * FROM $&#123;TableName&#125;&quot;
+mysql -h$&#123;HostName&#125; -P$&#123;Port&#125; -u$&#123;UserName&#125; -p$&#123;PassWord&#125; -D$&#123;DBName&#125; -e &quot;$&#123;Select_SQL&#125;&quot;
+​
+#更新数据
+Update_DB=&quot;UPDATE $&#123;TableName&#125; SET name=&#39;lisi&#39; WHERE id=1&quot;
+mysql -h$&#123;HostName&#125; -P$&#123;Port&#125; -u$&#123;UserName&#125; -p$&#123;PassWord&#125; -D$&#123;DBName&#125; -e &quot;$&#123;Update_DB&#125;&quot;
+​
+#删除表
+DELETE_TABLE=&quot;DROP TABLE $&#123;TableName&#125;&quot;
+mysql -h$&#123;HostName&#125; -P$&#123;Port&#125; -u$&#123;UserName&#125; -p$&#123;PassWord&#125; -D$&#123;DBName&#125; -e &quot;$&#123;DELETE_TABLE&#125;&quot;
+</code></pre>
+<p>​</p>
+<h2 id="五、脚本中常用命令"><a href="#五、脚本中常用命令" class="headerlink" title="五、脚本中常用命令"></a>五、脚本中常用命令</h2><p>awk和sed。</p>
+<p>awk 篇幅有限，简单的入门。</p>
+<p>1、基本语法</p>
+<pre><code>awk  &quot;BEGIN&#123; ... &#125; pattern&#123; ... &#125; END &#123; ... &#125;&quot;
+</code></pre>
+<p>2、内置变量介绍</p>
+<p>awk提供了有很多内置变量，如果你经常使用awk处理文本，了解这些这些内置变量的使用是很有必要的。下面看一下这些内置变量的详细介绍。<br>ARGC命令行参数个数（不包括awk的选项和awk的程序内容）。<br>ARGIND 当前正在处理的ARGV中的文件的索引值（同时处理多个文件时会用到）。<br>ARGV 命令行参数序列数组，下标从0开始。<br>CONVFMT 数字转换格式，和C语言中的数字输出格式化类似，默认为”%.6g”。<br>ENVIRON 当前系统的环境变量。<br>ERRNO 出错时的错误信息。<br>FIELDWIDTHS 以空格分隔的字段宽度，如果指定此变量，awk将会用指定的宽度替换变量FS指定的分隔符。<br>看下面的例子：</p>
+<pre><code>$ cat t
+abcdefasfa
+abcdefasfa
+abcdefasfa
+
+
+$ awk &#39;BEGIN &#123;FIELDWIDTHS=&quot;2 3 4&quot;&#125;&#123;print $1,$2,$3&#125;&#39; t
+ab cde fasf
+ab cde fasf
+ab cde fasf
+</code></pre>
+<ul>
+<li><p>FILENAME<br>当前正在处理的文件名，该变量不能在BEGIN块中使用。</p>
+</li>
+<li><p>FNR<br>当前处理的记录号。</p>
+</li>
+<li><p>FS<br>字段的分隔符，默认为空格。</p>
+</li>
+<li><p>IGNORECASE<br>如果该变量设置为非0值，在进行字符串匹配时忽略大小写。</p>
+</li>
+<li><p>NF<br>当前记录中的字段个数。</p>
+</li>
+<li><p>NR<br>已经读出的记录数。</p>
+</li>
+<li><p>OFMT<br>数字的输出格式。</p>
+</li>
+<li><p>OFS<br>输出的字段分隔符，默认为空格。</p>
+</li>
+<li><p>ORS<br>输出的记录分隔符，默认为新行。</p>
+</li>
+<li><p>RS<br>输入记录的分隔符，默认为新行。</p>
+</li>
+<li><p>RSTART<br>被match()函数匹配的字符串的起始位置，如果没有匹配则为0（从1开始）。</p>
+</li>
+<li><p>RLENGTH <br>被match()函数匹配的字符串的长度。</p>
+</li>
+<li><p>SUBSEP<br>数组中多个下标的分隔符，默认为”\034”。</p>
+</li>
+</ul>
+<p>内置函数</p>
+<p>awk 之所以成为一种优秀的程序设计语言的原因之一是它吸收了某些优秀的程序设计语言（例如C）语言的许多优点。这些优点之一就是内置函数的使用，awk定义并支持了一系列的内置函数，由于这些函数的使用，使得awk提供的功能更为完善和强大，例如，awk使用了一系列的字符串处理内置函数(这些函数看起来与C 语言的字符串处理函数相似，其使用方式与C语言中的函数也相差无几)，正是由于这些内置函数的使用，使awk处理字符串的功能更加强大。本文后面的附录中列有一般的awk所提供的内置函数，这些内置函数也许与你的awk版本有些出入，因此，在使用之前，最好参考一下你的系统中的联机帮助。</p>
+<p>内置的字符串函数</p>
+<pre><code>gsub(r,s)
+在整个$0中用s代替r
+gsub(r,s,t)
+在整个t中用s替代r
+index(s,t)
+返回s中字符串t的第一位置
+length(s)
+返回s长度
+match(s,r)
+测试s是否包含匹配r的字符串
+split(s,a,fs)
+在fs上将s分成序列a
+sprint(fmt,exp)
+返回经fmt格式化后的exp
+sub(r,s)
+用$0中最左边最长的子串代替s
+substr(s,p)
+返回字符串s中从p开始的后缀部分
+substr(s,p,n)
+返回字符串s中从p开始长度为n的后缀部分
+gsub函数有点类似于sed查找和替换。它允许替换一个字符串或字符为另一个字符串或字符，并以正则表达式的形式执行。第一个函数作用于记录$0，第二个gsub函数允许指定目标，然而，如果未指定目标，缺省为$0。
+index(s，t）函数返回目标字符串s中查询字符串t的首位置。length函数返回字符串s字符长度。
+match函数测试字符串s是否包含一个正则表达式r定义的匹配。
+split使用域分隔符fs将字符串s划分为指定序列a。
+sprint函数类似于printf函数，返回基本输出格式fmt的结果字符串exp。
+sub(r，s）函数将用s替代$0中最左边最长的子串，该子串被r匹配。
+substr(s，p）返回字符串s在位置p后的后缀。
+substr(s，p，n）同上，并指定子串长度为n。
+
+$ cat test.txt
+One
+Two
+Three
+Four
+Five
+$awk &#39;BEGIN&#123;print &quot;Start&quot;&#125; &#123;print&#125; END&#123;print &quot;End&quot;&#125;&#39; test.txt
+Start
+One
+Two
+Three
+Four
+Five
+End
+​
+$awk &#39;&#123;print&#125; END&#123;print &quot;End&quot;&#125;&#39; test.txt
+One
+Two
+Three
+Four
+Five
+End
+​
+$awk &#39;&#123;print&#125;&#39; test.txt
+One
+Two
+Three
+Four
+Five
+​
+$awk &#39;BEGIN &#123;print &quot;Start&quot;&#125; &#39;/^T.+/&#39;&#123;print&#125; END&#123;print &quot;END&quot;&#125;&#39; test.txt
+#对T开头的过滤 
+Start
+Two
+Three
+End
+</code></pre>
+<p>​<br>    $awk ‘’/^T.+/‘{print}’ test.txt<br>    Two<br>    Three<br>    ​<br>    ​<br>    $awk ‘BEGIN{i=0} {i++} END{print i}’ test.txt<br>    #五行，输出5<br>    5<br>    ​<br>    $awk ‘BEGIN{i=0} ‘/^F.+/‘{i++} END{print i}’ test.txt<br>    #F开头的是两行<br>    2<br>​<br>​<br>​<br>修改test.txt</p>
+<pre><code>One oNe oNe
+Two tWo twO
+Three tHree thRee
+Four fOur foUr
+Five fIve fIve
+</code></pre>
+<p>​<br>​<br>    $awk ‘’^T.+/‘{print $1,$3}’ test.txt<br>    #输出以T开头的第一列，第三列<br>    Two twO<br>    Three thRee<br>    ​<br>    ​<br>    $ps auxw |awk ‘{print $2}’<br>    #输出第二列<br>    ​<br>    ​<br>    $cat /proc/meminfo | awk ‘/MemTotal/{print $2}’<br>    #查找第MemTotal 的第2列</p>
+<pre><code>#awk &#39;&#123;print $1&#125;&#39;  /etc/passwd
+#awk &#39;&#123;print $1 ,$2&#125;&#39; /etc/passwd
+#awk &#39;&#123;print $NF&#125;&#39;  /etc/passwd
+#awk &#39;&#123;print $((NF-1))&#125;&#39;  /etc/passwd
+#awk &#39;&#123;print $1,$3,$7&#125;&#39; /etc/passwd
+#awk -F : &#39;&#123;print $1,$3,$7&#125;&#39; /etc/passwd
+#awk -F : &#39;&#123;print &quot;\t&quot;$1,&quot;\t&quot;$3,&quot;\t&quot;$7&#125;&#39; /etc/passwd
+#awk -v FS=: &#39;&#123;print $1,$3,$7&#125;&#39; /etc/passwd
+#awk -v FS=: -v OFS=: &#39;&#123;print $1,$3,$7&#125;&#39; /etc/passwd
+#awk -v FS=: -v OFS=&quot;;&quot; &#39;&#123;print $1,$3,$7&#125;&#39; /etc/passwd
+#awk -v FS=: -v OFS=&quot;\t&quot;  &#39;&#123;print $1,$3,$7&#125;&#39; /etc/passwd
+</code></pre>
+<p>二、printf<br>printf 命令的使用格式</p>
+<p>printf format,item1,item2,…</p>
+<p>要点：<br>1、与其print命令的最大不同是，printf需要指定format；<br>2、format用于指定后面的每个item的输出格式；<br>3、printf语句不会自动打印换行符；\n</p>
+<p>format格式的指示符都是以%开头，都免跟一个字符，如下：<br>%c：显示字符的ASCII码；<br>%d，%i：十进制整数；<br>%e，%E：科学计算法显示数值；<br>%f：显示浮点数；<br>%g，%G：以科学计算法的格式或浮点数的格式显示数值；<br>%s：显示字符串<br>%u：显示无符号整数；<br>%%：显示%自身；</p>
+<p>修饰符：<br>N：显示宽度；<br>-：左对齐；<br>+：显示数值符号；</p>
+<p>例子</p>
+<pre><code>#awk -F : &#39;&#123;printf &quot;%-15s %i\n&quot;,$1,$3&#125;&#39; /etc/passwd
+#awk -v FS=: &#39;&#123;printf $1,$3,$7&#125;&#39; /etc/passwd
+#awk -v FS=: &#39;&#123;printf &quot;%s%s%s&quot;,$1,$3,$7&#125;&#39; /etc/passwd
+#awk -v FS=: &#39;&#123;printf &quot;%s%s%s\n&quot;,$1,$3,$7&#125;&#39; /etc/passwd
+#awk -v FS=: &#39;&#123;printf &quot;-10%s%s%s\n&quot;,$1,$3,$7&#125;&#39; /etc/passwd
+</code></pre>
+<p>三、输出重定向</p>
+<pre><code>#awk -v FS=: &#39;&#123;printf &quot;-10%s%s%s\n&quot;,$1,$3,$7 &gt; &quot;/root/f2.txt&quot;&#125;&#39; /etc/passwd
+#awk -v FS=: &#39;&#123;printf &quot;%-20s%-10s%s\n&quot;,$1,$3,$((NF-1))&#125;&#39;  /etc/passwd
+#awk -v FS=: &#39;$3 &gt;500 &#123;printf &quot;%-20s%-10s%s\n&quot;,$1,$3,$((NF-1))&#125;&#39;  /etc/passwd
+#awk -v FS=: &#39;$3 &gt;=500 &#123;printf &quot;%-20s%-10s%s\n&quot;,$1,$3,$((NF-1))&#125;&#39;  /etc/passwd
+#awk -v FS=: &#39;$3 &gt;=500 &amp;&amp; $3 &lt; 65534  &#123;printf &quot;%-20s%-10s%s\n&quot;,$1,$3,$((NF-1))&#125;&#39;  /etc/passwd
+#awk -v FS=: &#39;/^root/  &#123;printf &quot;%-20s%-10s%s\n&quot;,$1,$3,$((NF-1))&#125;&#39;  /etc/passwd
+#awk -v FS=: &#39;/^root\&gt;/  &#123;printf &quot;%-20s%-10s%s\n&quot;,$1,$3,$((NF-1))&#125;&#39;  /etc/passwd
+#awk -F: &#39;&#123;if ($s&gt;=500 ) printf $1,&quot;common&quot;&#125;&#39;  /etc/passwd
+#awk -F: &#39;&#123;if ($s&gt;=500 &amp;&amp; $3 &lt; 65534 ) print $1,&quot;common&quot;&#125;&#39;  /etc/passwd
+#awk -F: &#39;&#123;if ($s&gt;=500 &amp;&amp; $3 &lt; 65534 ) printf &quot;%-20s%s&quot;, $1,&quot;common&quot;;else printf &quot;%-20s%s&quot;,$1,&quot;System&quot;&#125;&#39;  /etc/passwd
+#awk -F: &#39;&#123;if ($s&gt;=500 &amp;&amp; $3 &lt; 65534 ) printf &quot;%-20s%s&quot;,$1,&quot;common&quot;;else printf &quot;%-20s%s&quot;,$1,&quot;System&quot;&#125;&#39;  /etc/passwd
+#awk -F: &#39;&#123;if ($s&gt;=500 &amp;&amp; $3 &lt; 65534 ) printf &quot;%-20s%s&quot;,$1,&quot;common&quot;;else printf &quot;%-20s%s\n&quot;,$1,&quot;System&quot;&#125;&#39;  /etc/passwd
+#awk -F&quot;:&quot; &#39;&#123; print &quot;username: &quot; $1 &quot;\t\tuid:&quot; $3&quot; &#125;&#39; /etc/passwd
+</code></pre>
+<p>sed  命令（删除和替换）</p>
+<p>基本语法</p>
+<pre><code>sed &#39;样式命令&#39; 文件
+</code></pre>
+<p>样式<br>正则表达式、数据行的范围</p>
+<p>命令</p>
+<pre><code>d 删除
+p 显示
+s 替换
+</code></pre>
+<p>选项</p>
+<pre><code>-i
+-n
+</code></pre>
+<p>命令解析</p>
+<pre><code>#cat boat.txt
+Row, row, row your boat
+Row, row, row your boat, gently down the stream. 
+Merrily, merrily, merrily, merrily, life is but a dream.
+Row, row, row 
+Row your boat, back we go.
+Row, row, row , your boat,home we go.
+
+$sed ‘1,4d’  boat.txt
+#并不会对文件进行修改，打开boat.txt打开读出来，在显示的时候把前面四行删除了。并不会对文件进行修改
+Row, row, row 
+Row your boat, back we go.
+Row, row, row , your boat,home we go.
+对文件修改的话
+$sed -i ‘1,4d’  boat.txt
+#对文件进行修改，并不会显示
+正则表达式、数据行的范围（区分大小写）
+$sed &#39;/row/d&#39; boat.txt
+#将含有row的行全部删除，并打印出来。  d是删除
+Merrily, merrily, merrily, merrily, life is but a dream.
+Row your boat, back we go.
+
+
+
+
+# cat boat.txt
+Row, row, row your boat
+Row, row, row your boat, gently down the stream. 
+Merrily, merrily, merrily, merrily, life is but a dream.
+Row, row, row,123
+Row your boat, back we go.
+Row, row, row , your boat,home we go.
+$sed &#39;/[0-9]\&#123;3\&#125;/d&#39; boat.txt
+#正则表达式  数字[0-9]   ;三个数字&#123;3&#125;  大括号转义\&#123;\&#125;
+Row, row, row your boat
+Row, row, row your boat, gently down the stream. 
+Merrily, merrily, merrily, merrily, life is but a dream.
+Row your boat, back we go.
+Row, row, row , your boat,home we go
+#删除空行
+$sed &#39;/^$/d&#39; boat.txt
+#一行的开始^  一行的结尾$
+#一行的开始和结尾直接什么也没有^$
+$sed &#39;/row/!d&#39; boat.txt
+#删除不含row的行
+Row, row, row your boat
+Row, row, row your boat, gently down the stream. 
+Row, row, row,123
+Row, row, row , your boat,home we go
+$sed &#39;/row/p&#39; boat.txt
+#打印出含有row的行
+$sed -n &#39;/123/p&#39; boat.txt
+#显示含有123的一行
+Row, row, row,123
+$sed &#39;s/row/hello/&#39; boat.txt
+#将row替换成hello，只替换一行的第一个row
+Row, hello, row your boat
+Row, hello, row your boat, gently down the stream. 
+Row, hello, row,123
+Row, hello, row , your boat,home we go.
+$sed &#39;s/row/hello/g&#39; boat.txt
+#全部替换掉
+Row, hello, hello your boat
+Row, hello, hello your boat, gently down the stream. 
+Row, hello, hello,123
+Row, hello, hello , your boat,home we go.
+$sed &#39;s/row/hello/gi&#39; boat.txt
+#不区分大小写替换
+hello, hello, hello your boat
+hello, hello, hello your boat, gently down the stream. 
+hello, hello, hello,123
+hello, hello, hello , your boat,home we go.
+$sed &#39;s/row//gi&#39; boat.txt
+#不区分大小写，全部删除row
+, ,  your boat
+, ,  your boat, gently down the stream. 
+, , ,123
+, ,  , your boat,home we go.
+$sed &#39;s/^..//gi&#39; boat.txt
+#开头的两字字符删除掉
+w, row, row your boat
+w, row, row your boat, gently down the stream. 
+rrily, merrily, merrily, merrily, life is but a dream.
+w, row, row,123
+w your boat, back we go.
+w, row, row , your boat,home we go.
+$sed &#39;s/..$//gi&#39; boat.txt
+#将后面两个字符删除掉。
+Row, row, row your bo
+Row, row, row your boat, gently down the strea
+Merrily, merrily, merrily, merrily, life is but a drea
+Row, row, row,1
+Row your boat, back we g
+Row, row, row , your boat,home we g
+$sed &#39;s/\(row\)/\1ed/gi&#39; boat.txt
+#将row后面加上ed，不区分大小写，\(\)小括号转义
+Rowed, rowed, rowed your boat
+Rowed, rowed, rowed your boat, gently down the stream. 
+Merrily, merrily, merrily, merrily, life is but a dream.
+Rowed, rowed, rowed,123
+Rowed your boat, back we go.
+Rowed, rowed, rowed , your boat,home we go
+将boat.txt修改为
+Row, row, row your boat
+Row, row, row your boat, gently down the stream. 
+Merrily, merrily, AAA merrily, merrily, life is but a dream.
+Row, row, row
+Row DDD your boat, back we go.
+Row, row, row , your boat,home we go.
+$sed &#39;/AAA/,/DDD/s/row/hello/&#39; boat.txt
+#从AAA开始到DDD结束，将row替换为hello
+Row, row, row your boat
+Row, row, row your boat, gently down the stream. 
+Merrily, merrily, AAA merrily, merrily, life is but a dream.
+Row, hello, hello
+Row DDD your boat, back we go.
+Row, row, row , your boat,home we go.
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Shell/">Shell</a>, <a href="/tags/Shell脚本/">Shell脚本</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>IP分类及子网掩码 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1、IP地址的分类">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="IP分类及子网掩码"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-09-28T05:21:10.000Z"><a href="/2017/09/28/IP分类及子网掩码/">2017-09-28</a></time>
+        
+  
+    <h1 class="title">IP分类及子网掩码</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81IP%E5%9C%B0%E5%9D%80%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-text">1、IP地址的分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E7%A7%81%E6%9C%89IP%E5%9C%B0%E5%9D%80"><span class="toc-text">2、私有IP地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81IP%E5%9C%B0%E5%9D%80%E7%9A%84%E7%9B%B8%E5%85%B3%E8%A7%84%E5%AE%9A"><span class="toc-text">3、IP地址的相关规定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E9%BB%98%E8%AE%A4%E5%AD%90%E7%BD%91%E6%8E%A9%E7%A0%81"><span class="toc-text">4、默认子网掩码</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1%E3%80%81%E9%BB%98%E8%AE%A4%E5%AD%90%E7%BD%91%E6%8E%A9%E7%A0%81"><span class="toc-text">4.1、默认子网掩码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2%E3%80%81%E8%AE%A1%E7%AE%97%E5%8F%AF%E7%94%A8IP%E4%B8%AA%E6%95%B0"><span class="toc-text">4.2、计算可用IP个数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3%E3%80%81%E8%AE%A1%E7%AE%97%E5%AD%90%E7%BD%91%E6%8E%A9%E7%A0%81"><span class="toc-text">4.3、计算子网掩码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-4%E3%80%81%E8%AE%A1%E7%AE%97%E7%BD%91%E6%AE%B5"><span class="toc-text">4.4、计算网段</span></a></li></ol></li></ol>
+    </div>
+
+        <h3 id="1、IP地址的分类"><a href="#1、IP地址的分类" class="headerlink" title="1、IP地址的分类"></a>1、IP地址的分类</h3><span id="more"></span>
+
+<pre><code>IP地址分为A类、B类、C类、D类、E类，规定如下：
+A类：网络位8位，主机位24位，网络前导位为0，即：
+0*******.********.********.********  即1.0.0.0—127.255.255.255
+网络位00000000不可用，网络位01111111(127)表示回送地址，指本地机。
+B类：网络位16位，主机位16位，网络前导位为10，即：
+10******.********.********.********  即128.0.0.0—191.255.255.255
+C类：网络位24位，主机位8位，前导位为110，即：
+110*****.********.********.********  即192.0.0.0—223.255.255.255
+D类：组播地址，前导位为1110，即：
+1110****.********.********.********  即224.0.0.0—239.255.255.255
+E类：保留地址，前导位为11110，即：
+11110***.********.********.********  即240.0.0.0—247.255.255.255
+其中A类、B类、C类IP地址可供普通用户使用。
+</code></pre>
+<h3 id="2、私有IP地址"><a href="#2、私有IP地址" class="headerlink" title="2、私有IP地址"></a>2、私有IP地址</h3><p>IP地址分为公有IP地址和私有IP地址(也称外部IP地址和内部IP地址，或称全局IP地址和专用IP地址)，在互联网中，公有IP地址可以被外网访问，私有IP地址仅用于内部网络使用，不能被外网访问。私有IP地址如下：</p>
+<pre><code>A类：10.0.0.0—10.255.255.255
+B类：172.16.0.0—172.31.255.255
+C类：192.168.0.0—192.168.255.255
+</code></pre>
+<h3 id="3、IP地址的相关规定"><a href="#3、IP地址的相关规定" class="headerlink" title="3、IP地址的相关规定"></a>3、IP地址的相关规定</h3><p>3.1、网络地址、主机地址、广播地址</p>
+<p>IP地址由“网络位+主机位”组成。</p>
+<p>网络地址：主机位全0</p>
+<p>主机地址：网络位全0</p>
+<p>直接广播地址：主机位全1</p>
+<p>举例：IP地址 201.161.20.18 的网络地址是201.161.20.0，主机地址是0.0.0.18，直接广播地址为201.161.20.255。</p>
+<p>3.2、可用的IP地址</p>
+<p>主机位不可全0或全1（全0是网络地址，全1是广播地址）</p>
+<p>在一个网段内，最小的可用IP地址是“网络地址+1”，最大的可用IP地址是“广播地址-1”。</p>
+<p>举例：192.168.1.0～192.168.1.255网段中，可用的IP地址是：192.168.1.1～192.168.1.254 </p>
+<p>3.3.、受限广播地址(或称为“有限广播地址”) </p>
+<p>32位全1的IP地址(255.255.255.255)表示受限广播地址。</p>
+<p>受限广播地址和直接广播地址的区别，举例：255.255.255.255和192.168.5.255。</p>
+<p><strong>交换机转发广播，路由器不转发广播。</strong></p>
+<h3 id="4、默认子网掩码"><a href="#4、默认子网掩码" class="headerlink" title="4、默认子网掩码"></a>4、默认子网掩码</h3><h4 id="4-1、默认子网掩码"><a href="#4-1、默认子网掩码" class="headerlink" title="4.1、默认子网掩码"></a>4.1、默认子网掩码</h4><pre><code>A类IP段　 0.0.0.0 到127.255.255.255 
+B类IP段　 128.0.0.0 到191.255.255.255 
+C类IP段　 192.0.0.0 到223.255.255.255
+</code></pre>
+<p>默认分配的子网掩码每段只有255或0</p>
+<pre><code>A类的默认子网掩码　255.0.0.0　　　　　一个子网最多可以容纳1677万多台电脑
+B类的默认子网掩码　255.255.0.0　　　　一个子网最多可以容纳6万台电脑
+C类的默认子网掩码　255.255.255.0　　　一个子网最多可以容纳254台电脑
+</code></pre>
+<h4 id="4-2、计算可用IP个数"><a href="#4-2、计算可用IP个数" class="headerlink" title="4.2、计算可用IP个数"></a>4.2、计算可用IP个数</h4><p>将子网掩码转换成二进制，进行计算，如下：</p>
+<pre><code>255.0.0.0　　　11111111.00000000.00000000.00000000
+255.255.0.0　　11111111.11111111.00000000.00000000
+255.255.255.0　11111111.11111111.11111111.00000000
+</code></pre>
+<p>这是A/B/C三类默认子网掩码的二进制形式。其他子网掩码，只要是一串连续的1和一串连续的0就可以了（每段都是8位）。如11111111.11111111.11111000.00000000，这也是一段合法的子网掩码。子网掩码决定的是一个子网的计算机数目，计算机公式是2的m次方，其中，我们可以把m看到是后面的多少个0。如255.255.255.0转换成二进制，那就是11111111.11111111.11111111.00000000，后面有8个0，那m就是8，255.255.255.0这个子网掩码可以容纳2的8次方（台）电脑，也就是256台，但是有两个IP是不能用的，那就是最后一段不能为0和255，减去这两台，就是254台。</p>
+<p>例如：</p>
+<p>255.255.240.0这个子网掩码可以最多容纳多少台电脑？</p>
+<p>计算方法：<br>把将其转换为二进制的四段数字（每段要是8位，如果是0，可以写成8个0，也就是00000000）<br>11111111.1111111.11110000.00000000<br>后面12个0，那就是2的12次方，那么这个子网掩码可以容纳4096台电脑。</p>
+<h4 id="4-3、计算子网掩码"><a href="#4-3、计算子网掩码" class="headerlink" title="4.3、计算子网掩码"></a>4.3、计算子网掩码</h4><p>一个公司有600台电脑，组成一个对等局域网，子网掩码设多少最合适？</p>
+<p>首先，600台电脑使用B类IP最合适。</p>
+<p>2^9=512,2^10=1024</p>
+<p>所以子网掩码后面是10个0.</p>
+<p>11111111.11111111.11111100.00000000</p>
+<p>255.255.252.0</p>
+<h4 id="4-4、计算网段"><a href="#4-4、计算网段" class="headerlink" title="4.4、计算网段"></a>4.4、计算网段</h4><p>子网掩码只有一个作用，就是将某个IP地址划分成网络地址和主机地址两部分。同一个网络地址就是同一个网段。</p>
+<p>IP地址 = 网络地址 + 主机地址(又称：主机号和网络号组成)</p>
+<p>计算网络地址</p>
+<p>eg1：C类IP</p>
+<pre><code>IP:192.168.1.100
+NetMask:255.255.255.0
+</code></pre>
+<p>转化为二进制</p>
+<pre><code>IP:‭11000000.10101000.00000000.01100100‬
+NetMask:11111111.11111111.11111111.00000000
+</code></pre>
+<p>将IP和NetMask做与运算(and)，得到的结果是</p>
+<p>11000000.10101000.00000000.00000000</p>
+<p>转化成十进制192.168.1.0，这就是网络地址。</p>
+<p>将NetMask取反，再和IP做与运算(and),得到的结果是：</p>
+<p>00000000.00000000.00000000.01100100</p>
+<p>转化成十进制0.0.0.100，这就是主机地址</p>
+<p><strong>记录点不相关的东西</strong></p>
+<p><strong>路由工作在网络层，根据“路由表”转发数据，路由选择，路由转发。</strong></p>
+<p><strong>交换工作在数据链路层，根据“MAC地址表”转发数据，硬件转发。</strong></p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/子网掩码/">子网掩码</a>, <a href="/tags/IP分类/">IP分类</a>, <a href="/tags/私有IP/">私有IP</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

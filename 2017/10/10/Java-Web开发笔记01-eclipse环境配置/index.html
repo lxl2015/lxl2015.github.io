@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java-Web开发笔记01-eclipse环境配置 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="学习环境：
+
+windows 10
+Eclipse-jee-mars-2-win32-x86_64
+MYSQL 5.6
+Tomcat 7.0
+JDK 1.7">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Java-Web开发笔记01-eclipse环境配置"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-10-09T23:43:18.000Z"><a href="/2017/10/10/Java-Web开发笔记01-eclipse环境配置/">2017-10-10</a></time>
+        
+  
+    <h1 class="title">Java-Web开发笔记01-eclipse环境配置</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E5%AE%89%E8%A3%85JDK"><span class="toc-text">1、安装JDK</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E4%B8%8B%E8%BD%BDEclipse"><span class="toc-text">2、下载Eclipse</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E4%B8%8B%E8%BD%BDMYSQL-5-6"><span class="toc-text">3、下载MYSQL 5.6</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E4%B8%8B%E8%BD%BDtomcat"><span class="toc-text">4、下载tomcat</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81Eclipse%E9%85%8D%E7%BD%AETomcat"><span class="toc-text">5、Eclipse配置Tomcat</span></a></li></ol>
+    </div>
+
+        <p>学习环境：</p>
+<ul>
+<li>windows 10</li>
+<li>Eclipse-jee-mars-2-win32-x86_64</li>
+<li>MYSQL 5.6</li>
+<li>Tomcat 7.0</li>
+<li>JDK 1.7</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="1、安装JDK"><a href="#1、安装JDK" class="headerlink" title="1、安装JDK"></a>1、安装JDK</h3><p>下载JDK，安装即可。配置环境变量</p>
+<p>新建</p>
+<hr>
+<pre><code>JAVA_HOME
+D:\Program Files\Java\jdk1.7.0_79
+</code></pre>
+<hr>
+<hr>
+<pre><code>JRE_HOME
+D:\Program Files\Java\jdk1.7.0_79\jre
+</code></pre>
+<hr>
+<hr>
+<pre><code>CLASSPATH
+%JAVA_HOME%\lib;%JRE_HOME%\lib
+</code></pre>
+<hr>
+<br>
+<br>
+<br>
+在path里面添加
+
+<pre><code>%JAVA_HOME%\bin
+%JRE_HOME%\bin
+</code></pre>
+<h3 id="2、下载Eclipse"><a href="#2、下载Eclipse" class="headerlink" title="2、下载Eclipse"></a>2、下载Eclipse</h3><p><a target="_blank" rel="noopener" href="http://ftp.daumkakao.com/eclipse/technology/epp/downloads/release/mars/2/eclipse-jee-mars-2-win32-x86_64.zip">eclipse-jee-mars-2-win32-x86_64.zip</a></p>
+<p>点击下面连接下载即可，绿色安装。随性配置。</p>
+<h3 id="3、下载MYSQL-5-6"><a href="#3、下载MYSQL-5-6" class="headerlink" title="3、下载MYSQL 5.6"></a>3、下载MYSQL 5.6</h3><p>下载完MYSQL，需配置环境变量<br>例如我下载的mysql解压到D:\Program Files\并重命名为MYSQL。</p>
+<p>在MYSQL复制一份my-defaul.ini为my.ini<br>添加</p>
+<pre><code>[mysqld] 
+basedir=D:\Program Files\MySQL
+datadir=D:\Program Files\MySQL\data
+</code></pre>
+<p>在path里面添加</p>
+<pre><code>D:\Program Files\MYSQL\bin
+</code></pre>
+<p>即可。</p>
+<p>管理员运行CMD.exe，运行如下命令</p>
+<pre><code>&gt; cd D:\Program Files\MySQL\bin
+&gt; mysqld -install
+&gt; net start mysql
+&gt; mysql -u root -p #默认情况下无密码
+</code></pre>
+<h3 id="4、下载tomcat"><a href="#4、下载tomcat" class="headerlink" title="4、下载tomcat"></a>4、下载tomcat</h3><p>下载 apache-tomcat-7******即可。startup.bat启动，shutdown.bat关闭。</p>
+<h3 id="5、Eclipse配置Tomcat"><a href="#5、Eclipse配置Tomcat" class="headerlink" title="5、Eclipse配置Tomcat"></a>5、Eclipse配置Tomcat</h3><p>Window——&gt;Preferences——&gt;Server——&gt;Runtime Environments——&gt;add——&gt;后面按照提示配就可以了。</p>
+<p>如果出现问题，Google一下。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/10-Web/">10. Web</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Java-Web/">Java Web</a>, <a href="/tags/Eclipse/">Eclipse</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

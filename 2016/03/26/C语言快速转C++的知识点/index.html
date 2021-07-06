@@ -1,0 +1,1062 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C语言快速转C++的知识点 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="其实快速入门还是很简单，记住CPP的三大特性就可以了。
+CPP的三大特性：封装、继承、多态">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C语言快速转C++的知识点"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2016-03-26T08:07:01.000Z"><a href="/2016/03/26/C语言快速转C++的知识点/">2016-03-26</a></time>
+        
+  
+    <h1 class="title">C语言快速转C++的知识点</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%81%E8%A3%85"><span class="toc-text">封装</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF"><span class="toc-text">继承</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%B7%E8%B4%9D%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="toc-text">拷贝构造函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E4%BB%A5%E5%80%BC%E4%BC%A0%E9%80%92%E7%9A%84%E6%96%B9%E5%BC%8F%E4%BC%A0%E5%85%A5%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0"><span class="toc-text">对象以值传递的方式传入函数参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%B1%E5%BA%A6%E6%8B%B7%E8%B4%9D"><span class="toc-text">深度拷贝</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%9A%E6%80%81"><span class="toc-text">多态</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E8%BD%BD"><span class="toc-text">重载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">运算符重载</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E5%86%99"><span class="toc-text">重写</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#C-%E5%8F%8B%E5%85%83%E5%87%BD%E6%95%B0"><span class="toc-text">C++友元函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%85%E8%81%94%E5%87%BD%E6%95%B0"><span class="toc-text">内联函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#C-%E7%B1%BB%E7%9A%84%E9%9D%99%E6%80%81%E6%88%90%E5%91%98"><span class="toc-text">C++类的静态成员</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E7%94%A8"><span class="toc-text">引用</span></a></li></ol>
+    </div>
+
+        <p>其实快速入门还是很简单，记住CPP的三大特性就可以了。</p>
+<p>CPP的三大特性：封装、继承、多态</p>
+<span id="more"></span>
+
+
+<h1 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h1><p>1、在C语言编程中，我们会常用到struct这个关键字，如果你对这个关键字有较深入的理解，你就会发现，它完全就是一个class类中声明的public，谁都可以访问它，并没有限定它。</p>
+<p>为什么要封装：</p>
+<ul>
+<li>封装是将数据和操作数据的函数捆绑在一起的机制，隐藏实现细节，数据更安全，使代码模块化。</li>
+<li>封装是将数据抽象化，而数据抽象是一种仅向用户暴露接口而把具体的实现细节隐藏起来的机制。</li>
+</ul>
+<p>但是CPP就不一样了，在封装类的过程中，它有三个关键字，public, protected,private。默认情况下，在类中定义的所有项目都是私有的。</p>
+<ul>
+<li>public    关键字 public 确定了类成员的访问属性。在类对象作用域内，公共成员在类的外部是可访问的</li>
+<li>protected 保护成员变量或函数与私有成员十分相似，但有一点不同，保护成员在派生类（即子类）中是可访问的。</li>
+<li>private   私有成员变量或函数在类的外部是不可访问的，甚至是不可查看的。只有类和友元函数可以访问私有成员。</li>
+</ul>
+<p>2、一个类中有构造函数和析构函数，构造函数可以重载，析构函数不能重载。如果用户没有写构造函数和析构函数，编译时会自动生成构造函数和析构函数。</p>
+<p>构造函数</p>
+<ul>
+<li>建立一个对象，就会调用一次构造函数</li>
+<li>构造函数没有返回值，只是初始化对象。</li>
+<li>构造函数不能被用户调用</li>
+</ul>
+<p>析构函数</p>
+<ul>
+<li><p>对象结束生命周期时，会调用析构函数。</p>
+</li>
+<li><p>析构函数往往用来做“清理善后”的工作，例如new了一块内存，需要在析构函数调用delete释放内存。</p>
+</li>
+<li><p>析构函数无参，无返回值，不能被重载，一个类中只能有一个析构函数。</p>
+</li>
+<li><p>析构函数也应该和类名相同，只是在函数名前面加一个位取反符号~</p>
+<pre><code>  /*************************************************************************
+  &gt; File Name: encapsulation.cpp
+  &gt; Author: Lin
+  &gt; Created Time: Wed 21 Feb 2018 03:07:22 PM CST
+  ************************************************************************/
+  
+  #include &lt;iostream&gt;
+  using namespace std;
+  
+  
+  class Box
+  &#123;
+  public:
+      double get_volume();
+      Box(double length,double breadth, double height);
+  private:
+      double length;  //长度
+      double breadth; //宽度
+      double height;  //高度
+  &#125;;
+  
+  
+  Box::Box(double length,double breadth, double height)
+  &#123;
+      this-&gt;length = length;
+      this-&gt;breadth = breadth;
+      this-&gt;height = height;
+  &#125;
+  
+  double Box::get_volume()
+  &#123;
+      return this-&gt;height * this-&gt;breadth * this-&gt;length;
+  &#125;
+  
+  
+  
+  int main(int argc, char **argv)
+  &#123;
+  
+      Box box(1.0,2.0,3.0);
+      
+      cout &lt;&lt; box.get_volume() &lt;&lt; endl;
+      
+      return 0;
+  &#125;
+</code></pre>
+</li>
+</ul>
+<p>编译运行：</p>
+<pre><code>    # g++ encapsulation.cpp -o encapsulation
+    # ./encapsulation
+    6
+</code></pre>
+<h1 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h1><p>1、一个类继承一个或者多个父类。子类可以继承父类所有非私有成员，如果父类的成员不想被子类访问，则需要在父类中声明为private</p>
+<p>一个子类可以继承所有父类方法，但是下列情况除外：</p>
+<ul>
+<li>父类的构造函数、析构函数和拷贝构造函数</li>
+<li>父类的重载运算符。</li>
+<li>父类的友元函数 </li>
+</ul>
+<p>2、当子类继承父类，父类可以被继承为public、protected或private几种类型。</p>
+<p>子类继承时调用父类的构造方法有以下几种情况</p>
+<ol>
+<li><p>如果子类<strong>没有定义构造方法</strong>，则调用<strong>父类的无参数的构造方法</strong>。</p>
+</li>
+<li><p>如果子类定义了构造方法，不论是无参数还是带参数，在创建子类的对象的时候,首先执行父类无参数的构造方法，然后执行自己的构造方法。</p>
+</li>
+<li><p>在创建子类对象时候，如果<strong>子类的构造函数没有显示调用父类的构造函数</strong>，则会调用父类的默认无参构造函数。</p>
+</li>
+<li><p>在创建子类对象时候，如果子类的构造函数没有显示调用父类的构造函数且父类自己提供了无参构造函数，则会调用父类自己的无参构造函数。</p>
+</li>
+<li><p>在创建子类对象时候，如果子类的构造函数没有显示调用父类的构造函数且父类只定义了自己的有参构造函数，则会出错（如果父类只有有参数的构造方法，则子类必须显示调用此带参构造方法）。</p>
+</li>
+<li><p>如果子类调用父类带参数的构造方法，需要用初始化父类成员对象的方式。例如</p>
+<pre><code> /*************************************************************************
+     &gt; File Name: animal.cpp
+     &gt; Author: Lin
+     &gt; Mail: 1010361011@qq.com
+     &gt; Created Time: Fri 23 Feb 2018 02:58:41 PM CST
+  ************************************************************************/
+ #include &lt;iostream&gt;
+ using namespace std;
+ 
+ class animal&#123;
+     public:
+         animal(int height, int weight)&#123;
+             cout &lt;&lt; &quot;animal construct&quot; &lt;&lt; endl;
+         &#125;
+ &#125;;
+ 
+ class fish:public animal&#123;
+     public:
+         fish():animal(100,200)&#123;
+             cout &lt;&lt; &quot;fish construct&quot; &lt;&lt; endl;
+         &#125;
+ &#125;;
+ 
+ int main(int argc, char ** argv)
+ &#123;
+     fish fh;
+     return 0;
+ &#125;
+</code></pre>
+</li>
+</ol>
+<p>在fish类的构造函数后，加一个冒号（:），然后加上父类的带参数的构造函数。这样，在子类的构造函数被调用时，系统就会去调用父类的带参数的构造函数去构造对象。</p>
+<h2 id="拷贝构造函数"><a href="#拷贝构造函数" class="headerlink" title="拷贝构造函数"></a>拷贝构造函数</h2><p>C++规定与类同名的函数就是拷贝构造函数</p>
+<p>默认拷贝构造函数：在类定义中如果没有提供自己的拷贝构造函数，则C++提供一个默认的构造函数，其拷贝策略是逐个成员依次拷贝。</p>
+<p>拷贝构造函数分为两种：深拷贝和浅拷贝</p>
+<p>默认拷贝构造函数均是浅拷贝</p>
+<p>但是一个类可能拥有其它资源，如其构造函数分配了一个堆内存，析构函数释放了这个内存，则此时就需要进行深拷贝了。<br>深拷贝不能依赖编译器实现。</p>
+<p>拷贝构造函数通常用于：</p>
+<ul>
+<li>通过使用另一个同类型的对象来初始化新创建的对象。</li>
+<li>复制对象把它作为参数传递给函数。</li>
+<li>复制对象，并从函数返回这个对象。</li>
+</ul>
+<pre><code>classname (const classname &amp;obj) &#123;
+   // 构造函数的主体
+&#125;
+</code></pre>
+<p>一个简单的浅拷贝（example1）：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: copy_constructor.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Sat 10 Mar 2018 03:16:33 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+
+
+class copy_class
+&#123;
+private:
+    int copy_num;
+public:
+    copy_class(int argv)
+    &#123;
+        copy_num = argv;
+    &#125;
+
+
+    void show();
+&#125;;
+
+
+void copy_class::show()
+&#123;
+    cout &lt;&lt; &quot;copy_num =&quot; &lt;&lt; copy_num &lt;&lt; endl;
+&#125;
+
+
+int main(int argc ,const char *argv[])
+&#123;
+    copy_class cpy1(99);
+    copy_class cpy2 = cpy1;//对象的初始化要调用拷贝构造函数，而非赋值
+
+    cpy2.show();
+    return 0;
+
+&#125;
+</code></pre>
+<p>运行：</p>
+<pre><code># g++ copy_constructor.cpp  -o copy_constructor
+# ./copy_constructor
+copy_num =99
+</code></pre>
+<p>从上面的代码可以看出来，对象cpy2分配了内存并完成了对象cpy1的复制过程。相同类型的类对象通过拷贝构造函数来完成整个复制过程。</p>
+<p>example2：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: copy_constructor_example1.cpp
+    &gt; Author: Lin
+    &gt; Mail: 1010361011@qq.com
+    &gt; Created Time: Sat 10 Mar 2018 03:39:14 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+
+
+class copy_class
+&#123;
+private:
+    int copy_nums;
+public:
+    copy_class(int argv)
+    &#123;
+        copy_nums = argv;
+    &#125;
+
+    copy_class(const copy_class &amp;c)
+    &#123;
+        copy_nums = c.copy_nums;
+    &#125;
+
+    void show()
+    &#123;
+        cout &lt;&lt; &quot;copy_nums = &quot; &lt;&lt; copy_nums &lt;&lt; endl;
+    &#125;
+&#125;;
+
+
+//#define EXAMPLE_1
+
+
+int main(int argc ,char *argv[])
+&#123;
+    copy_class cpy1(99);
+#ifdef EXAMPLE_1
+    copy_class cpy2 = cpy1;
+#else
+    copy_class cpy2(cpy1);
+#endif
+
+    cpy2.show();
+
+    return 0;
+
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># g++ copy_constructor_example1.cpp -o example
+# ./example 
+copy_nums = 99
+</code></pre>
+<p>copy_class(const copy_class &amp; c)是我们自定义的拷贝构造函数。拷贝构造函数的函数名称必须和类名称一致，它必须的一个参数是本类型的一个引用变量。</p>
+<h2 id="对象以值传递的方式传入函数参数"><a href="#对象以值传递的方式传入函数参数" class="headerlink" title="对象以值传递的方式传入函数参数"></a>对象以值传递的方式传入函数参数</h2><pre><code>/*************************************************************************
+    &gt; File Name: copy_constructor_argv.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Sat 10 Mar 2018 03:48:51 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+class copy_class
+&#123;
+private:
+    int copy_nums;
+public:
+    copy_class(int argc);
+    copy_class(const copy_class &amp;c);
+
+    ~copy_class();
+    void show();
+&#125;;
+
+
+copy_class::copy_class(int argc)
+&#123;
+    this-&gt;copy_nums = argc;
+    cout &lt;&lt; &quot;构造函数&quot; &lt;&lt; endl;
+&#125;
+
+copy_class::copy_class(const copy_class &amp;c)
+&#123;
+    copy_nums = c.copy_nums;
+    cout &lt;&lt; &quot;拷贝构造函数&quot; &lt;&lt; endl;
+&#125;
+
+
+copy_class::~copy_class()
+&#123;
+    cout &lt;&lt; &quot;析构函数&quot; &lt;&lt; endl;
+&#125;
+
+void copy_class::show()
+&#123;
+    cout &lt;&lt; &quot;copy_nums = &quot;&lt;&lt; copy_nums &lt;&lt; endl;
+&#125;
+
+
+
+void whole_function(copy_class c)
+&#123;
+    c.show();
+
+    cout &lt;&lt; &quot;test&quot; &lt;&lt; endl;
+&#125;
+
+
+
+int main(int argc, const char *argv[])
+&#123;
+    copy_class cpy(99);
+
+    cout &lt;&lt; &quot;-----------------------------------------&quot; &lt;&lt; endl;
+    whole_function(cpy);
+    cout &lt;&lt; &quot;-----------------------------------------&quot; &lt;&lt; endl;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># g++ copy_constructor_argv.cpp  -o argv
+# ./argv 
+构造函数
+-----------------------------------------
+拷贝构造函数
+copy_nums = 99
+test
+析构函数
+-----------------------------------------
+析构函数
+</code></pre>
+<p>调用whole_function()函数过程</p>
+<ul>
+<li>c对象传入形参时，会产生一个临时变量tmp。</li>
+<li>然后调用拷贝构造函数把c的值赋值给tmp。</li>
+<li>等whole_function()执行完成后，析构掉tmp对象</li>
+</ul>
+<h2 id="深度拷贝"><a href="#深度拷贝" class="headerlink" title="深度拷贝"></a>深度拷贝</h2><p>里面含有指针。注意释放内存。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: deep_copy.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 04:58:49 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+#define N   10
+class deep_copy&#123;
+    
+private:
+    int nums;
+    int *point;
+public:
+    //构造函数
+    deep_copy(int nums);
+    deep_copy(const deep_copy &amp; dc);
+    ~deep_copy();
+    void show();
+&#125;;
+
+
+deep_copy::deep_copy(int nums)
+&#123;
+    int index = 0;
+    int *tmp = NULL;
+    this-&gt;nums = nums;
+    this-&gt;point = new int[N];
+    tmp = this-&gt;point;
+
+    for(index = 0; index &lt; N;index++)
+    &#123;
+        *tmp++ = index;
+    &#125;
+
+    cout &lt;&lt; &quot;构造函数&quot; &lt;&lt; endl;
+
+&#125;
+
+deep_copy::deep_copy(const deep_copy &amp;dc)
+&#123;
+    int index, *tmp = NULL, *tmp_c = NULL;
+    this-&gt;nums = dc.nums;
+    this-&gt;point = new int[N];
+    
+    tmp = this-&gt;point;
+    tmp_c = dc.point;
+        
+    for(index = 0; index &lt; N; index++)
+    &#123;
+        *tmp++ = *tmp_c++;
+    &#125;
+
+    cout &lt;&lt; &quot;拷贝构造函数&quot; &lt;&lt; endl;
+
+&#125;
+
+
+void deep_copy::show()
+&#123;
+    int index = 0;
+    int *tmp = this-&gt;point;
+    for(index = 0; index &lt; N;index ++)
+    &#123;
+        cout &lt;&lt; *(tmp++)  &lt;&lt; &quot;\t&quot;;
+    &#125;
+
+    cout &lt;&lt; &quot;nums = &quot; &lt;&lt; nums &lt;&lt; endl;
+&#125;
+
+
+deep_copy::~deep_copy()
+&#123;
+    if(point != NULL)
+        delete[] point;
+
+    cout &lt;&lt; &quot;析构函数&quot; &lt;&lt; endl;
+    
+&#125;
+
+void g_function(deep_copy &amp; dc)
+&#123;
+    dc.show();
+    cout &lt;&lt; &quot;g_function&quot; &lt;&lt; endl;
+&#125;
+int main(int agrc ,const char *argv[])
+&#123;
+    deep_copy dc(10086);
+
+    cout &lt;&lt; &quot;-----------------------&quot;&lt;&lt; endl;
+    
+    g_function(dc);
+    
+    cout &lt;&lt; &quot;-----------------------&quot;&lt;&lt; endl;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># ./deep_copy
+构造函数
+-----------------------
+0       1       2       3       4       5       6       7       8       9       nums = 10086
+g_function
+-----------------------
+析构函数
+</code></pre>
+<p>在编写C语言的时候，函数调用指针的时候，首先拷贝一份指针的地址，进行入栈操作，此时改变指针的位置，并不会改变原指针的位置。C++以对象为目标，操作对象内的指针，注意指针是否变换位置。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: m.c
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 05:22:50 AM EDT
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+
+#define N 10
+
+void evaluate(int *nums)
+&#123;
+    int index = 0;
+    for(index = 0; index &lt; N; index++)
+    &#123;
+        *nums++ = index;
+    &#125;
+&#125;
+
+
+void show(int *nums)
+&#123;
+    int index;
+    for(index = 0; index &lt; N; index++)
+        printf(&quot;%d\t&quot;,*nums++);
+
+    printf(&quot;\n&quot;);
+&#125;
+
+
+int main(int argc, char *argv[])
+&#123;
+    int *nums = malloc(N * sizeof(int));
+    if(nums == NULL)
+    &#123;
+        printf(&quot;Malloc failed.&quot;);
+        return -1;
+    &#125;
+
+    evaluate(nums);
+    show(nums);
+
+
+    free(nums);
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果：<br>    # gcc m.c -o m<br>    # ./m<br>    0       1       2       3       4       5       6   9</p>
+<h1 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h1><h2 id="重载"><a href="#重载" class="headerlink" title="重载"></a>重载</h2><p>c++重载分为函数重载和运算符重载。</p>
+<p>函数重载条件：</p>
+<ul>
+<li>在同一个类内，函数的参数类型、参数的个数不同，才会构成重载。</li>
+</ul>
+<p>函数重载</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: overload.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 10:04:20 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+
+
+class animal
+&#123;
+public:
+    void sing(int song_num);
+    void sing(const char *song_name);
+&#125;;
+
+
+void animal::sing(int song_num)
+&#123;
+    cout &lt;&lt; &quot;song number is &quot; &lt;&lt; song_num &lt;&lt; endl;
+&#125;
+
+
+void animal::sing(const char *song_name)
+&#123;
+    cout &lt;&lt; &quot;song name is &quot; &lt;&lt; song_name &lt;&lt; endl;
+&#125;
+
+
+int main(int argc, char *argv[])
+&#123;
+    animal anm;
+    anm.sing(100);
+    anm.sing(&quot;Just for fun&quot;);
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果是：<br>    # g++ overload.cpp -o overload<br>    # ./overload<br>    song number is 100<br>    song name is Just for fun</p>
+<h3 id="运算符重载"><a href="#运算符重载" class="headerlink" title="运算符重载"></a>运算符重载</h3><p>一个简单的加法重载eg：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: operator_overload.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 10:17:10 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+
+
+class animal
+&#123;
+private:
+    int sheep_nums;
+    int dog_nums;
+    int cat_nums;
+
+public:
+    void set_nums(int sheep_nums, int dog_nums, int cat_nums);
+    animal operator+(const animal &amp;a);
+    void show();
+
+&#125;;
+
+void animal::set_nums(int sheep_nums, int dog_nums, int cat_nums)
+&#123;
+    this-&gt;cat_nums = cat_nums;
+    this-&gt;sheep_nums = sheep_nums;
+    this-&gt;dog_nums = dog_nums;
+&#125;
+
+animal animal::operator+(const animal&amp; a)
+&#123;
+    animal tmp;
+
+    tmp.cat_nums = this-&gt;cat_nums + a.cat_nums;
+    tmp.dog_nums = this-&gt;dog_nums + a.dog_nums;
+    tmp.sheep_nums = this-&gt;sheep_nums + a.sheep_nums;
+
+    return tmp;
+&#125;
+
+void animal::show()
+&#123;
+    cout &lt;&lt; &quot;sheep nums: &quot; &lt;&lt; sheep_nums \
+        &lt;&lt; &quot;\ndog nums: &quot; &lt;&lt; dog_nums \
+        &lt;&lt; &quot;\ncat nums: &quot; &lt;&lt; cat_nums &lt;&lt; endl;
+&#125;
+
+
+int main(int agrc ,char **argv)
+&#123;
+    animal a1;
+    animal a2;
+    animal a3;
+
+    a1.set_nums(1,2,3);
+    a2.set_nums(10, 20, 30);
+    a3 = a1+ a2;
+    a3.show();
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># g++ operator_overload.cpp  -o operator_overload
+# ./operator_overload
+sheep nums: 11
+dog nums: 22
+cat nums: 33
+</code></pre>
+<h2 id="重写"><a href="#重写" class="headerlink" title="重写"></a>重写</h2><p>重写override：也叫做覆盖。子类重新定义父类中有相同名称和参数的虚函数。函数特征相同。但是具体实现不同，主要是在继承关系中出现的 。<br>重写需要注意：</p>
+<ol>
+<li><p> 被重写的函数不能是static的。必须是virtual的</p>
+</li>
+<li><p> 重写函数必须有相同的类型，名称和参数列表</p>
+</li>
+<li><p>重写函数的访问修饰符可以不同。尽管virtual是private的，派生类中重写改写为public,protected也是可以的。</p>
+<p> /*************************************************************************</p>
+<pre><code> &gt; File Name: override.cpp
+ &gt; Author: Lin
+ &gt; Mail: 1010361011@qq.com
+ &gt; Created Time: Tue 27 Mar 2018 10:40:42 AM EDT
+</code></pre>
+<p>  ************************************************************************/</p>
+<p> #include <iostream><br> using namespace std;</p>
+<p> class animal<br> {</p>
+<pre><code> public:
+     void eat()
+     &#123;
+         cout &lt;&lt; &quot;animal eat&quot; &lt;&lt; endl;
+     &#125;
+     virtual void sleep()
+     &#123;
+         cout &lt;&lt; &quot;animal sleep&quot; &lt;&lt; endl;
+     &#125;
+
+     virtual void breath()
+     &#123;
+         cout &lt;&lt; &quot;animal breath&quot; &lt;&lt; endl;
+     &#125;
+</code></pre>
+<p> };</p>
+<p> class cat:public animal<br> {</p>
+<pre><code> public:
+     void breath()
+     &#123;
+         cout &lt;&lt; &quot;cat breath&quot; &lt;&lt; endl;
+     &#125;
+
+     void sleep()
+     &#123;
+         cout &lt;&lt; &quot;cat sleep&quot; &lt;&lt; endl;
+     &#125;
+</code></pre>
+<p> };</p>
+<p> int main(int argc ,char **argv)<br> {</p>
+<pre><code> cat c;
+ c.breath();
+ c.sleep();
+ c.eat();
+ return 0;
+</code></pre>
+<p> }</p>
+</li>
+</ol>
+<pre><code># g++ override.cpp  -o override
+# ./override
+cat breath
+cat sleep
+animal eat
+</code></pre>
+<p>还有一种是重定义，又叫隐藏。</p>
+<p>1 成员函数重载特征：</p>
+<pre><code>相同的范围（在同一个类中）
+函数名字相同
+参数不同
+virtual关键字可有可无
+</code></pre>
+<p>2 重写（覆盖)是指派生类函数覆盖基类函数，特征是：</p>
+<pre><code>不同的范围，分别位于基类和派生类中
+函数的名字相同
+参数相同
+基类函数必须有virtual关键字
+</code></pre>
+<p>3 重定义(隐藏)是指派生类的函数屏蔽了与其同名的基类函数，规则如下：</p>
+<pre><code>如果派生类的函数和基类的函数同名，但是参数不同，此时，不管有无virtual，基类的函数被隐藏。
+如果派生类的函数与基类的函数同名，并且参数也相同，但是基类函数没有vitual关键字，此时，基类的函数被隐藏。
+</code></pre>
+<h1 id="C-友元函数"><a href="#C-友元函数" class="headerlink" title="C++友元函数"></a>C++友元函数</h1><p>类的友元函数是定义在类外部，但有权访问类的所有私有（private）成员和保护（protected）成员。尽管友元函数的原型有在类的定义中出现过，但是友元函数并不是成员函数。<br>友元可以是一个函数，该函数被称为友元函数；友元也可以是一个类，该类被称为友元类，在这种情况下，整个类及其所有成员都是友元。</p>
+<p>声明类 ClassTwo 的所有成员函数作为类 ClassOne 的友元，需要在类 ClassOne 的定义中放置如下声明：</p>
+<pre><code>friend class ClassTwo;
+</code></pre>
+<p>example：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: friend.cpp
+    &gt; Author: Lin
+    &gt; Mail: 1010361011@qq.com
+    &gt; Created Time: Sun 01 Apr 2018 08:40:10 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+class point
+&#123;
+private:
+    int x,y;
+public:
+    friend void print_show(point p);
+    void setX(int x);
+    void setY(int y);
+&#125;;
+void point::setX(int x)
+&#123;
+    this-&gt;x = x;
+&#125;
+void point::setY(int y)
+&#123;
+    this-&gt;y = y;
+&#125;
+//注意该函数不是任何类的成员函数
+void print_show(point p)
+&#123;
+    /*
+     *因为是友元函数，所以可以直接访问该类的任何成员
+     * */
+    cout &lt;&lt; &quot;x = &quot; &lt;&lt; p.x &lt;&lt; endl;
+    cout &lt;&lt; &quot;y = &quot; &lt;&lt; p.y &lt;&lt; endl;
+&#125;
+int main(int argc, const char *argv[])
+&#123;
+    point p;
+    p.setX(100);
+    p.setY(200);
+    print_show(p);
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果:</p>
+<pre><code># g++ friend.cpp -o friend
+# ./friend
+x = 100
+y = 200
+</code></pre>
+<h1 id="内联函数"><a href="#内联函数" class="headerlink" title="内联函数"></a>内联函数</h1><p>C++ 内联函数是通常与类一起使用。如果一个函数是内联的，那么在编译时，编译器会把该函数的代码副本放置在每个调用该函数的地方。<br>对内联函数进行任何修改，都需要重新编译函数的所有客户端，因为编译器需要重新更换一次所有的代码，否则将会继续使用旧的函数。<br>如果想把一个函数定义为内联函数，则需要在函数名前面放置关键字 inline，在调用函数之前需要对函数进行定义。如果已定义的函数多于一行，编译器会忽略 inline 限定符。<br>在类定义中的定义的函数都是内联函数，即使没有使用 inline 说明符。<br>下面是一个实例，使用内联函数来返回两个数中的最大值：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: inline.cpp
+    &gt; Author: Lin
+    &gt; Mail: 1010361011@qq.com
+    &gt; Created Time: Sun 01 Apr 2018 08:50:10 AM EDT
+ ************************************************************************/
+#include &lt;iostream&gt;
+ 
+using namespace std;
+inline int Max(int x, int y)
+&#123;
+   return (x &gt; y)? x : y;
+&#125;
+// 程序的主函数
+int main( )
+&#123;
+   cout &lt;&lt; &quot;Max (20,10): &quot; &lt;&lt; Max(20,10) &lt;&lt; endl;
+   cout &lt;&lt; &quot;Max (0,200): &quot; &lt;&lt; Max(0,200) &lt;&lt; endl;
+   cout &lt;&lt; &quot;Max (100,1010): &quot; &lt;&lt; Max(100,1010) &lt;&lt; endl;
+   return 0;
+&#125;
+</code></pre>
+<p>运行结果</p>
+<pre><code># g++ inline.cpp -o inline
+# ./inline
+Max (20,10): 20
+Max (0,200): 200
+Max (100,1010): 1010
+</code></pre>
+<h1 id="C-类的静态成员"><a href="#C-类的静态成员" class="headerlink" title="C++类的静态成员"></a>C++类的静态成员</h1><p>当我们声明类的成员为静态时，这意味着无论创建多少个类的对象，静态成员都只有一个副本。<br>静态成员在类的所有对象中是共享的。如果不存在其他的初始化语句，在创建第一个对象时，所有的静态数据都会被初始化为零。我们不能把静态成员放置在类的定义中，但是可以在类的外部通过使用范围解析运算符 :: 来重新声明静态变量从而对它进行初始化，如下面的实例所示。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: static.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Sun 01 Apr 2018 08:50:10 AM EDT
+ ************************************************************************/
+#include &lt;iostream&gt;
+#include &lt;string.h&gt;
+using namespace std;
+class point
+&#123;
+private:
+    int x;
+    int y;
+public:
+    static int count;
+    void output()
+    &#123;
+        cout &lt;&lt; &quot;count = &quot; &lt;&lt; count &lt;&lt; endl;
+    &#125;
+    point()
+    &#123;
+        x = 100;
+        y = 200;
+        count ++;
+    &#125;
+    ~point()
+    &#123;
+    &#125;
+&#125;;
+int point::count = 0;
+int main(int argc, const char *argv[])
+&#123;
+    point pt1;
+    point pt2;
+    cout &lt;&lt; &quot;count = &quot; &lt;&lt; point::count &lt;&lt; endl;
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果</p>
+<pre><code># g++ static.cpp -o static
+# ./static
+
+count = 2
+</code></pre>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p>引用就是一个变量的别名，他需要用另外一个变量或对象初始化自身。</p>
+<pre><code>int a = 5;
+int &amp;b = a; //用&amp;表示申明一个引用。引用必须在申明时进行初始化
+</code></pre>
+<p>考虑下面代码：</p>
+<pre><code>int a = 5;
+int &amp;b = a;
+int c=3;
+b=c; //此处并不是将b 变成c 的引用，而是给b 赋值，此时，b 和a 的值都变成了3
+
+/*************************************************************************
+    &gt; File Name: quote.cpp
+    &gt; Author: Lin
+    &gt; Mail: 1010361011@qq.com
+    &gt; Created Time: Sun 01 Apr 2018 08:50:10 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+//change 函数主要用来交换a 和b 的值
+void change(int&amp; a,int&amp; b);
+int  main()
+&#123;
+    int x=5;
+    int y=3;
+    cout&lt;&lt;&quot;original x=&quot;&lt;&lt;x&lt;&lt;endl;
+    cout&lt;&lt;&quot;original y=&quot;&lt;&lt;y&lt;&lt;endl;
+    change(x,y); /*此处如果用指针传递，则调用change（&amp;x, &amp;y），这样很容易让人
+                   迷惑，不知道交换的是x 和y 的值，还是x 和y 的地址？此处用引用，
+                   可读性就比指针要好*/
+    cout&lt;&lt;&quot;changed x=&quot;&lt;&lt;x&lt;&lt;endl;
+    cout&lt;&lt;&quot;changed y=&quot;&lt;&lt;y&lt;&lt;endl;
+    return 0;
+&#125;
+/*在change()函数的实现中，我们采用了一个小算法，完成了a 和b 值的交换，读者下来可以仔
+  细研读，细细体味一下（读者还可以采用其他的方法，当然也可以直接使用通常的实现，定义一个
+  临时变量，完成a 和b 值的交换）*/
+void change(int&amp; a,int&amp; b)
+&#123;
+    a=a+b;
+    b=a-b;
+    a=a-b;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># g++ quote.cpp -o quote
+# ./quote
+original x=5
+original y=3
+changed x=3
+changed y=5
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/01-CPP-基础/">01. CPP 基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

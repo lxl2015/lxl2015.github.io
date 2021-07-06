@@ -1,0 +1,298 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>yum安装mysql及初始化操作 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="yum install mysql
+
+
+mysql initialization
+
+2.1 change the mysql password
+
+2.2 add the user and remote connect">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="yum安装mysql及初始化操作"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2019-01-24T02:15:33.000Z"><a href="/2019/01/24/yum安装mysql及初始化操作/">2019-01-24</a></time>
+        
+  
+    <h1 class="title">yum安装mysql及初始化操作</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81yum-%E5%AE%89%E8%A3%85MYSQL"><span class="toc-text">1、yum 安装MYSQL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81MYSQL%E5%88%9D%E5%A7%8B%E5%8C%96%E6%93%8D%E4%BD%9C"><span class="toc-text">2、MYSQL初始化操作</span></a></li></ol>
+    </div>
+
+        <ol>
+<li> <strong>yum install mysql</strong></li>
+</ol>
+<ol start="2">
+<li><p><strong>mysql initialization</strong></p>
+<ul>
+<li><p>2.1 change the mysql password</p>
+</li>
+<li><p>2.2 add the user and remote connect</p>
+</li>
+</ul>
+</li>
+</ol>
+<span id="more"></span>
+
+
+
+<h3 id="1、yum-安装MYSQL"><a href="#1、yum-安装MYSQL" class="headerlink" title="1、yum 安装MYSQL"></a>1、yum 安装MYSQL</h3><!--more-->
+
+
+<p>首先我们需要从MySQL开发者网站下载Yum仓库文件，导入Yum库后，一个简单的yumupdate命令将确保你运行在MySQL5.6的最新发布版上，包括一些安全特性的更新。Yum同时也将确保导入相关依赖库，这些都将使我们的安装过程简单化。进入<a target="_blank" rel="noopener" href="http://dev.mysql.com/downloads/repo/%EF%BC%8C%E4%B8%8B%E8%BD%BDRedHat">http://dev.mysql.com/downloads/repo/，下载RedHat</a> Enterprise Linux 6 / Oracle Linux 6版。下面链接选择对应版本<a target="_blank" rel="noopener" href="https://repo.mysql.com//">https://repo.mysql.com//</a></p>
+<p>下载完成后将Yum库导入到你的本地：</p>
+<pre><code>sudo yum localinstall mysql-community-release-el6-*.noarch.rpm  
+</code></pre>
+<p>这个Yum库包含了MySQLServer，MySQL工作台管理工具以及ODBC驱动，现在可以通过下面的命令简单地安装MySQLServer：</p>
+<pre><code>sudo yum install mysql-community-server 
+</code></pre>
+<h3 id="2、MYSQL初始化操作"><a href="#2、MYSQL初始化操作" class="headerlink" title="2、MYSQL初始化操作"></a>2、MYSQL初始化操作</h3><p>2.1、修改密码</p>
+<ul>
+<li>当MySQL服务启动的时候，会自动生成一个临时密码，此时需要我们去查询，然后使用root账户登陆，再修改密码</li>
+</ul>
+<pre><code>    # grep &#39;temporary password&#39; /var/log/mysqld.log
+    2017-06-17T02:01:01.026946Z 1 [Note] A temporary password is generated for root@localhost: TqWlxlV3p.a8
+</code></pre>
+<p>如果没有发现临时密码，可以在配置文件<code>/etc/my.cnf</code>中加入<code>skip-grant-tables</code></p>
+<p>那么我们要修改mysql的root密码我们可以使用这个命令</p>
+<pre><code>/usr/local/bin/mysqladmin -uroot password 123
+</code></pre>
+<p>意思就是将root帐号以localhost域的密码设置成“123”；<br>再将root的密码改为345。</p>
+<pre><code>mysqladmin -uroot -p123 password345;
+</code></pre>
+<p>在修改密码的时候，说 </p>
+<pre><code>ERROR 1819 (HY000): Your password does not satisfy the current policy requirements
+&gt;set global validate_password_policy=0;
+&gt;set global validate_password_length=1;
+即可
+&gt;alter user &#39;root&#39;@&#39;localhost&#39; identified by &#39;root&#39;; 
+&gt;flush privileges; 
+</code></pre>
+<p>修改mysql中root的密码：</p>
+<pre><code>shell&gt;mysql -u root -p
+mysql&gt; update user set password=password(&quot;hchy123&quot;) where user=’root’;
+mysql&gt; flush privileges //刷新数据库
+x 1shell&gt;mysql -u root -p2mysql&gt; update user set password=password(&quot;hchy123&quot;) where user=’root’;3mysql&gt; flush privileges //刷新数据库
+</code></pre>
+<p>2.2、添加用户及远程连接：</p>
+<p>增加新用户。（注意：和上面不同，下面的因为是MySQL环境中的命令，所以后面都带一个分号作为命令结束符）<br>格式：</p>
+<pre><code># grant select on 数据库.* to 用户名@登录主机 identified by &quot;密码&quot;
+
+
+mysql -u root -p
+mysql&gt;use mysql;
+mysql&gt;update user set host =&#39;%&#39;where user =&#39;root&#39;;
+mysql&gt;flush privileges;
+</code></pre>
+<p>例1、增加一个用户hchy密码为hchy123，让他可以在任何主机上登录，并对所有数据库有查询、插入、修改、删除的权限。首先用以root用户连入MySQL，然后键入以下命令：</p>
+<pre><code>mysql&gt;grant select,insert,update,delete on *.* to hchy@localhost identified by &quot;hchy123&quot;;
+</code></pre>
+<p>如果你不想hchy有密码，可以再打一个命令将密码消掉。</p>
+<pre><code>mysql&gt;grant select,insert,update,delete on 数据库.* to test2@localhost identified by &quot;&quot;;
+</code></pre>
+<p>创建一个用户hchy在特定客户端192.168.1.222登录，可访问特定数据库hchy_db</p>
+<pre><code>mysql &gt;grant select, insert, update, delete, create,drop on hchy_db.* to hchy@192.168.1.222 identified by &#39;password&#39;;
+</code></pre>
+<p>删除授权：</p>
+<pre><code>mysql&gt; revoke all privileges on *.* from root@”%”;
+mysql&gt; delete from user where user=”root” and host=”%”;
+mysql&gt; flush privileges;
+</code></pre>
+<p>MySQL支持root远程连接的方法，远程连接我们自然要用’%’来匹配比较好，或者你可以指定某个IP</p>
+<pre><code>mysql&gt;GRANT ALL PRIVILEGES ON *.* TO &#39;root&#39;@&#39;%&#39; IDENTIFIED BY &#39;123456&#39; WITH GRANT OPTION;
+</code></pre>
+<p>上句话的意思就是使用root在任意一台计算机上面以密码“123456”来连接，你如果在远程计算机上面使用密码“123”是无法连接的，包括你在本地使用mysql -uroot -p 密码为123456也无法连接。<br>当然执行上面一句SQL我们还需要刷新下缓存区，使之生效</p>
+<pre><code>mysql&gt;FLUSH PRIVILEGES
+</code></pre>
+<p>其实还有一种更加方便的修改root的远程启用方式。</p>
+<pre><code>mysql&gt;use mysql;
+mysql&gt;update user set host=&#39;%&#39; where user=&#39;root&#39; AND host=&#39;localhost&#39;;
+mysql&gt;FLUSH PRIVILEGES;
+</code></pre>
+<p>这种方法的好处就是在于 不用直接的修改用户的密码，而且采用经常使用的sql比较熟悉。</p>
+<p>如果出现ERROR 1819 (HY000): Your password does not satisfy the current policy requirements</p>
+<pre><code>mysql&gt; set global validate_password_policy=0;
+</code></pre>
+<p>2.3、mysqldump备份恢复数据</p>
+<p>备份数据库</p>
+<pre><code>shell&gt; mysqldump -h host -u root -p dbname &gt;dbname_backup.sql
+</code></pre>
+<p>恢复数据库</p>
+<pre><code>shell&gt; mysqladmin -h myhost -u root -p create dbname
+shell&gt; mysqldump -h host -u root -p dbname &lt; dbname_backup.sql
+</code></pre>
+<p>如果只想卸出建表指令，则命令如下：<br>    shell&gt; mysqladmin -u root -p -d databasename &gt; a.sql</p>
+<p>如果只想卸出插入数据的sql命令，而不需要建表命令，则命令如下：<br>    shell&gt; mysqladmin -u root -p -t databasename &gt; a.sql</p>
+<p>那么如果只想要数据，而不想要什么sql命令时，应该如何操作呢？</p>
+<pre><code>mysqldump -T./ phptest driver
+</code></pre>
+<p>其中，只有指定了-T参数才可以卸出纯文本文件，表示卸出数据的目录，./表示当前目录，即与mysqldump同一目录。如果不指定driver 表，则将卸出整个数据库的数据。每个表会生成两个文件，一个为.sql文件，包含建表执行。另一个为.txt文件，只包含数据，且没有sql指令。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/05-Linux-Operation/">05. Linux Operation</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/yum/">yum</a>, <a href="/tags/Mysql/">Mysql</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

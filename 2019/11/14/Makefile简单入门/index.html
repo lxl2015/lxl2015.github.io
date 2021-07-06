@@ -1,0 +1,513 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Makefile简单入门 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="makefile可以重命名。例如makefile被命名为Makefile_rename
+make -f Makefile_rename">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Makefile简单入门"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2019-11-14T15:35:39.000Z"><a href="/2019/11/14/Makefile简单入门/">2019-11-14</a></time>
+        
+  
+    <h1 class="title">Makefile简单入门</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Makefile%E8%A7%84%E5%88%99"><span class="toc-text">1. Makefile规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Makefile%E9%A2%84%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F"><span class="toc-text">2. Makefile预定义变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Makefile%E8%B5%8B%E5%80%BC%E6%93%8D%E4%BD%9C%E7%9A%84%E5%90%AB%E4%B9%89"><span class="toc-text">3. Makefile赋值操作的含义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%A4%9A%E5%B1%82%E7%BA%A7%E7%9A%84makefile%E7%BC%96%E5%86%99"><span class="toc-text">4. 多层级的makefile编写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%86%99%E7%9A%84%E6%96%87%E4%BB%B6"><span class="toc-text">项目中写的文件</span></a></li></ol>
+    </div>
+
+        <p>makefile可以重命名。例如makefile被命名为Makefile_rename</p>
+<pre><code>make -f Makefile_rename
+</code></pre>
+<span id="more"></span>
+
+<h3 id="1-Makefile规则"><a href="#1-Makefile规则" class="headerlink" title="1. Makefile规则"></a>1. Makefile规则</h3><p>Makefile 的基本格式为：</p>
+<pre><code>目标: 依赖
+(TAB键)规则
+</code></pre>
+<ul>
+<li>目标 –&gt; 需要生成的目标文件</li>
+<li>依赖 –&gt; 生成该目标所需的一些文件</li>
+<li>规则 –&gt; 由依赖文件生成目标文件的手段</li>
+<li>TAB键–&gt; 每条规则必须以<code>TAB键</code>开头，使用空格不行</li>
+</ul>
+<p>当我们使用<code>gcc main.c -o main</code>,可以用Makefile</p>
+<pre><code>main:main.c
+    gcc main.c -o main
+</code></pre>
+<p>其中，第一行中的<code>main</code>就是要生成的目标，<code>main.c</code>就是依赖，第二行就是由<code>main.c</code>生成<code>main</code>的规则。</p>
+<h3 id="2-Makefile预定义变量"><a href="#2-Makefile预定义变量" class="headerlink" title="2. Makefile预定义变量"></a>2. Makefile预定义变量</h3><pre><code>$* 不包含扩展名的目标文件名称。
+$+ 所有的依赖文件，以空格分开，并以出现的先后为序，可能包含重复的依赖文件。
+$&lt; 第一个依赖文件的名称。
+$? 所有的依赖文件，以空格分开，这些依赖文件的修改日期比目标的创建日期晚。
+$@ 目标的完整名称。
+$^ 所有的依赖文件，以空格分开，不包含重复的依赖文件。
+$% 如果目标是归档成员，则该变量表示目标的归档成员名称。例如，如果目标名称为 mytarget.so(image.o)，则 @为mytarget.so，而% 为 image.o。
+AR 归档维护程序的名称，默认值为 ar。
+ARFLAGS 归档维护程序的选项。
+AS 汇编程序的名称，默认值为 as。
+ASFLAGS 汇编程序的选项。
+CC C 编译器的名称，默认值为 cc。
+CCFLAGS C 编译器的选项。
+CPP C 预编译器的名称，默认值为 $(CC) -E。
+CPPFLAGS C 预编译的选项。
+CXX C++ 编译器的名称，默认值为 g++。
+CXXFLAGS C++ 编译器的选项。
+FC FORTRAN 编译器的名称，默认值为 f77。
+FFLAGS FORTRAN 编译器的选项。
+</code></pre>
+<h3 id="3-Makefile赋值操作的含义"><a href="#3-Makefile赋值操作的含义" class="headerlink" title="3. Makefile赋值操作的含义"></a>3. Makefile赋值操作的含义</h3><pre><code>= 是最基本的赋值
+:= 是覆盖之前的值
+?= 是如果没有被赋值过就赋予等号后面的值
++= 是添加等号后面的值
+?=: 条件赋值(conditional variable assignment)，如果变量已经赋值，则不要重新赋值；
+
+
+
+
+var = hello
+var ?= byebye
+TARGET:
+    @echo $(var)
+</code></pre>
+<hr>
+<pre><code>$ make
+hello
+</code></pre>
+<p>这里看出，var并没有赋值为byebye，因为它已经有值了。</p>
+<p>这两个赋值的区别在于如果表达式中包含其他的变量，那其他变量展开的时机。<br>:= 在赋值的时候就展开，以后不再变化；<br>= 在使用的时候展开，如果赋值和使用之间右部变量发生改变，则取值发生变化；</p>
+<pre><code>var = hello
+A := $(var)
+B = $(var)
+var = byebye
+TARGET:
+    @echo $(A)
+    @echo $(B)
+</code></pre>
+<hr>
+<pre><code>$ make
+hello
+byebye
+</code></pre>
+<p>这里看出，var取值发生改变后，A的取之并没有变化，而B在使用的时候，使用的是最新的var。</p>
+<h3 id="4-多层级的makefile编写"><a href="#4-多层级的makefile编写" class="headerlink" title="4. 多层级的makefile编写"></a>4. 多层级的makefile编写</h3><p>只是举个例：</p>
+<pre><code>$ tree
+.
+├── include
+│   └── function.h
+├── Makefile
+└── src
+    ├── A
+    │   ├── function.c
+    │   └── Makefile
+    └── B
+        ├── main.c
+        └── Makefile
+</code></pre>
+<hr>
+<pre><code>/*************************************************************************
+        &gt; File Name: function.h
+        &gt; Created Time: Sat 04 Mar 2017 07:31:24 PM CST
+************************************************************************/
+
+#ifndef _FUNCTION_H
+#define _FUNCTION_H
+int function(int );
+#endif
+</code></pre>
+<hr>
+<pre><code>/*************************************************************************
+        &gt; File Name: function.c
+        &gt; Created Time: Sat 04 Mar 2017 07:27:28 PM CST
+************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &quot;../../include/function.h&quot;
+int function(int f)
+&#123;
+    printf(&quot;function:%d\n&quot;,f);
+    return 0;
+&#125;
+</code></pre>
+<hr>
+<pre><code>/*************************************************************************
+        &gt; File Name: main.c
+        &gt; Created Time: Sat 04 Mar 2017 07:28:18 PM CST
+************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &quot;../../include/function.h&quot;
+int main(int argc, const char *argv[])
+&#123;
+    function(5);
+    return 0;
+&#125;
+</code></pre>
+<p>A目录下的Makefile</p>
+<pre><code>function.o:function.c
+        gcc -c function.c -o function.o
+clean:
+        rm function.o
+</code></pre>
+<p>B目录下Makefile</p>
+<pre><code>CFLAGS=-I../../include
+main:main.o ../A/function.o
+        gcc $(CFLAGS) main.o ../A/function.o -o main
+main.o:main.c
+        gcc -c main.c -o main.o
+clean:
+        rm main.o main
+</code></pre>
+<p>顶层目录下Makefile</p>
+<pre><code>CC=gcc
+ROOT:=$(shell pwd)
+INCLUDE:=$(ROOT)/include
+SRC:=$(ROOT)/src
+
+SUBDIR:=$(SRC)/A $(SRC)/B
+
+default:usr
+
+usr:
+        @for n in $(SUBDIR);do $(MAKE) -C $$n;done
+clean:
+        @for n in $(SUBDIR);do $(MAKE) -C $$n clean;done
+</code></pre>
+<p>运行：</p>
+<pre><code>$ ls
+include  Makefile  src
+
+$ make
+make[1]: Entering directory `/home/gabriel/test/test/src/A&#39;
+gcc -c function.c -o function.o
+make[1]: Leaving directory `/home/gabriel/test/test/src/A&#39;
+make[1]: Entering directory `/home/gabriel/test/test/src/B&#39;
+gcc -c main.c -o main.o
+gcc -I../../include main.o ../A/function.o -o main
+make[1]: Leaving directory `/home/gabriel/test/test/src/B&#39;
+
+$ ./src/B/main 
+function:5
+
+$ make clean
+make[1]: Entering directory `/home/gabriel/test/test/src/A&#39;
+rm function.o
+make[1]: Leaving directory `/home/gabriel/test/test/src/A&#39;
+make[1]: Entering directory `/home/gabriel/test/test/src/B&#39;
+rm main.o main
+make[1]: Leaving directory `/home/gabriel/test/test/src/B&#39;
+</code></pre>
+<h3 id="项目中写的文件"><a href="#项目中写的文件" class="headerlink" title="项目中写的文件"></a>项目中写的文件</h3><pre><code>$ tree
+.
+├── bin
+│   ├── gabriel_task_client
+│   └── gabriel_task_server
+├── conf
+│   ├── proxy
+│   │   └── gabriel_task.conf
+│   └── server
+│       └── gabriel_task.conf
+├── include
+│   ├── cJSON.h
+│   ├── common.h
+│   ├── db.h
+│   ├── gabe_callback.h
+│   ├── gabe_config.h
+│   ├── gabe_daemon.h
+│   ├── gabe_json.h
+│   ├── gabe_log.h
+│   ├── gabe_msg.h
+│   ├── gabe_regex.h
+│   ├── gabe_sock.h
+│   ├── init.h
+│   ├── libssh2_config.h
+│   └── sem.h
+├── Makefile==========================================&gt;①
+├── obj_proxy
+├── obj_server
+└── src
+    ├── core
+    │   ├── cJSON.c
+    │   ├── common.c
+    │   ├── db.c
+    │   ├── gabe_callback.c
+    │   ├── gabe_config.c
+    │   ├── gabe_daemon.c
+    │   ├── gabe_json.c
+    │   ├── gabe_log.c
+    │   ├── gabe_msg.c
+    │   ├── gabe_regex.c
+    │   ├── gabe_sock.c
+    │   ├── init.c
+    │   └── sem.c
+    ├── gabriel_task_client
+    │   ├── gabe_proxy.c
+    │   └── Makefile===================================②
+    └── gabriel_task_server
+        ├── gabe_server.c
+        └── Makefile====================================③
+</code></pre>
+<p>①</p>
+<pre><code>$ cat Makefile 
+SUBDIR=src/gabriel_task_client \
+        src/gabriel_task_server
+
+gabriel_task:
+        @for n in $&#123;SUBDIR&#125;; do $(MAKE) -C $$n;done
+clean:
+        @for n in $&#123;SUBDIR&#125;; do $(MAKE) -C $$n clean;done
+</code></pre>
+<p>②</p>
+<pre><code>$ cat src/gabriel_task_client/Makefile 
+INC_DIR=../../include
+BIN_DIR=../../bin
+SRC_DIR=../core
+OBJ_DIR=../../obj_proxy
+
+
+SRC=$&#123;wildcard $&#123;SRC_DIR&#125;/*.c ./gabe_proxy.c&#125;
+OBJ=$&#123;patsubst %.c,$(OBJ_DIR)/%.o,$&#123;notdir $&#123;SRC&#125;&#125;&#125;
+TARGET=gabriel_task_client
+BIN_TARGET=$&#123;BIN_DIR&#125;/$&#123;TARGET&#125;
+CC=gcc
+CFLAGS=-g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I$&#123;INC_DIR&#125;
+LIBS=-lmysqlclient -lpthread -lm -lssh2
+$&#123;BIN_TARGET&#125;:$&#123;OBJ&#125;
+        $&#123;CC&#125; $&#123;OBJ&#125; $&#123;LIBS&#125; -o $@
+
+$&#123;OBJ_DIR&#125;/%.o:$&#123;SRC_DIR&#125;/%.c
+        $&#123;CC&#125; $&#123;CFLAGS&#125; -c $&lt; -o $@
+$&#123;OBJ_DIR&#125;/%.o:gabe_proxy.c
+        $&#123;CC&#125; $&#123;CFLAGS&#125; -c $&lt; -o $@
+clean:
+        find $&#123;OBJ_DIR&#125; -name *.o -exec rm -rf &#123;&#125; \;
+</code></pre>
+<p>③</p>
+<pre><code>$ cat src/gabriel_task_server/Makefile 
+INC_DIR=../../include
+BIN_DIR=../../bin
+SRC_DIR=../core
+OBJ_DIR=../../obj_server
+
+
+SRC=$&#123;wildcard $&#123;SRC_DIR&#125;/*.c ./gabe_server.c&#125;
+OBJ=$&#123;patsubst %.c,$(OBJ_DIR)/%.o,$&#123;notdir $&#123;SRC&#125;&#125;&#125;
+
+TARGET=gabriel_task_server
+BIN_TARGET=$&#123;BIN_DIR&#125;/$&#123;TARGET&#125;
+CC=gcc
+CFLAGS=-g -Wall -D DEBUG_TEST -D SERVER_TYPE -I$&#123;INC_DIR&#125;
+LIBS=-lmysqlclient -lpthread -lm -lssh2
+$&#123;BIN_TARGET&#125;:$&#123;OBJ&#125;
+        $&#123;CC&#125; $&#123;OBJ&#125; $&#123;LIBS&#125; -o $@
+
+$&#123;OBJ_DIR&#125;/%.o:$&#123;SRC_DIR&#125;/%.c
+        $&#123;CC&#125; $&#123;CFLAGS&#125; -c $&lt; -o $@
+$&#123;OBJ_DIR&#125;/%.o:gabe_server.c
+        $&#123;CC&#125; $&#123;CFLAGS&#125; -c $&lt; -o $@
+clean:
+        find $&#123;OBJ_DIR&#125; -name *.o -exec rm -rf &#123;&#125; \;  
+</code></pre>
+<p> 运行结果：</p>
+<pre><code>$ make
+make[1]: Entering directory `/home/gabriel/test/gabriel_task/gabrile_task/src/gabriel_task_client&#39;
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/cJSON.c -o ../../obj_proxy/cJSON.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/common.c -o ../../obj_proxy/common.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/db.c -o ../../obj_proxy/db.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_callback.c -o ../../obj_proxy/gabe_callback.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_config.c -o ../../obj_proxy/gabe_config.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_daemon.c -o ../../obj_proxy/gabe_daemon.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_json.c -o ../../obj_proxy/gabe_json.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_log.c -o ../../obj_proxy/gabe_log.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_msg.c -o ../../obj_proxy/gabe_msg.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_regex.c -o ../../obj_proxy/gabe_regex.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/gabe_sock.c -o ../../obj_proxy/gabe_sock.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/init.c -o ../../obj_proxy/init.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c ../core/sem.c -o ../../obj_proxy/sem.o
+gcc -g -Wall -D DEBUG_TEST -D CLIENT_TYPE -I../../include -c gabe_proxy.c -o ../../obj_proxy/gabe_proxy.o
+gcc ../../obj_proxy/cJSON.o ../../obj_proxy/common.o ../../obj_proxy/db.o ../../obj_proxy/gabe_callback.o ../../obj_proxy/gabe_config.o ../../obj_proxy/gabe_daemon.o ../../obj_proxy/gabe_json.o ../../obj_proxy/gabe_log.o ../../obj_proxy/gabe_msg.o ../../obj_proxy/gabe_regex.o ../../obj_proxy/gabe_sock.o ../../obj_proxy/init.o ../../obj_proxy/sem.o ../../obj_proxy/gabe_proxy.o -lmysqlclient -lpthread -lm -lssh2 -o ../../bin/gabriel_task_client
+make[1]: Leaving directory `/home/gabriel/test/gabriel_task/gabrile_task/src/gabriel_task_client&#39;
+make[1]: Entering directory `/home/gabriel/test/gabriel_task/gabrile_task/src/gabriel_task_server&#39;
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/cJSON.c -o ../../obj_server/cJSON.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/common.c -o ../../obj_server/common.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/db.c -o ../../obj_server/db.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_callback.c -o ../../obj_server/gabe_callback.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_config.c -o ../../obj_server/gabe_config.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_daemon.c -o ../../obj_server/gabe_daemon.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_json.c -o ../../obj_server/gabe_json.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_log.c -o ../../obj_server/gabe_log.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_msg.c -o ../../obj_server/gabe_msg.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_regex.c -o ../../obj_server/gabe_regex.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/gabe_sock.c -o ../../obj_server/gabe_sock.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/init.c -o ../../obj_server/init.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c ../core/sem.c -o ../../obj_server/sem.o
+gcc -g -Wall -D DEBUG_TEST -D SERVER_TYPE -I../../include -c gabe_server.c -o ../../obj_server/gabe_server.o
+gcc ../../obj_server/cJSON.o ../../obj_server/common.o ../../obj_server/db.o ../../obj_server/gabe_callback.o ../../obj_server/gabe_config.o ../../obj_server/gabe_daemon.o ../../obj_server/gabe_json.o ../../obj_server/gabe_log.o ../../obj_server/gabe_msg.o ../../obj_server/gabe_regex.o ../../obj_server/gabe_sock.o ../../obj_server/init.o ../../obj_server/sem.o ../../obj_server/gabe_server.o -lmysqlclient -lpthread -lm -lssh2 -o ../../bin/gabriel_task_server
+make[1]: Leaving directory `/home/gabriel/test/gabriel_task/gabrile_task/src/gabriel_task_server&#39;     
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Makefile/">Makefile</a>, <a href="/tags/make/">make</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

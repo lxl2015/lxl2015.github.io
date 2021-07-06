@@ -1,0 +1,443 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java-Web开发笔记02-html-and-css | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1、创建第一个项目">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Java-Web开发笔记02-html-and-css"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-10-09T23:46:25.000Z"><a href="/2017/10/10/Java-Web开发笔记02-html-and-css/">2017-10-10</a></time>
+        
+  
+    <h1 class="title">Java-Web开发笔记02-html-and-css</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E5%88%9B%E5%BB%BA%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE"><span class="toc-text">1、创建第一个项目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81HTML%E6%96%87%E4%BB%B6"><span class="toc-text">2、HTML文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81CSS%E6%96%87%E4%BB%B6"><span class="toc-text">3、CSS文件</span></a></li></ol>
+    </div>
+
+        <h3 id="1、创建第一个项目"><a href="#1、创建第一个项目" class="headerlink" title="1、创建第一个项目"></a>1、创建第一个项目</h3><span id="more"></span>
+
+<p>打开Eclipse。</p>
+<p>File——&gt;NEW——&gt;Dynamic Web Project——&gt;填写项目名称——&gt;之后默认</p>
+<h3 id="2、HTML文件"><a href="#2、HTML文件" class="headerlink" title="2、HTML文件"></a>2、HTML文件</h3><p>下面是创建的HTML文件，至于标签，可以去<a target="_blank" rel="noopener" href="http://www.w3school.com.cn/html/index.asp">w3school</a>查看。</p>
+<p>传智播客的材料。</p>
+<img src="/2017/10/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B002-html-and-css/HTML.png" class="" title="图片">
+
+
+
+<pre><code>&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;TITLE&gt;HTML语法&lt;/TITLE&gt;
+&lt;Meta charset=&quot;UTF-8&quot;&gt;
+&lt;/HEAD&gt;
+&lt;BODY&gt;
+
+&lt;!-- 分隔标签 --&gt;
+
+    &lt;!-- 文字上的分隔标签
+    强制断行标签&lt;br&gt;、强制分段标签&lt;p&gt; --&gt;
+    
+    这是一个断行的范例&lt;br&gt;看出来了吗？ 
+    这是一个分段的范例&lt;p&gt;基本上他会比断行还多空出一行
+
+
+    &lt;!-- 分隔线标签 --&gt;
+    普通分隔线&lt;hr&gt;
+
+    橘色分隔线&lt;hr color=&quot;#ff8000&quot;&gt;
+    
+    宽度为240px的分隔线&lt;hr width=&quot;100&quot;&gt;
+    
+    厚度为5的分隔线&lt;hr size=&quot;10&quot;&gt;
+    
+    靠右的分隔线&lt;hr align=&quot;right&quot;&gt;
+    
+    实心分隔线（无阴影&lt;hr noshade size=&quot;10&quot;&gt;
+
+&lt;!-- 排版标签  --&gt;
+    
+    &lt;!-- 文字置左、置中、置右 --&gt;
+    &lt;p align=&quot;left&quot;&gt;文字靠左&lt;/p&gt;
+    &lt;p align=&quot;center&quot;&gt;文字置中&lt;/p&gt;
+    &lt;p align=&quot;right&quot;&gt;文字靠右&lt;/p&gt;
+
+
+    &lt;!-- 置中标签 --&gt;
+    &lt;center&gt;这是最中间&lt;/center&gt;
+
+    &lt;!-- 向右缩排标签 --&gt;
+    &lt;blockquote&gt;缩排1单位&lt;/blockquote&gt;
+
+    &lt;blockquote&gt;&lt;blockquote&gt;缩排2单位&lt;/blockquote&gt;&lt;/blockquote&gt;
+
+
+    &lt;!-- 保存原始格式标签 --&gt;
+    &lt;pre&gt;
+    文　字
+    　格　式
+    &lt;/pre&gt;
+
+
+&lt;!-- 字体标签 --&gt;
+
+    &lt;!-- 标题标签 --&gt;
+    &lt;h1&gt;标题一&lt;/h1&gt;
+    
+    &lt;h2&gt;标题二&lt;/h2&gt;
+    
+    &lt;h3&gt;标题三&lt;/h3&gt;
+    
+    &lt;h4&gt;标题四&lt;/h4&gt;
+    
+    &lt;h5&gt;标题五&lt;/h5&gt;
+    
+    &lt;h6&gt;标题六&lt;/h6&gt;
+
+    &lt;!-- 设定字体大小标签 --&gt;
+        &lt;!-- 标题的大小一共有七种，也就是&lt;font size=1&gt;（最小）到&lt;font size=7&gt;（最大），
+        另外，还有一种写法：&lt;font size=+1&gt;文字内容&lt;/font&gt;，
+        其意思就是说：比预设字大一级。当然也可以 font size=+2
+        （比预设字大二级），或是 font size=-1（比预设字小一级），
+        以一般而言，预设字体多为 3。 --&gt;
+    
+    &lt;font size=1&gt;字体一&lt;/font&gt; 或是
+    &lt;font size=-2&gt;字体一&lt;/font&gt;
+    &lt;br&gt;
+    &lt;font size=2&gt;字体二&lt;/font&gt; 或是
+    &lt;font size=-1&gt;字体二&lt;/font&gt;
+    &lt;br&gt;
+    
+    &lt;font size=3&gt;字体三&lt;/font&gt; 或是
+    &lt;font size=+0&gt;字体三&lt;/font&gt;
+    &lt;br&gt;
+    
+    &lt;font size=4&gt;字体四&lt;/font&gt; 或是
+    &lt;font size=+1&gt;字体四&lt;/font&gt;
+    &lt;br&gt;
+    
+    &lt;font size=5&gt;字体五&lt;/font&gt; 或是
+    &lt;font size=+2&gt;字体五&lt;/font&gt;
+    &lt;br&gt;
+    
+    &lt;font size=6&gt;字体六&lt;/font&gt; 或是
+    &lt;font size=+3&gt;字体六&lt;/font&gt;
+    &lt;br&gt;
+    
+    &lt;font size=6&gt;字体七&lt;/font&gt; 或是
+    &lt;font size=+4&gt;字体七&lt;/font&gt;
+    &lt;br&gt;
+
+    &lt;!-- 字型变化标签 --&gt;
+
+    &lt;b&gt;粗体&lt;/b&gt;
+    
+    &lt;i&gt;斜体&lt;/i&gt;
+    
+    &lt;u&gt;底线&lt;/u&gt;
+    
+    &lt;sup&gt;上标&lt;/sup&gt;
+    
+    &lt;sub&gt;下标&lt;/sub&gt;
+    
+    &lt;tt&gt;打字机&lt;/tt&gt;
+    
+    &lt;em&gt;强调&lt;/em&gt;
+    
+    &lt;strong&gt;加强&lt;/strong&gt;
+    
+    &lt;samp&gt;范例&lt;/samp&gt;
+    
+    &lt;code&gt;原始码&lt;/code&gt;
+    
+    &lt;var&gt;变数&lt;/var&gt;
+    
+    &lt;dfn&gt;定义&lt;/dfn&gt;
+    
+    &lt;cite&gt;引用&lt;/cite&gt;
+    
+    &lt;address&gt;所在地址&lt;/address&gt;
+
+
+
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</code></pre>
+<p>有个表单</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html;charset=utf-8&quot;&gt;
+&lt;title&gt;一个表单&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action=&quot;#&quot; method=&quot;post&quot;&gt;
+        用户名：&lt;input type=&quot;text&quot; name=&quot;username&quot; value=&quot;&quot; size=&quot;2&quot; maxlength=&quot;3&quot;
+            rendonly=&quot;readonly disable=&quot; disable /&gt;&lt;br /&gt; 密码：&lt;input
+            type=&quot;password&quot; name=&quot;password&quot; /&gt;&lt;br /&gt; 性别：男&lt;input type=&quot;radio&quot;
+            name=&quot;sex&quot; value=&quot;male&quot;&gt;女&lt;input type=&quot;radio&quot; name=&quot;sex&quot;
+            value=&quot;female&quot; /&gt;&lt;br /&gt; 爱好：抽烟&lt;input type=&quot;checkbox&quot; name=&quot;habbit&quot;
+            value=&quot;smork&quot;&gt; 喝酒&lt;input type=&quot;checkbox&quot; name=&quot;habbit&quot;
+            value=&quot;drink&quot;&gt; 烫头&lt;input type=&quot;checkbox&quot; name=&quot;habbit&quot;
+            value=&quot;tangtou&quot;&gt; &lt;br /&gt; &lt;label&gt;学历：&lt;/label&gt; &lt;select name=&quot;&quot;
+            size=&quot;1&quot;&gt;
+            &lt;option value=&quot;zk&quot;&gt;专科&lt;/option&gt;
+            &lt;option value=&quot;bk&quot;&gt;本科&lt;/option&gt;
+            &lt;option value=&quot;ss&quot;&gt;硕士&lt;/option&gt;
+        &lt;/select&gt; &lt;br /&gt; 个人说明：&lt;br /&gt;
+        &lt;textarea rows=&quot;10&quot; cols=&quot;75&quot; name=&quot;desc&quot;&gt;这家伙很懒，什么都没留下&lt;/textarea&gt;
+        &lt;br /&gt; 近照：&lt;input type=&quot;file&quot; name=&quot;file&quot;&gt;&lt;br /&gt; &lt;input
+            type=&quot;hidden&quot; name=&quot;haha&quot; value=&quot;heihei&quot;&gt; &lt;input
+            type=&quot;submit&quot; value=&quot;提交&quot;&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>s</p>
+<img src="/2017/10/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B002-html-and-css/form.png" class="" title="图片">
+
+
+<h3 id="3、CSS文件"><a href="#3、CSS文件" class="headerlink" title="3、CSS文件"></a>3、CSS文件</h3><p>1、CSS概念<br>CSS:Casecade Style Sheet 层叠样式表</p>
+<p>2、结合方式</p>
+<p>2.1、html标签添加上style属性，属性的值填写Css代码，所有标签都有style属性。</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;!-- 结合方式一   &quot;color:green&quot;就是css代码 --&gt;
+    &lt;p style=&quot;color: green;&quot;&gt;这是一个CSS样式。&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<img src="/2017/10/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B002-html-and-css/1.png" class="" title="图片">
+
+<p>2.2、使用head标签中的style标签，设置页面样式，style中填写css代码</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;style type=&quot;text/css&quot;&gt;
+h1 &#123;
+    color: red;
+&#125;
+
+h2 &#123;
+    color: blue;
+&#125;
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- 结合方式二 --&gt;
+    &lt;h1&gt;结合方式二&lt;/h1&gt;
+    &lt;h2&gt;结合方式二&lt;/h2&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<img src="/2017/10/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B002-html-and-css/2.png" class="" title="图片">
+
+<p>2.3、将外部的css引入当前页面</p>
+<p>./WebContent/css/lxl_css.css</p>
+<pre><code>@CHARSET &quot;UTF-8&quot;;
+
+p &#123;
+    color: blue;
+&#125;
+
+h1 &#123;
+    color: red;
+&#125;
+</code></pre>
+<p>./WebContent/html/lxl_html.html</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;../css/lxl_css.css&quot;&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;结合方式三&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<img src="/2017/10/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B002-html-and-css/3.png" class="" title="图片">
+<p>3、Css语法</p>
+<p>CSS 规则由两个主要的部分构成：选择器，以及一条或多条声明:</p>
+<img src="/2017/10/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B002-html-and-css/selector.gif" class="" title="图片">
+
+<p>选择器通常是您需要改变样式的 HTML 元素。<br>每条声明由一个属性和一个值组成。<br>属性（property）是您希望设置的样式属性（style attribute）。每个属性有一个值。属性和值被冒号分开。</p>
+<p>CSS声明总是以分号(;)结束，声明组以大括号({})括起来:</p>
+<p>为了让CSS可读性更强，你可以每行只描述一个属性:</p>
+<p>传智播客的材料。</p>
+<img src="/2017/10/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B002-html-and-css/CSS.png" class="" title="图片">
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/10-Web/">10. Web</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Java-Web/">Java Web</a>, <a href="/tags/Eclipse/">Eclipse</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

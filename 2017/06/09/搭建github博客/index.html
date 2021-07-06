@@ -1,0 +1,302 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>搭建github博客 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1、前期准备">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="搭建github博客"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-06-09T14:20:54.000Z"><a href="/2017/06/09/搭建github博客/">2017-06-09</a></time>
+        
+  
+    <h1 class="title">搭建github博客</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E5%89%8D%E6%9C%9F%E5%87%86%E5%A4%87"><span class="toc-text">1、前期准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E9%85%8D%E7%BD%AEgithub"><span class="toc-text">2、配置github</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E3%80%81%E7%94%9F%E6%88%90SSH-Key"><span class="toc-text">2.1、生成SSH Key</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E3%80%81%E5%AE%89%E8%A3%85node-js%E5%92%8Cgit"><span class="toc-text">2.2、安装node.js和git</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E3%80%81%E5%AE%89%E8%A3%85hexo%E5%8F%8A%E9%85%8D%E7%BD%AE"><span class="toc-text">2.3、安装hexo及配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-1%E3%80%81%E5%AE%89%E8%A3%85"><span class="toc-text">2.3.1、安装</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4%E3%80%81%E6%9B%B4%E6%8D%A2%E4%B8%BB%E9%A2%98"><span class="toc-text">2.4、更换主题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5%E3%80%81hexo%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-text">2.5、hexo常用命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E5%A4%9A%E5%8F%B0%E7%94%B5%E8%84%91%E5%90%8C%E6%AD%A5HEXO%E5%8D%9A%E5%AE%A2"><span class="toc-text">3、多台电脑同步HEXO博客</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1%E3%80%81%E5%88%9B%E5%BB%BA%E5%88%86%E6%94%AF"><span class="toc-text">3.1、创建分支</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2%E3%80%81%E5%8F%A6%E5%A4%96%E4%B8%80%E5%8F%B0%E7%94%B5%E8%84%91%E9%85%8D%E7%BD%AE"><span class="toc-text">3.2、另外一台电脑配置</span></a></li></ol></li></ol>
+    </div>
+
+        <h2 id="1、前期准备"><a href="#1、前期准备" class="headerlink" title="1、前期准备"></a>1、前期准备</h2><span id="more"></span>
+<blockquote>
+<p>github帐号<br>node.js<br>git-for-windows </p>
+</blockquote>
+<h2 id="2、配置github"><a href="#2、配置github" class="headerlink" title="2、配置github"></a>2、配置github</h2><h3 id="2-1、生成SSH-Key"><a href="#2-1、生成SSH-Key" class="headerlink" title="2.1、生成SSH Key"></a>2.1、生成SSH Key</h3><pre><code># git config --global user.name lxl2015
+# git config --global user.email 1010******@qq.com
+</code></pre>
+<p>创建本地ssh(用于上传到你对应的github账号)<br>    # ssh-keygen -t rsa -C “1010******@qq.com”</p>
+<p>打开id_rsa.pub，将内容粘贴到github里面Settings ——&gt;SSH and GPG kyes ——&gt;New SSH Key ——&gt;Add SSH Key</p>
+<p>验证 </p>
+<pre><code># ssh -T git@github.com
+</code></pre>
+<p>根据提示选择后出现</p>
+<pre><code>Hi Fly-Sunshine-J! You&#39;ve successfully authenticated, but GitHub does not provide shell access.
+</code></pre>
+<p>说明验证成功</p>
+<h3 id="2-2、安装node-js和git"><a href="#2-2、安装node-js和git" class="headerlink" title="2.2、安装node.js和git"></a>2.2、安装node.js和git</h3><p>默认选项安装即可</p>
+<h3 id="2-3、安装hexo及配置"><a href="#2-3、安装hexo及配置" class="headerlink" title="2.3、安装hexo及配置"></a>2.3、安装hexo及配置</h3><p>hexo官网里面更新最新的安装方式，<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/">点这里</a></p>
+<h4 id="2-3-1、安装"><a href="#2-3-1、安装" class="headerlink" title="2.3.1、安装"></a>2.3.1、安装</h4><p>配置初始环境</p>
+<pre><code># npm install hexo-cli -g
+# hexo init blog
+# cd blog
+# npm install
+# hexo server
+</code></pre>
+<p>hexo配置在blog下面。登录到localhost:4000预览看一下。如果界面正常，说明已经成功一半。</p>
+<pre><code># vi _config.yml
+</code></pre>
+<p>按照下面内容修改</p>
+<pre><code># Site
+title: Linux笔记
+subtitle:
+description:
+author: lxl2015
+language: zh-CN
+timezone: Asia/Shanghai 
+...
+...
+# Deployment
+## Docs: https://hexo.io/docs/deployment.html
+deploy:
+type: git
+repository: git@github.com:lxl2015/lxl2015.github.io.git
+branch: master
+</code></pre>
+<p>注意：你应该在github上有一个类似lxl2015.github.io的仓库</p>
+<h3 id="2-4、更换主题"><a href="#2-4、更换主题" class="headerlink" title="2.4、更换主题"></a>2.4、更换主题</h3><p>假设你喜欢的主题叫abc</p>
+<pre><code># git clone url  xxx/blog/themes/abc
+# rm xxx/blog/themes/abc/.git
+</code></pre>
+<p>打开blog目录下的_config.yml</p>
+<pre><code>vi _config.yml
+</code></pre>
+<p>修改 </p>
+<pre><code>theme: abc
+</code></pre>
+<h3 id="2-5、hexo常用命令"><a href="#2-5、hexo常用命令" class="headerlink" title="2.5、hexo常用命令"></a>2.5、hexo常用命令</h3><pre><code># hexo new &quot;postName&quot; #新建文章,默认在source/_posts/下面
+# hexo new page &quot;pageName&quot; #新建页面
+# hexo generate #生成静态页面至public目录
+# hexo server #开启预览访问端口（默认端口4000，&#39;ctrl + c&#39;关闭server）
+# hexo deploy #部署到GitHub
+# hexo clean #清除缓存
+# hexo help  # 查看帮助
+# hexo version  #查看Hexo的版本
+</code></pre>
+<p>一般写文章的流程是 </p>
+<ol>
+<li>hexo new “name”    //创建文章</li>
+<li>hexo g            //生成静态页面</li>
+<li>hexo s            //本地预览</li>
+<li>hexo d            //发布到github上面</li>
+</ol>
+<blockquote>
+<p>初始化分类目录</p>
+</blockquote>
+<pre><code># hexo new page &quot;categories&quot;
+</code></pre>
+<blockquote>
+<p>如果生成文章没有标签</p>
+</blockquote>
+<pre><code># hexo new page tags
+</code></pre>
+<blockquote>
+<p>如果没有其他页面，查看主题下面的_config.yml对应的页面。</p>
+</blockquote>
+<p>例如</p>
+<pre><code>about: /resume
+# hexo new page resume
+</code></pre>
+<h2 id="3、多台电脑同步HEXO博客"><a href="#3、多台电脑同步HEXO博客" class="headerlink" title="3、多台电脑同步HEXO博客"></a>3、多台电脑同步HEXO博客</h2><h3 id="3-1、创建分支"><a href="#3-1、创建分支" class="headerlink" title="3.1、创建分支"></a>3.1、创建分支</h3><p>在lxl2015.github.io.git创建一个分支hexo，用来存放blog文件夹下的文件。</p>
+<p>1.删除主题下面的.git文件夹</p>
+<p>2.在blog目录下创建hexo分支</p>
+<pre><code># git init
+//创建hexo分支
+# git checkout -b hexo
+# git remote add origin git@github.com:lxl2015/lxl2015.github.io.git
+# git add package.json source _config.yml scaffolds themes
+# git commit -m &quot;add hexo&quot;
+# git push -u origin hexo
+</code></pre>
+<p>登录github，选择默认分支</p>
+<img src="/2017/06/09/%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2/da-jian-github-blog01.png" class="" title="默认分支">
+
+
+<h3 id="3-2、另外一台电脑配置"><a href="#3-2、另外一台电脑配置" class="headerlink" title="3.2、另外一台电脑配置"></a>3.2、另外一台电脑配置</h3><p>切换分支</p>
+<pre><code># git clone -b hexo git@github.com:lxl2015/lxl2015.github.io.git
+# npm install
+</code></pre>
+<p>错误信息：</p>
+<blockquote>
+<p>如果出现：ERROR Deployer not found: git</p>
+</blockquote>
+<pre><code>npm install hexo-deployer-git --save
+</code></pre>
+<blockquote>
+<p>出现warning: LF will be replaced by CRLF </p>
+</blockquote>
+<pre><code>git config --global core.autocrlf false 
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/11-Open-Source/">11.Open Source</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/github/">github</a>, <a href="/tags/hexo/">hexo</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

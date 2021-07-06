@@ -1,0 +1,290 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Zabbix开启调试模式 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1、开启调试模式">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Zabbix开启调试模式"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-08T10:15:57.000Z"><a href="/2017/08/08/Zabbix开启调试模式/">2017-08-08</a></time>
+        
+  
+    <h1 class="title">Zabbix开启调试模式</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E5%BC%80%E5%90%AF%E8%B0%83%E8%AF%95%E6%A8%A1%E5%BC%8F"><span class="toc-text">1、开启调试模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E6%97%A5%E5%BF%97%E5%88%86%E5%89%B2%E7%A8%8B%E5%BA%8F"><span class="toc-text">2、日志分割程序</span></a></li></ol>
+    </div>
+
+        <h4 id="1、开启调试模式"><a href="#1、开启调试模式" class="headerlink" title="1、开启调试模式"></a>1、开启调试模式</h4><span id="more"></span>
+
+<p>关闭zabbix_server</p>
+<pre><code># /etc/ini.d/zabbix_server stop
+</code></pre>
+<p>编辑配置文件</p>
+<pre><code># vi /etc/zabbix/zabbix_server.conf
+</code></pre>
+<p>修改</p>
+<pre><code>### Option: LogFileSize
+#       Maximum size of log file in MB.
+#       0 - disable automatic log rotation.
+#
+# Mandatory: no
+# Range: 0-1024
+# Default:
+# LogFileSize=1
+LogFileSize=0
+
+
+### Option: DebugLevel
+#       Specifies debug level:
+#       0 - basic information about starting and stopping of Zabbix processes
+#       1 - critical information
+#       2 - error information
+#       3 - warnings
+#       4 - for debugging (produces lots of information)
+#       5 - extended debugging (produces even more information)
+#
+# Mandatory: no
+# Range: 0-5
+# Default:
+# DebugLevel=3
+DebugLevel=4
+</code></pre>
+<p>删除zabbix_server.log</p>
+<pre><code># rm /tmp/zabbix_server.log -rf
+</code></pre>
+<p>启动zabbix_server</p>
+<pre><code># /etc/init.d/zabbix_server start
+</code></pre>
+<p>等待很长时间后</p>
+<pre><code># /etc/init.d/zabbix_server stop
+</code></pre>
+<h4 id="2、日志分割程序"><a href="#2、日志分割程序" class="headerlink" title="2、日志分割程序"></a>2、日志分割程序</h4><p>不知道是我写的还是别人的，忘记了。</p>
+<pre><code>/*************************************************************************
+  &gt; File Name: zabbix_log_cutout.c
+  &gt; Author: Lin
+  &gt; Mail: 不想写邮箱
+  &gt; Created Time: Fri 28 Jul 2017 19:19:20 AM CST
+ ************************************************************************/
+#include &lt;stdio.h&gt;
+
+int main(int argc, char *argv[])
+&#123;
+  FILE *fp, *fp_out;
+  int process;
+  char buf[4096];
+  int flag = 0;
+  int p, p_o = 0;
+  char out_file[128];
+
+  if (argc &lt; 3) &#123;
+    fprintf(stderr, &quot;没有给出文件名称或PID\n&quot;);
+    return 1;
+  &#125;
+
+  process = atoi(argv[2]);
+  if (process &gt; 999999 || process &lt; 1) &#123;
+    fprintf(stderr, &quot;PID 不正确.\n&quot;);
+    return 3;
+  &#125;
+
+  if (snprintf(out_file, sizeof(out_file), &quot;%s-%06d.log&quot;, argv[1], process) &gt;= sizeof(out_file)) &#123;
+    fprintf(stderr, &quot;不能生成分割文件.\n%s 名字太长.\n&quot;, argv[1]);
+    return 4;
+  &#125;
+
+  if ((fp = fopen(argv[1], &quot;r&quot;)) == NULL) &#123;
+    fprintf(stderr, &quot;打开 %s失败\n&quot;, argv[1]);
+    return 2;
+  &#125;
+
+  fp_out = fopen(out_file, &quot;w&quot;);
+  while (fgets(buf, 4096, fp) != NULL) &#123;
+    if (sscanf(buf, &quot;%6d:&quot;, &amp;p) == 1) &#123;
+      if (p != process) &#123;
+        p_o = 0;
+        continue;
+      &#125;
+      p_o = p;
+      fputs(buf, fp_out);
+    &#125; else if (p_o == process) &#123;
+      fputs(buf, fp_out);
+    &#125;
+  &#125;
+
+  fclose(fp);
+  fclose(fp_out);
+  
+  return 0;
+&#125;
+
+# gcc zabbix_log_cutout.c -o zabbix_log_cutout
+# cp /var/log/zabbix/zabbix_server.log .
+# zabbix_log_cutout zabbix_server.log 进程号
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/11-Open-Source/">11.Open Source</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Zabbix/">Zabbix</a>, <a href="/tags/调试模式/">调试模式</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

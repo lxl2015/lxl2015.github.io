@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>制作Centos局域网本地源 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="本来不打算记下来，网上一搜一大把，只是还要筛选一下，浪费时间">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="制作Centos局域网本地源"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-17T09:13:19.000Z"><a href="/2017/08/17/制作Centos局域网本地源/">2017-08-17</a></time>
+        
+  
+    <h1 class="title">制作Centos局域网本地源</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1%E3%80%81%E5%AE%89%E8%A3%85http%E6%9C%8D%E5%8A%A1"><span class="toc-text">1、安装http服务</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2%E3%80%81%E5%AE%89%E8%A3%85%E7%9B%B8%E5%85%B3%E5%88%B6%E4%BD%9C%E7%9A%84%E8%BD%AF%E4%BB%B6%E5%8C%85"><span class="toc-text">2、安装相关制作的软件包</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3%E3%80%81%E8%8E%B7%E5%8F%96%E6%BA%90%E6%96%87%E4%BB%B6"><span class="toc-text">3、获取源文件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E3%80%81%E4%B8%8B%E8%BD%BD163%E7%9A%84%E6%BA%90"><span class="toc-text">3.1、下载163的源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E3%80%81%E6%8C%82%E5%9C%A8%E5%85%89%E7%9B%98%E9%95%9C%E5%83%8F"><span class="toc-text">3.2、挂在光盘镜像</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4%E3%80%81%E5%88%9B%E5%BB%BA%E6%BA%90%E7%B4%A2%E5%BC%95%E6%96%87%E4%BB%B6"><span class="toc-text">4、创建源索引文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5%E3%80%81%E9%85%8D%E7%BD%AErepo"><span class="toc-text">5、配置repo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6%E3%80%81%E9%AA%8C%E8%AF%81"><span class="toc-text">6、验证</span></a></li></ol>
+    </div>
+
+        <p>本来不打算记下来，网上一搜一大把，只是还要筛选一下，浪费时间</p>
+<span id="more"></span>
+<p><br/><br/></p>
+<h1 id="1、安装http服务"><a href="#1、安装http服务" class="headerlink" title="1、安装http服务"></a>1、安装http服务</h1><pre><code># yum install httpd
+</code></pre>
+<p>修改配置文件</p>
+<pre><code># vi /etc/httpd/conf/httpd.conf
+</code></pre>
+<p>修改</p>
+<pre><code>ServerName www.example.com:80 
+DocumentRoot &quot;/var/www/html/yum&quot;
+</code></pre>
+<p>重启服务</p>
+<pre><code># service httpd restart
+</code></pre>
+<h1 id="2、安装相关制作的软件包"><a href="#2、安装相关制作的软件包" class="headerlink" title="2、安装相关制作的软件包"></a>2、安装相关制作的软件包</h1><pre><code>#rpm –qa|grep  createrepo 
+</code></pre>
+<p>如果为发现，则安装createrepo</p>
+<pre><code>#rpm –ivh createrepo-0.9.9-22.el6.noarch.rpm deltarpm-3.5-0.5.20090913git.el6.x86_64.rpm python-deltarpm-3.5-0.5.20090913git.el6.x86_64.rpm
+</code></pre>
+<h1 id="3、获取源文件"><a href="#3、获取源文件" class="headerlink" title="3、获取源文件"></a>3、获取源文件</h1><p>首先先要将所有的数据包上传或者挂载到/yum/source目录下.</p>
+<h2 id="3-1、下载163的源"><a href="#3-1、下载163的源" class="headerlink" title="3.1、下载163的源"></a>3.1、下载163的源</h2><pre><code># cd /yum/source
+# wget http://mirrors.163.com/centos/6/os/x86_64/Packages/
+# wget -nc -B http://mirrors.163.com/centos/6/os/x86_64/Packages/ -F -nH --cut-dirs=3 -i index.html 
+</code></pre>
+<p>慢慢下载吧</p>
+<pre><code># ln –s /yum/source/ /var/www/html/yum/
+</code></pre>
+<h2 id="3-2、挂在光盘镜像"><a href="#3-2、挂在光盘镜像" class="headerlink" title="3.2、挂在光盘镜像"></a>3.2、挂在光盘镜像</h2><p>对于光盘DVD，可这样挂载</p>
+<pre><code># mkdir /yum/source
+# mount /dev/cdrom /yum/source 
+# ls /yum/source   
+</code></pre>
+<p>对于iso文件，可以这样挂载</p>
+<pre><code># mount -o loop rhel-server-xxx-dvd.iso /yum/source
+# ls /yum/source
+# ln –s /yum/source/Package/ /var/www/html/yum/
+</code></pre>
+<h1 id="4、创建源索引文件"><a href="#4、创建源索引文件" class="headerlink" title="4、创建源索引文件"></a>4、创建源索引文件</h1><p>如果是挂载方式</p>
+<pre><code># createrepo -g /media/iso/repodata/repomd.xml/ var/www/html/yum/ .
+</code></pre>
+<p>下载163的源</p>
+<pre><code># createrepo /yum/source/
+</code></pre>
+<h1 id="5、配置repo"><a href="#5、配置repo" class="headerlink" title="5、配置repo"></a>5、配置repo</h1><pre><code># cp CentOS-Base.repo CentOS-Base.repo.bak
+# vi CentOS-Base.repo
+</code></pre>
+<p>修改为</p>
+<pre><code>name=CentOS-$releasever - Base
+baseurl=http://IP/
+gpgcheck=0
+gpgkey=http://IP/RPM-GPG-KEY-CentOS-6
+</code></pre>
+<h1 id="6、验证"><a href="#6、验证" class="headerlink" title="6、验证"></a>6、验证</h1><pre><code># yum clean all
+# yum makecache
+# yum install cmake
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/05-Linux-Operation/">05. Linux Operation</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/httpd/">httpd</a>, <a href="/tags/本地源/">本地源</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

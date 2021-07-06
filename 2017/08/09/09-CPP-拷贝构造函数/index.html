@@ -1,0 +1,550 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux CPP 拷贝构造函数 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="拷贝构造函数">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux CPP 拷贝构造函数"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-09T09:48:01.000Z"><a href="/2017/08/09/09-CPP-拷贝构造函数/">2017-08-09</a></time>
+        
+  
+    <h1 class="title">Linux CPP 拷贝构造函数</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%B7%E8%B4%9D%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="toc-text">拷贝构造函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E4%BB%A5%E5%80%BC%E4%BC%A0%E9%80%92%E7%9A%84%E6%96%B9%E5%BC%8F%E4%BC%A0%E5%85%A5%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0"><span class="toc-text">对象以值传递的方式传入函数参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%B1%E5%BA%A6%E6%8B%B7%E8%B4%9D"><span class="toc-text">深度拷贝</span></a></li></ol></li></ol>
+    </div>
+
+        <h3 id="拷贝构造函数"><a href="#拷贝构造函数" class="headerlink" title="拷贝构造函数"></a>拷贝构造函数</h3><span id="more"></span>
+
+
+<p>C++规定与类同名的函数就是拷贝构造函数</p>
+<p>默认拷贝构造函数：在类定义中如果没有提供自己的拷贝构造函数，则C++提供一个默认的构造函数，其拷贝策略是逐个成员依次拷贝。</p>
+<p>拷贝构造函数分为两种：深拷贝和浅拷贝</p>
+<p>默认拷贝构造函数均是浅拷贝</p>
+<p>但是一个类可能拥有其它资源，如其构造函数分配了一个堆内存，析构函数释放了这个内存，则此时就需要进行深拷贝了。<br>深拷贝不能依赖编译器实现。</p>
+<p>拷贝构造函数通常用于：</p>
+<ul>
+<li>通过使用另一个同类型的对象来初始化新创建的对象。</li>
+<li>复制对象把它作为参数传递给函数。</li>
+<li>复制对象，并从函数返回这个对象。</li>
+</ul>
+<pre><code>    classname (const classname &amp;obj) &#123;
+       // 构造函数的主体
+    &#125;
+</code></pre>
+<p>一个简单的浅拷贝（example1）：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: copy_constructor.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Sat 10 Mar 2018 03:16:33 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+
+
+class copy_class
+&#123;
+private:
+    int copy_num;
+public:
+    copy_class(int argv)
+    &#123;
+        copy_num = argv;
+    &#125;
+
+
+    void show();
+&#125;;
+
+
+void copy_class::show()
+&#123;
+    cout &lt;&lt; &quot;copy_num =&quot; &lt;&lt; copy_num &lt;&lt; endl;
+&#125;
+
+
+int main(int argc ,const char *argv[])
+&#123;
+    copy_class cpy1(99);
+    copy_class cpy2 = cpy1;//对象的初始化要调用拷贝构造函数，而非赋值
+
+    cpy2.show();
+    return 0;
+
+&#125;
+</code></pre>
+<p>运行：</p>
+<pre><code># g++ copy_constructor.cpp  -o copy_constructor
+# ./copy_constructor
+copy_num =99
+</code></pre>
+<p>从上面的代码可以看出来，对象cpy2分配了内存并完成了对象cpy1的复制过程。相同类型的类对象通过拷贝构造函数来完成整个复制过程。</p>
+<p>example2：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: copy_constructor_example1.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Sat 10 Mar 2018 03:39:14 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+
+
+class copy_class
+&#123;
+private:
+    int copy_nums;
+public:
+    copy_class(int argv)
+    &#123;
+        copy_nums = argv;
+    &#125;
+
+    copy_class(const copy_class &amp;c)
+    &#123;
+        copy_nums = c.copy_nums;
+    &#125;
+
+    void show()
+    &#123;
+        cout &lt;&lt; &quot;copy_nums = &quot; &lt;&lt; copy_nums &lt;&lt; endl;
+    &#125;
+&#125;;
+
+
+//#define EXAMPLE_1
+
+
+int main(int argc ,char *argv[])
+&#123;
+    copy_class cpy1(99);
+#ifdef EXAMPLE_1
+    copy_class cpy2 = cpy1;
+#else
+    copy_class cpy2(cpy1);
+#endif
+
+    cpy2.show();
+
+    return 0;
+
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># g++ copy_constructor_example1.cpp -o example
+# ./example 
+copy_nums = 99
+</code></pre>
+<p>copy_class(const copy_class &amp; c)是我们自定义的拷贝构造函数。拷贝构造函数的函数名称必须和类名称一致，它必须的一个参数是本类型的一个引用变量。</p>
+<h4 id="对象以值传递的方式传入函数参数"><a href="#对象以值传递的方式传入函数参数" class="headerlink" title="对象以值传递的方式传入函数参数"></a>对象以值传递的方式传入函数参数</h4><pre><code>/*************************************************************************
+    &gt; File Name: copy_constructor_argv.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Sat 10 Mar 2018 03:48:51 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+class copy_class
+&#123;
+private:
+    int copy_nums;
+public:
+    copy_class(int argc);
+    copy_class(const copy_class &amp;c);
+
+    ~copy_class();
+    void show();
+&#125;;
+
+
+copy_class::copy_class(int argc)
+&#123;
+    this-&gt;copy_nums = argc;
+    cout &lt;&lt; &quot;构造函数&quot; &lt;&lt; endl;
+&#125;
+
+copy_class::copy_class(const copy_class &amp;c)
+&#123;
+    copy_nums = c.copy_nums;
+    cout &lt;&lt; &quot;拷贝构造函数&quot; &lt;&lt; endl;
+&#125;
+
+
+copy_class::~copy_class()
+&#123;
+    cout &lt;&lt; &quot;析构函数&quot; &lt;&lt; endl;
+&#125;
+
+void copy_class::show()
+&#123;
+    cout &lt;&lt; &quot;copy_nums = &quot;&lt;&lt; copy_nums &lt;&lt; endl;
+&#125;
+
+
+
+void whole_function(copy_class c)
+&#123;
+    c.show();
+
+    cout &lt;&lt; &quot;test&quot; &lt;&lt; endl;
+&#125;
+
+
+
+int main(int argc, const char *argv[])
+&#123;
+    copy_class cpy(99);
+
+    cout &lt;&lt; &quot;-----------------------------------------&quot; &lt;&lt; endl;
+    whole_function(cpy);
+    cout &lt;&lt; &quot;-----------------------------------------&quot; &lt;&lt; endl;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># g++ copy_constructor_argv.cpp  -o argv
+# ./argv 
+构造函数
+-----------------------------------------
+拷贝构造函数
+copy_nums = 99
+test
+析构函数
+-----------------------------------------
+析构函数
+</code></pre>
+<p>调用whole_function()函数过程</p>
+<ul>
+<li>c对象传入形参时，会产生一个临时变量tmp。</li>
+<li>然后调用拷贝构造函数把c的值赋值给tmp。</li>
+<li>等whole_function()执行完成后，析构掉tmp对象</li>
+</ul>
+<h4 id="深度拷贝"><a href="#深度拷贝" class="headerlink" title="深度拷贝"></a>深度拷贝</h4><p>里面含有指针。注意释放内存。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: deep_copy.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 04:58:49 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+#define N   10
+class deep_copy&#123;
+    
+private:
+    int nums;
+    int *point;
+public:
+    //构造函数
+    deep_copy(int nums);
+    deep_copy(const deep_copy &amp; dc);
+    ~deep_copy();
+    void show();
+&#125;;
+
+
+deep_copy::deep_copy(int nums)
+&#123;
+    int index = 0;
+    int *tmp = NULL;
+    this-&gt;nums = nums;
+    this-&gt;point = new int[N];
+    tmp = this-&gt;point;
+
+    for(index = 0; index &lt; N;index++)
+    &#123;
+        *tmp++ = index;
+    &#125;
+
+    cout &lt;&lt; &quot;构造函数&quot; &lt;&lt; endl;
+
+&#125;
+
+deep_copy::deep_copy(const deep_copy &amp;dc)
+&#123;
+    int index, *tmp = NULL, *tmp_c = NULL;
+    this-&gt;nums = dc.nums;
+    this-&gt;point = new int[N];
+    
+    tmp = this-&gt;point;
+    tmp_c = dc.point;
+        
+    for(index = 0; index &lt; N; index++)
+    &#123;
+        *tmp++ = *tmp_c++;
+    &#125;
+
+    cout &lt;&lt; &quot;拷贝构造函数&quot; &lt;&lt; endl;
+
+&#125;
+
+
+void deep_copy::show()
+&#123;
+    int index = 0;
+    int *tmp = this-&gt;point;
+    for(index = 0; index &lt; N;index ++)
+    &#123;
+        cout &lt;&lt; *(tmp++)  &lt;&lt; &quot;\t&quot;;
+    &#125;
+
+    cout &lt;&lt; &quot;nums = &quot; &lt;&lt; nums &lt;&lt; endl;
+&#125;
+
+
+deep_copy::~deep_copy()
+&#123;
+    if(point != NULL)
+        delete[] point;
+
+    cout &lt;&lt; &quot;析构函数&quot; &lt;&lt; endl;
+    
+&#125;
+
+void g_function(deep_copy &amp; dc)
+&#123;
+    dc.show();
+    cout &lt;&lt; &quot;g_function&quot; &lt;&lt; endl;
+&#125;
+int main(int agrc ,const char *argv[])
+&#123;
+    deep_copy dc(10086);
+
+    cout &lt;&lt; &quot;-----------------------&quot;&lt;&lt; endl;
+    
+    g_function(dc);
+    
+    cout &lt;&lt; &quot;-----------------------&quot;&lt;&lt; endl;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># ./deep_copy
+构造函数
+-----------------------
+0       1       2       3       4       5       6       7       8       9       nums = 10086
+g_function
+-----------------------
+析构函数
+</code></pre>
+<p>在编写C语言的时候，函数调用指针的时候，首先拷贝一份指针的地址，进行入栈操作，此时改变指针的位置，并不会改变原指针的位置。C++以对象为目标，操作对象内的指针，注意指针是否变换位置。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: m.c
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 05:22:50 AM EDT
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+
+#define N 10
+
+void evaluate(int *nums)
+&#123;
+    int index = 0;
+    for(index = 0; index &lt; N; index++)
+    &#123;
+        *nums++ = index;
+    &#125;
+&#125;
+
+
+void show(int *nums)
+&#123;
+    int index;
+    for(index = 0; index &lt; N; index++)
+        printf(&quot;%d\t&quot;,*nums++);
+
+    printf(&quot;\n&quot;);
+&#125;
+
+
+int main(int argc, char *argv[])
+&#123;
+    int *nums = malloc(N * sizeof(int));
+    if(nums == NULL)
+    &#123;
+        printf(&quot;Malloc failed.&quot;);
+        return -1;
+    &#125;
+
+    evaluate(nums);
+    show(nums);
+
+
+    free(nums);
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># gcc m.c -o m
+# ./m
+0       1       2       3       4       5       6   9
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/01-CPP-基础/">01. CPP 基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

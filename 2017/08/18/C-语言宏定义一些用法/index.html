@@ -1,0 +1,744 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C 语言宏定义一些用法 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="C 语言中有使用define定义的宏，还有C语言的预定义宏。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C 语言宏定义一些用法"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-18T08:11:37.000Z"><a href="/2017/08/18/C-语言宏定义一些用法/">2017-08-18</a></time>
+        
+  
+    <h1 class="title">C 语言宏定义一些用法</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-define%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="toc-text">1. define使用技巧</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%A2%84%E5%AE%9A%E4%B9%89%E5%AE%8F"><span class="toc-text">2. 预定义宏</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#C%E8%B0%83%E7%94%A8C-%E5%BA%93"><span class="toc-text">C调用C++库</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E5%AE%8F-VA-ARGS"><span class="toc-text">2.1. 可变参数宏__VA_ARGS__</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-%E8%B7%A8%E5%B9%B3%E5%8F%B0"><span class="toc-text">2.2. 跨平台</span></a></li></ol></li></ol>
+    </div>
+
+        <p>C 语言中有使用<code>define</code>定义的宏，还有C语言的预定义宏。</p>
+<span id="more"></span>
+
+<h3 id="1-define使用技巧"><a href="#1-define使用技巧" class="headerlink" title="1. define使用技巧"></a>1. define使用技巧</h3><p><strong>连接</strong></p>
+<pre><code>#define conn(x,y) x##y
+//x##y : 表示x连接y
+
+int i = conn(123,456); /* 结果就是i=123456;*/
+char* str = conn(&quot;asdf&quot;, &quot;adf&quot;); /*结果就是 str = &quot;asdfadf&quot;;*/
+</code></pre>
+<hr>
+<p><strong>连接用法:函数拼接</strong></p>
+<pre><code>/*************************************************************************
+    &gt; File Name: define.h
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 02:48:22 PM CST
+ ************************************************************************/
+
+#ifndef _DEFINE_H
+#define _DEFINE_H
+
+#define MEM_FUNC_MALLOC(__prefix)                   \
+static void * __prefix ## _mem_malloc(size_t size)  \
+&#123;                                                   \
+    return malloc(size);                            \
+&#125;
+
+#define MEM_FUNC_FREE(__prefix)                     \
+static void __prefix ## _mem_free(void *p)          \
+&#123;                                                   \
+    free(p);                                        \
+&#125;
+
+#define MEM_FUNC(__prefix)                          \
+MEM_FUNC_MALLOC(__prefix)                           \
+MEM_FUNC_FREE(__prefix)                             
+#endif
+</code></pre>
+<hr>
+<pre><code>/*************************************************************************
+    &gt; File Name: define.c
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 02:53:11 PM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &quot;define.h&quot;
+
+MEM_FUNC(test1)
+MEM_FUNC(test2)
+
+int main(int argc, const char *argv[])
+&#123;
+    char *tmp1,*tmp2;
+
+    tmp1 = test1_mem_malloc(100);
+    memset(tmp1,0,100);
+    strcpy(tmp1,&quot;Hello World!&quot;);
+    printf(&quot;tmp1 = %s\n&quot;,tmp1);
+    test1_mem_free(tmp1);
+
+    tmp2 = test2_mem_malloc(100);
+    memset(tmp2,0,100);
+    strcpy(tmp2,&quot;Hello Kitty!&quot;);
+    printf(&quot;tmp2 = %s\n&quot;,tmp2);
+    test2_mem_free(tmp2);
+
+    return 0;
+&#125;
+</code></pre>
+<hr>
+<pre><code># gcc  define.c -o define
+# ./define
+tmp1 = Hello World!
+tmp2 = Hello Kitty!
+</code></pre>
+<p>检查一下内存是否泄露</p>
+<pre><code># valgrind --leak-check=full ./define
+==18702== Memcheck, a memory error detector
+==18702== Copyright (C) 2002-2012, and GNU GPL&#39;d, by Julian Seward et al.
+==18702== Using Valgrind-3.8.1 and LibVEX; rerun with -h for copyright info
+==18702== Command: ./define
+==18702== 
+tmp1 = Hello World!
+tmp2 = Hello Kitty!
+==18702== 
+==18702== HEAP SUMMARY:
+==18702==     in use at exit: 0 bytes in 0 blocks
+==18702==   total heap usage: 2 allocs, 2 frees, 200 bytes allocated
+==18702== 
+==18702== All heap blocks were freed -- no leaks are possible
+==18702== 
+==18702== For counts of detected and suppressed errors, rerun with: -v
+==18702== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 6 from 6)
+</code></pre>
+<p><strong>连接用法:结构体拼接</strong></p>
+<pre><code>#include &lt;stdio.h&gt;
+
+# define DEFINE_S(name,type1,type2) \
+typedef struct test_ ## name        \
+&#123;                                   \
+    type1 t1;                       \
+    type2 t2;                       \
+&#125;test_ ## name ## _t;
+
+int main(int argc, const char *argv[])
+&#123;
+    DEFINE_S(tt1,int,char);
+    DEFINE_S(tt2,float,double);
+
+    test_tt1_t ttt1;
+    ttt1.t1 = 100;
+    ttt1.t2 = &#39;\n&#39;;
+    
+    printf(&quot;ttt1 t1:%d,t2:%c\n&quot;,ttt1.t1,ttt1.t2);
+
+    test_tt2_t ttt2;
+    ttt2.t1 = 1.11;
+    ttt2.t2 = 3.1;
+    printf(&quot;ttt2 t1:%f,t2:%f\n&quot;,ttt2.t1,ttt2.t2);
+
+    return 0;
+&#125;
+</code></pre>
+<p><strong>定义指针函数</strong></p>
+<pre><code>/*************************************************************************
+    &gt; File Name: 2.c
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Thu 15 Jun 2017 11:17:49 AM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+
+#define THREAD_ENTRY_POINTER(pointer_name)  \
+    unsigned pointer_name(void *)
+
+#define THREAD_ENTRY(entry_name,arg_name)   \
+    unsigned entry_name(void *arg_name)
+
+
+THREAD_ENTRY(test_loop,args)
+&#123;
+    printf(&quot;\n%d\n&quot;,*((int *)args));
+&#125;
+
+
+int test_start(THREAD_ENTRY_POINTER(hander),void *args)
+&#123;
+    (*hander)(args);
+    return 0;
+&#125;
+
+
+int main(int argc, const char *argv[])
+&#123;
+    int args = 100;
+    test_start(test_loop,&amp;args);
+    return 0;
+&#125;
+</code></pre>
+<p><strong>判断最小值</strong></p>
+<pre><code># define MIN(a, b) ((a) &lt; (b) ? (a) : (b))
+</code></pre>
+<p><strong>判断最大值</strong></p>
+<pre><code># define MAX(a, b) ((a) &gt; (b) ? (a) : (b))
+</code></pre>
+<p><strong>得到一个field在结构体(struct)中的偏移量</strong></p>
+<pre><code># define OFFSETOF( type, field ) ( (size_t) &amp;(( type *) 0)-&gt; field )
+</code></pre>
+<p><strong>得到一个结构体中field所占用的字节数</strong></p>
+<pre><code># define FSIZ( type, field ) sizeof( ((type *) 0)-&gt;field )
+</code></pre>
+<p><strong>将一个字母转换为大写</strong></p>
+<pre><code># define UPCASE( c ) ( ((c) &gt;= &#39;&#39;a&#39;&#39; &amp;&amp; (c) &lt;= &#39;&#39;z&#39;&#39;) ? ((c) - 0x20) : (c) )
+</code></pre>
+<p><strong>判断字符是不是10进值的数字</strong></p>
+<pre><code># define DECCHK( c ) ((c) &gt;= &#39;&#39;0&#39;&#39; &amp;&amp; (c) &lt;= &#39;&#39;9&#39;&#39;)
+</code></pre>
+<p><strong>判断字符是不是16进值的数字</strong></p>
+<pre><code># define HEXCHK( c ) ( ((c) &gt;= &#39;&#39;0&#39;&#39; &amp;&amp; (c) &lt;= &#39;&#39;9&#39;&#39;) ||((c) &gt;= &#39;&#39;A&#39;&#39; &amp;&amp; (c) &lt;= &#39;&#39;F&#39;&#39;) ||((c) &gt;= &#39;&#39;a&#39;&#39; &amp;&amp; (c) &lt;= &#39;&#39;f&#39;&#39;) )
+</code></pre>
+<p><strong>防止溢出的一个方法</strong></p>
+<pre><code># define INC_SAT( val ) (val = ((val)+1 &gt; (val)) ? (val)+1 : (val))
+</code></pre>
+<p><strong>返回数组元素的个数</strong></p>
+<pre><code># define ARR_SIZE( a ) ( sizeof( (a) ) / sizeof( *a ) )
+</code></pre>
+<p><strong>简单数学计算（绝对值，三角函数等</strong></p>
+<pre><code># define ABS( a ) ( ((a)&gt;0) ? (a) : (-(a)) )  
+</code></pre>
+<p><strong>定义复杂语句</strong></p>
+<pre><code># define xxx_free(ptr)        \
+    \
+do                \
+&#123;                \
+    if (ptr)        \
+    &#123;            \
+        free(ptr);    \
+        ptr = NULL;    \
+    &#125;            \
+&#125;                \
+while (0)
+
+# define xxx_fclose(file)    \
+    \
+do                \
+&#123;                \
+    if (file)        \
+    &#123;            \
+        fclose(file);    \
+        file = NULL;    \
+    &#125;            \
+&#125;    
+</code></pre>
+<h3 id="2-预定义宏"><a href="#2-预定义宏" class="headerlink" title="2. 预定义宏"></a>2. 预定义宏</h3><p>ANSI C标准中有几个标准预定义宏</p>
+<table>
+<thead>
+<tr>
+<th align="center">预定义宏</th>
+<th align="center">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>func</strong></td>
+<td align="center">在源代码中插入当前所在函数名</td>
+</tr>
+<tr>
+<td align="center"><strong>LINE</strong></td>
+<td align="center">在源代码中插入当前源代码行号</td>
+</tr>
+<tr>
+<td align="center"><strong>FILE</strong></td>
+<td align="center">在源文件中插入当前源文件名</td>
+</tr>
+<tr>
+<td align="center"><strong>DATE</strong></td>
+<td align="center">在源文件中插入当前的编译日期</td>
+</tr>
+<tr>
+<td align="center"><strong>TIME</strong></td>
+<td align="center">在源文件中插入当前编译时间</td>
+</tr>
+<tr>
+<td align="center"><strong>STDC</strong></td>
+<td align="center">当要求程序严格遵循ANSI C标准时该标识被赋值为1</td>
+</tr>
+<tr>
+<td align="center"><strong>STDC_VERSION</strong></td>
+<td align="center">如何实现复合C89整部1，则这个宏的值为19940SL；如果实现符合C99，则这个宏的值为199901L；否则数值是未定义</td>
+</tr>
+<tr>
+<td align="center"><strong>STDC_EOBTED</strong> (C99)</td>
+<td align="center">实现为宿主实现时为1,实现为独立实现为0</td>
+</tr>
+<tr>
+<td align="center"><strong>STDC_IEC_559</strong> (C99)</td>
+<td align="center">浮点数实现复合IBC 60559标准时定义为1，否者数值是未定义</td>
+</tr>
+<tr>
+<td align="center"><strong>STDC_IEC_559_COMPLEX</strong> (C99)</td>
+<td align="center">复数运算实现复合IBC 60559标准时定义为1，否者数值是未定义</td>
+</tr>
+<tr>
+<td align="center"><strong>STDC_ISO_10646</strong> (C99)</td>
+<td align="center">定义为长整型常量，yyyymmL表示wchar_t值复合ISO 10646标准及其指定年月的修订补充，否则数值未定义</td>
+</tr>
+<tr>
+<td align="center">__cplusplus</td>
+<td align="center">当使用C ++编译器时，定义此宏。您可以使用它 __cplusplus来测试头是否由C编译器或C ++编译器编译。该宏类似于__STDC_VERSION__扩展为版本号。根据所选择的语言标准，宏的价值是 199711L1998 C ++标准， 201103L2011 C ++标准， 201402L2014 C ++标准， 201703L2017 C ++标准，或严格大于201703L使用的实验语言的未指定值-std = C ++ 2a中 和 -std = GNU ++ 2a中。</td>
+</tr>
+</tbody></table>
+<p>__func__</p>
+<pre><code>//func.c
+#include &lt;stdio.h&gt;
+int main(int argc,const char *argv[])
+&#123;
+    printf(&quot;name:%s\n&quot;,__func__);
+&#125;
+
+# gcc func.c -o func
+# ./func
+main
+</code></pre>
+<p>__LINE__和__FILE__</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: line.c
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 04:32:54 PM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define test_malloc(size)   __test_malloc(__FILE__,__LINE__,size)
+#define test_free(p)        __test_free(__FILE__,__LINE__,p)
+
+static void * __test_malloc(const char *name,int line,size_t size)
+&#123;
+    printf(&quot;name:%s,line:%d\n&quot;,name,line);
+    return malloc(size);
+&#125;
+
+static void __test_free(const char *name,int line,void *p)
+&#123;
+    printf(&quot;name:%s,line:%d\n&quot;,name,line);
+    free(p);
+&#125;
+
+
+int main(int argc, const char *argv[])
+&#123;
+    char *t = test_malloc(100);
+    test_free(t);
+    return 0;
+&#125;
+</code></pre>
+<hr>
+<pre><code># gcc line.c  -o line
+# ./line 
+name:line.c,line:29
+name:line.c,line:30
+# valgrind --leak-check=full ./line
+==20458== Memcheck, a memory error detector
+==20458== Copyright (C) 2002-2012, and GNU GPL&#39;d, by Julian Seward et al.
+==20458== Using Valgrind-3.8.1 and LibVEX; rerun with -h for copyright info
+==20458== Command: ./line
+==20458== 
+name:line.c,line:29
+name:line.c,line:30
+==20458== 
+==20458== HEAP SUMMARY:
+==20458==     in use at exit: 0 bytes in 0 blocks
+==20458==   total heap usage: 1 allocs, 1 frees, 100 bytes allocated
+==20458== 
+==20458== All heap blocks were freed -- no leaks are possible
+==20458== 
+==20458== For counts of detected and suppressed errors, rerun with: -v
+==20458== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 6 from 6)
+</code></pre>
+<p>__cplusplus C/C++函数调用</p>
+<h4 id="C调用C-库"><a href="#C调用C-库" class="headerlink" title="C调用C++库"></a>C调用C++库</h4><p>先写一个CPP静态库</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: cpphello.h
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 05:01:52 PM CST
+ ************************************************************************/
+
+#ifndef _CPPHELLO_H
+#define _CPPHELLO_H
+
+#ifdef __cplusplus
+extern &quot;C&quot;
+&#123;
+#endif
+    void hello(void);
+#ifdef __cplusplus
+&#125;
+#endif
+#endif
+</code></pre>
+<hr>
+<pre><code>/*************************************************************************
+    &gt; File Name: cpphello.cpp
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 05:05:11 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+#include &quot;cpphello.h&quot;
+using namespace std;
+
+void hello(void)
+&#123;
+    cout &lt;&lt; &quot;This is CPP library!&quot; &lt;&lt; endl;
+&#125;
+
+# g++ -c cpphello.cpp  -o cpphello.o
+# ar -rsc libcpphello.a cpphello.o
+</code></pre>
+<p>写个C函数，调用CPP库</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: hello.c
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 05:07:06 PM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &quot;cpphello.h&quot;
+int main(int argc, const char *argv[])
+&#123;
+    hello();
+    return 0;
+&#125;
+
+# g++ hello.c  -o hello -L . libcpphello.a 
+# ./hello 
+This is CPP library!
+</code></pre>
+<p><strong>C++调用C库</strong></p>
+<p>先写个C静态库</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: hello.h
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 05:19:21 PM CST
+ ************************************************************************/
+
+#ifndef _HELLO_H
+#define _HELLO_H
+#ifdef __cplusplus
+extern &quot;C&quot;
+#endif
+void hello(void);
+#endif
+</code></pre>
+<hr>
+<pre><code>/*************************************************************************
+    &gt; File Name: hello.c
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 05:19:34 PM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &quot;hello.h&quot;
+void hello(void)
+&#123;
+    printf(&quot;This is C library\n&quot;);
+&#125;
+</code></pre>
+<p>写个CPP调用C库</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: cpphello.cpp
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Wed 14 Jun 2017 05:21:13 PM CST
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+
+extern &quot;C&quot;
+&#123;
+#include &quot;hello.h&quot;
+&#125;
+using namespace std;
+int main(int argc, const char *argv[])
+&#123;
+    hello();
+    return 0;
+&#125;
+</code></pre>
+<p>生成C静态库</p>
+<pre><code># gcc -c hello.c -o hello.o
+# ar -rsc libhello.a hello.o
+</code></pre>
+<p>CPP调用C库<br>    # g++ cpphello.cpp -o cpphello -L . libhello.a<br>    # ./cpphello<br>    This is C library</p>
+<p>这只是简单的调用，详细的请点<a target="_blank" rel="noopener" href="https://isocpp.org/wiki/faq/mixing-c-and-cpp">这里</a>。稍后会有翻译文章</p>
+<h3 id="2-1-可变参数宏-VA-ARGS"><a href="#2-1-可变参数宏-VA-ARGS" class="headerlink" title="2.1. 可变参数宏__VA_ARGS__"></a>2.1. 可变参数宏__VA_ARGS__</h3><p>__VA_ARGS__可以接受可变数目的参数</p>
+<pre><code>#include &lt;stdio.h&gt;
+#define VAA(...) printf(__VA_ARGS__) 
+int main(int argc, const char *argv[])
+&#123;
+    int tmp1 = 10;
+    float tmp2 = 1.123;
+    VAA(&quot;hello\n&quot;);
+    VAA(&quot;tmp1 = %d, tmp2 = %f\n&quot;,tmp1,tmp2);
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果<br>    hello<br>    tmp1 = 10, tmp2 = 1.123000</p>
+<h4 id="2-2-跨平台"><a href="#2-2-跨平台" class="headerlink" title="2.2. 跨平台"></a>2.2. 跨平台</h4><p>2.2.1、预定义__GNUC__宏</p>
+<p><code>__GNUC__</code>是gcc编译器编译代码时预定义的一个宏。需要针对gcc编写代码时， 可以使用该宏进行条件编译。<code>__GNUC__</code>的值表示gcc的版本。需要针对gcc特定版本编写代码时，也可以使用该宏进行条件编译。<code>__GNUC__</code>的类型是“int”，该宏被扩展后， 得到的是整数字面值。可以通过仅预处理，查看宏扩展后的文本。</p>
+<p>示例：</p>
+<pre><code>//test.cpp
+#include &lt;assert.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;typeinfo&gt;
+#ifndef __GNUC__
+#error sample for gcc compiler
+#else
+/* use gcc special extension: #warning , __attribute__, etc.  */
+#endif
+int main(int argc, const char *argv[])
+&#123;
+    
+    printf(&quot;hello gcc %d\n&quot;,__GNUC__);    
+    assert( typeid(__GNUC__)==typeid(int) );    
+    printf(&quot;press Enter to exit\n&quot;);    
+    (void)getchar();
+    return 0;
+&#125;
+
+# g++ test.cpp -o test
+# ./test    
+hello gcc 4
+press Enter to exit
+</code></pre>
+<p>2.2.2、预定义_MSC_VER宏</p>
+<p><code>_MSC_VER</code>是微软C/C++编译器——cl.exe编译代码时预定义的一个宏。需要针对cl编写代码时， 可以使用该宏进行条件编译。<code>_MSC_VER</code>的值表示cl的版本。需要针对cl特定版本编写代码时， 也可以使用该宏进行条件编译。<code>_MSC_VER</code>的类型是”int”。该宏被扩展后，得到的是整数字面值。可以通过仅预处理， 查看宏扩展后的文本。</p>
+<p>示例：</p>
+<pre><code>/*_MSC_VER.cpp */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;typeinfo&gt;
+#define TO_LITERAL(text) TO_LITERAL_(text)
+#define TO_LITERAL_(text) #text
+#ifndef _MSC_VER
+#error sample for msvc compiler
+#else
+/* use msvc special extension: #pragma message,__declspec,__stdcall,etc. */
+#pragma message(&quot;----------------------------------------\n&quot;)
+#pragma message(&quot;----------------------------------------\n&quot;)
+#pragma message(&quot;---------- hello msvc &quot; TO_LITERAL(_MSC_VER) &quot; -------------&quot;)
+#pragma message(&quot;\n----------------------------------------\n&quot;)
+#pragma message(&quot;----------------------------------------\n&quot;)
+extern __declspec(dllimport) void __stdcall declare_but_dont_reference(void);
+#endif
+
+int main()
+&#123;
+    printf(&quot;hello msvc, version=%d\n&quot;, _MSC_VER);
+    printf(&quot;typeof _MSC_VER=\&quot;%s\&quot;\n&quot;, typeid(_MSC_VER).name());
+    system(&quot;pause&quot;); /* msvc only on windows? */
+    return 0;
+&#125;
+</code></pre>
+<p>使用vs2017编译时</p>
+<pre><code>1&gt;------ 已启动全部重新生成: 项目: test, 配置: Debug Win32 ------
+1&gt;D:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(387,5): warning MSB8028: 中间目录(Debug\)包含从另一个项目(Project1.vcxproj)共享的文件。   这会导致错误的清除和重新生成行为。
+1&gt;test.cpp
+1&gt;----------------------------------------
+1&gt;
+1&gt;----------------------------------------
+1&gt;
+1&gt;---------- hello msvc 1911 -------------
+1&gt;
+1&gt;----------------------------------------
+1&gt;
+1&gt;----------------------------------------
+1&gt;
+1&gt;**************************************************\Debug\test.exe
+1&gt;tst.vcxproj -&gt; D:*********************\Debug\test.pdb (Partial PDB)
+1&gt;已完成生成项目“test.vcxproj”的操作。
+========== 全部重新生成: 成功 1 个，失败 0 个，跳过 0 个 ==========
+</code></pre>
+<p>运行</p>
+<pre><code>hello msvc, version=1911
+typeof _MSC_VER=&quot;int&quot;
+请按任意键继续. . .
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/02-C基础/">02. C基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/C/">C</a>, <a href="/tags/宏定义/">宏定义</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

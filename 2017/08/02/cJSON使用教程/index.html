@@ -1,0 +1,481 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cJSON使用教程 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="cJSON解析数组">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cJSON使用教程"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-02T13:21:35.000Z"><a href="/2017/08/02/cJSON使用教程/">2017-08-02</a></time>
+        
+  
+    <h1 class="title">cJSON使用教程</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#cJSON%E8%A7%A3%E6%9E%90%E6%95%B0%E7%BB%84"><span class="toc-text">cJSON解析数组</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%A8%E5%8E%9F%E6%9D%A5%E7%9A%84JSON%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8A%E6%B7%BB%E5%8A%A0%E5%88%A0%E9%99%A4%E5%AD%97%E6%AE%B5"><span class="toc-text">在原来的JSON的基础上添加删除字段</span></a></li></ol>
+    </div>
+
+        <h1 id="cJSON解析数组"><a href="#cJSON解析数组" class="headerlink" title="cJSON解析数组"></a>cJSON解析数组</h1><span id="more"></span>
+
+<p>最近有个Windows项目，奈何对Windows那一套编程不太熟悉。项目里面需要对json解析。发现cJSON最适合我。下面记一下不太熟悉的地方。<br>要是有<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/cjson/files/">这个</a>链接库，不是github上面的<a target="_blank" rel="noopener" href="https://github.com/DaveGamble/cJSON">那个</a>。</p>
+<p>上代码，里面含义不做解析。</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &quot;cJSON.h&quot;
+
+
+int main (int argc, const char * argv[]) &#123;
+    /* 会用到的JSON格式 */
+    
+    /*
+    &#123;
+    &quot;name&quot;: &quot;Jack Nimble&quot;,
+    &quot;format&quot;: 
+        &#123;
+            &quot;type&quot;: &quot;rect&quot;,
+            &quot;width&quot;: 1920,
+            &quot;height&quot;: 1080,
+            &quot;interlace&quot;: false,
+            &quot;frame rate&quot;: 24
+        &#125;
+    &#125;
+    */
+    char text1[]=&quot;&#123;\&quot;name\&quot;: \&quot;Jack Nimble\&quot;,\&quot;format\&quot;: &#123;\&quot;type\&quot;: \&quot;rect\&quot;,\&quot;width\&quot;: 1920,\&quot;height\&quot;: 1080,\&quot;interlace\&quot;: false,\&quot;frame rate\&quot;: 24&#125;&#125;&quot;;   
+    
+#if 0
+    
+    /*
+    &#123;
+    &quot;Image&quot;: 
+        &#123;
+            &quot;Width&quot;: 800,
+            &quot;Height&quot;: 600,
+            &quot;Title&quot;: &quot;View from 15th Floor&quot;,
+            &quot;Thumbnail&quot;: 
+            &#123;
+                &quot;Url&quot;: &quot;http:/*www.example.com/image/481989943&quot;,
+                &quot;Height&quot;: 125,
+                &quot;Width&quot;: &quot;100&quot;
+            &#125;,
+            &quot;IDs&quot;: 
+            [
+                116,
+                943,
+                234,
+                38793
+            ]
+        &#125;
+    &#125;
+    
+    */
+    char text2[]=&quot;&#123;\&quot;Image\&quot;: &#123;\&quot;Width\&quot;: 800,\&quot;Height\&quot;: 600,\&quot;Title\&quot;: \&quot;View from 15th Floor\&quot;,\&quot;Thumbnail\&quot;: &#123;\&quot;Url\&quot;: \&quot;http:/*www.example.com/image/481989943\&quot;,\&quot;Height\&quot;: 125,\&quot;Width\&quot;: \&quot;100\&quot;&#125;,\&quot;IDs\&quot;: [116,943,234,38793]&#125;&#125;&quot;;
+    
+    
+    /*
+    [
+        &#123;
+            &quot;precision&quot;: &quot;zip&quot;,
+            &quot;Latitude&quot;: 37.7668,
+            &quot;Longitude&quot;: -122.3959,
+            &quot;Address&quot;: &quot;&quot;,
+            &quot;City&quot;: &quot;SAN FRANCISCO&quot;,
+            &quot;State&quot;: &quot;CA&quot;,
+            &quot;Zip&quot;: &quot;94107&quot;,
+            &quot;Country&quot;: &quot;US&quot;
+        &#125;,
+        &#123;
+            &quot;precision&quot;: &quot;zip&quot;,
+            &quot;Latitude&quot;: 37.371991,
+            &quot;Longitude&quot;: -122.02602,
+            &quot;Address&quot;: &quot;&quot;,
+            &quot;City&quot;: &quot;SUNNYVALE&quot;,
+            &quot;State&quot;: &quot;CA&quot;,
+            &quot;Zip&quot;: &quot;94085&quot;,
+            &quot;Country&quot;: &quot;US&quot;
+        &#125;
+    ]
+    
+    */
+    char text3[]=&quot;[&#123;\&quot;precision\&quot;: \&quot;zip\&quot;,\&quot;Latitude\&quot;:  37.7668,\&quot;Longitude\&quot;: -122.3959,\&quot;Address\&quot;:\&quot;\&quot;,\&quot;City\&quot;: \&quot;SAN FRANCISCO\&quot;,\&quot;State\&quot;:\&quot;CA\&quot;,\&quot;Zip\&quot;:  \&quot;94107\&quot;,\&quot;Country\&quot;:   \&quot;US\&quot;&#125;,&#123;\&quot;precision\&quot;: \&quot;zip\&quot;,\&quot;Latitude\&quot;:  37.371991,\&quot;Longitude\&quot;: -122.026020,\&quot;Address\&quot;: \&quot;\&quot;,\&quot;City\&quot;: \&quot;SUNNYVALE\&quot;,\&quot;State\&quot;:\&quot;CA\&quot;,\&quot;Zip\&quot;:  \&quot;94085\&quot;,\&quot;Country\&quot;:\&quot;US\&quot;&#125;]&quot;;
+
+
+#endif
+    
+    /*
+    &#123;
+        &quot;RULE&quot;: 
+        [
+            &#123;
+                &quot;id&quot;: &quot;1e67bf1d3b9947f784ff4433d4ea8523&quot;,
+                &quot;tt&quot;: &quot;789&quot;
+            &#125;,
+            &#123;
+                &quot;id&quot;: &quot;348f3e036723462aab398bf90fec9654&quot;,
+                &quot;tt&quot;: &quot;456&quot;
+            &#125;,
+            &#123;
+                &quot;id&quot;: &quot;8e58ed2249ae4704bd01371acee39512&quot;,
+                &quot;tt&quot;: &quot;123&quot;
+            &#125;
+        ],
+        &quot;KEY&quot;: 
+        [
+            &#123;
+                &quot;operate&quot;: &quot;A&quot;,
+                &quot;xm&quot;: &quot;张二&quot;,
+                &quot;sfzh&quot;: &quot;370821199911111111&quot;
+            &#125;,
+            &#123;
+                &quot;operate&quot;: &quot;D&quot;,
+                &quot;xm&quot;: &quot;里斯&quot;,
+                &quot;sfzh&quot;: &quot;370323197922222222&quot;
+            &#125;,
+            &#123;
+                &quot;operate&quot;: &quot;A&quot;,
+                &quot;xm&quot;: &quot;李四&quot;,
+                &quot;sfzh&quot;: &quot;370000200033333333&quot;
+            &#125;
+        ],
+        &quot;version&quot;: &quot;20170801130753&quot;
+    &#125;
+    
+    */
+    char text4[] = &quot;&#123;\&quot;RULE\&quot;: [&#123;\&quot;id\&quot;: \&quot;1e67bf1d3b9947f784ff4433d4ea8523\&quot;,\&quot;tt\&quot;: \&quot;789\&quot;&#125;,&#123;\&quot;id\&quot;: \&quot;348f3e036723462aab398bf90fec9654\&quot;,\&quot;tt\&quot;: \&quot;456\&quot;&#125;,&#123;\&quot;id\&quot;: \&quot;8e58ed2249ae4704bd01371acee39512\&quot;,\&quot;tt\&quot;: \&quot;123\&quot;&#125;],\&quot;KEY\&quot;: [&#123;\&quot;operate\&quot;: \&quot;A\&quot;,\&quot;xm\&quot;: \&quot;张二\&quot;,\&quot;sfzh\&quot;: \&quot;370821199911111111\&quot;&#125;,&#123;\&quot;operate\&quot;: \&quot;D\&quot;,\&quot;xm\&quot;: \&quot;里斯\&quot;,\&quot;sfzh\&quot;: \&quot;370323197922222222\&quot;&#125;,&#123;\&quot;operate\&quot;: \&quot;A\&quot;,\&quot;xm\&quot;: \&quot;李四\&quot;,\&quot;sfzh\&quot;: \&quot;370000200033333333\&quot;&#125;],\&quot;version\&quot;: \&quot;20170801130753\&quot;&#125;&quot;;
+
+
+
+
+    /*
+     * 解析JSON格式1
+     *
+     * */
+    cJSON *root1 = NULL;
+    cJSON *fmt1 = NULL;
+    root1 = cJSON_Parse(text1);
+    fmt1 = cJSON_GetObjectItem(root1,&quot;format&quot;);
+
+    printf(&quot;************************JSON1******************************\n&quot;);
+    printf(&quot;name:%s\n&quot;,cJSON_GetObjectItem(root1,&quot;name&quot;)-&gt;valuestring);
+    printf(&quot;width:%d\n&quot;,cJSON_GetObjectItem(fmt1,&quot;width&quot;)-&gt;valueint);
+    cJSON_Delete(root1);
+    printf(&quot;************************JSON1******************************\n&quot;);
+
+
+    /*
+     * 解析JSON格式4
+     * */
+    cJSON *root4 = NULL;
+    cJSON *fmt4 = NULL;
+    root4 = cJSON_Parse(text4);
+
+    fmt4 = cJSON_GetObjectItem(root4,&quot;RULE&quot;);
+
+    /*
+     * 方法1
+     * */
+    cJSON  *array_list = fmt4-&gt;child;
+    printf(&quot;************************JSON4-1******************************\n&quot;);
+    while(array_list != NULL)
+    &#123;
+        printf(&quot;id:%s\n&quot;,cJSON_GetObjectItem(array_list,&quot;id&quot;)-&gt;valuestring);  
+        array_list=array_list-&gt;next;  
+    &#125;
+
+    printf(&quot;************************JSON4-1******************************\n&quot;);
+
+    /*
+     * 方法2
+     * */
+
+    int i = 0 ;
+    int arrySize=cJSON_GetArraySize(fmt4);
+    cJSON *array;
+
+    printf(&quot;************************JSON4-2******************************\n&quot;);
+    for(i = 0; i &lt; arrySize; i++)
+    &#123;
+        array = cJSON_GetArrayItem(fmt4,i);
+        printf(&quot;%s\n&quot;,cJSON_GetObjectItem(array,&quot;tt&quot;)-&gt;valuestring);
+    &#125;
+    printf(&quot;************************JSON4-2******************************\n&quot;);
+    cJSON_Delete(root4);
+
+    return 0;
+&#125;
+</code></pre>
+<p>编译：</p>
+<pre><code>$ gcc -o test.c cJSON.c -lm
+</code></pre>
+<p>运行</p>
+<pre><code>$ ./test
+</code></pre>
+<p>结果</p>
+<pre><code>************************JSON1******************************
+name:Jack Nimble
+width:1920
+************************JSON1******************************
+************************JSON4-1******************************
+id:1e67bf1d3b9947f784ff4433d4ea8523
+id:348f3e036723462aab398bf90fec9654
+id:8e58ed2249ae4704bd01371acee39512
+************************JSON4-1******************************
+************************JSON4-2******************************
+789
+456
+123
+************************JSON4-2******************************
+</code></pre>
+<h1 id="在原来的JSON的基础上添加删除字段"><a href="#在原来的JSON的基础上添加删除字段" class="headerlink" title="在原来的JSON的基础上添加删除字段"></a>在原来的JSON的基础上添加删除字段</h1><pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &quot;cJSON.h&quot;
+
+int main (int argc, const char * argv[]) 
+&#123;
+    char text[]=&quot;&#123;\&quot;name\&quot;: \&quot;Jack\&quot;&#125;&quot;;
+
+
+    char *out;
+    char buffer[200] = &#123;0&#125;;
+
+
+
+    cJSON *root = NULL;
+    cJSON *fmt = NULL;
+    root = cJSON_Parse(text);
+
+    /*
+    添加整数类型数据
+    */
+    cJSON_AddNumberToObject(root, &quot;number&quot;, 10010);    
+    printf(&quot;number:%d\n&quot;,cJSON_GetObjectItem(root,&quot;number&quot;)-&gt;valueint);
+    /*
+    添加字符串类型数据
+    */
+    cJSON_AddStringToObject(root,&quot;AAAAAAAAAAAA&quot;,&quot;BBBBBBBBBBBBB&quot;);
+    printf(&quot;AAAAAAAAAAAA:%s\n&quot;,cJSON_GetObjectItem(root,&quot;AAAAAAAAAAAA&quot;)-&gt;valuestring);
+    
+    /*
+    添加空数据
+    */
+    cJSON_AddStringToObject(root,&quot;CCCCCCCCC&quot;,&quot;&quot;); 
+    printf(&quot;CCCCCCCCC:%s\n&quot;,cJSON_GetObjectItem(root,&quot;CCCCCCCCC&quot;)-&gt;valuestring);
+    
+    /*
+    打印出JSON格式数据
+    cJSON_PrintUnformatted 是打印无格式的JSON数据
+    */
+    out = cJSON_Print(root);
+
+    memcpy(buffer,out,strlen(out));
+    printf(&quot;\n添加后的数据\n%s\n&quot;,out);
+    
+    
+    /*
+    删除JSON中的number字段
+    */
+    cJSON_DeleteItemFromObject(root, &quot;number&quot;); 
+    out = cJSON_Print(root);
+    //after cJSON_Print ,need free out.   free(out)
+        
+    printf(&quot;\n删除后的数据\n%s\n&quot;,out);
+
+
+    cJSON_Delete(root);
+
+
+    return 0;
+&#125;
+</code></pre>
+<p>编译：</p>
+<pre><code>$ gcc -o test.c cJSON.c -lm
+</code></pre>
+<p>运行</p>
+<pre><code>$ ./test
+</code></pre>
+<p>运行结果</p>
+<pre><code>number:10010
+AAAAAAAAAAAA:BBBBBBBBBBBBB
+CCCCCCCCC:
+
+添加后的数据
+&#123;
+        &quot;name&quot;: &quot;Jack&quot;,
+        &quot;number&quot;:10010,
+        &quot;AAAAAAAAAAAA&quot;: &quot;BBBBBBBBBBBBB&quot;,
+        &quot;CCCCCCCCC&quot;:    &quot;&quot;
+&#125;
+
+删除后的数据
+&#123;
+        &quot;name&quot;: &quot;Jack&quot;,
+        &quot;AAAAAAAAAAAA&quot;: &quot;BBBBBBBBBBBBB&quot;,
+        &quot;CCCCCCCCC&quot;:    &quot;&quot;
+&#125;
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/C/">C</a>, <a href="/tags/cJSON/">cJSON</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

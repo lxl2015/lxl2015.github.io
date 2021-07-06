@@ -1,0 +1,701 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux C 程序调试 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="在编写完程序后，需对程序进行调试测试，检查程序是否内存泄露，程序运行效率，多进程多线程调试等调试。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux C 程序调试"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2018-08-09T04:33:56.000Z"><a href="/2018/08/09/Linux-C程序调试/">2018-08-09</a></time>
+        
+  
+    <h1 class="title">Linux C 程序调试</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-GDB%E8%B0%83%E8%AF%95"><span class="toc-text">1.GDB调试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1%E4%B8%80%E8%88%AC%E4%BD%BF%E7%94%A8"><span class="toc-text">1.1一般使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-GDB-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A4%9A%E8%BF%9B%E7%A8%8B%E8%B0%83%E8%AF%95"><span class="toc-text">1.2.GDB 多线程多进程调试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-strace-backtrace-backtrace-symbols"><span class="toc-text">2.strace&#x2F;backtrace&#x2F;backtrace_symbols</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Valgrind"><span class="toc-text">3.Valgrind</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-perf"><span class="toc-text">4.perf</span></a></li></ol>
+    </div>
+
+        <p>在编写完程序后，需对程序进行调试测试，检查程序是否内存泄露，程序运行效率，多进程多线程调试等调试。</p>
+<span id="more"></span>
+
+<p>一般都会进程GDB调试，但是在调试的程序之前，必须在编译的时候加上<code>-g</code>编译选项，否则无法进行GDB调试。<br>GDB调试一般就两种，普普通通的调试，看看程序员如何运行的，还有一种是多进程多线程调试，这个也是最难的，一般人不这么干，因为多进程，多线程跑起来，就不好控制了(如果没有在程序中加入调试日志的话，只能这么做)。<br>检查程序运行效率，运行时间，追踪程序运行轨迹。<br>还有一种就是使用Valgrind程序进行内存检查。</p>
+<h3 id="1-GDB调试"><a href="#1-GDB调试" class="headerlink" title="1.GDB调试"></a>1.GDB调试</h3><p>使用GDB调试，需要添加<code>-g</code>编译选项.</p>
+<h3 id="1-1一般使用"><a href="#1-1一般使用" class="headerlink" title="1.1一般使用"></a>1.1一般使用</h3><p>可以直接运行无参数的gdb或者加上参数。</p>
+<pre><code>$ gdb            # 
+$ gdb program    #
+</code></pre>
+<p>也可以直接运行二进制程序和core文件</p>
+<pre><code>$ gdb program core
+</code></pre>
+<p>也可以绑定特定进程号。</p>
+<pre><code>$ gdb program 1234
+$ gdb -p 1234
+</code></pre>
+<p>GDB会绑定1234进程号，除非在该路径下有一个1234的文件</p>
+<p>常用的一些命令如下：</p>
+<pre><code>break [file:]functiop
+Set a breakpoint at function (in file).设置断点
+
+&gt; (gdb) b 123                # main函数文件的第123行
+&gt; (gdb) b test.c:123        # test.c 文件的第123行
+</code></pre>
+<hr>
+<pre><code>run [arglist]
+Start your program (with arglist, if specified). 运行
+
+&gt; (gdb) r                                        # 直接运行，没有启动参数
+&gt; (gdb) r -c /etc/zabbix/zabbix_server.conf        # 加上启动参数
+</code></pre>
+<hr>
+<pre><code>until
+Execute until the program reaches a source line greater than the current or a specified location (same args as break command) within the current frame.跳出循环
+
+&gt; (gdb) u
+</code></pre>
+<hr>
+<pre><code>delete [breakpoint or expressions]
+Delete some breakpoints or auto-display expressions.
+
+&gt; (gdb) d n            #删除断点n
+</code></pre>
+<hr>
+<pre><code>bt  Backtrace: display the program stack.显示堆栈信息
+
+&gt; (gdb) bt            # 打印堆栈信息
+</code></pre>
+<hr>
+<pre><code>print expr
+Display the value of an expression. 打印变量
+
+&gt; (gdb) p ptr        # 打印ptr指针内存
+</code></pre>
+<hr>
+<pre><code>c   Continue running your program (after stopping, e.g. at a breakpoint).继续执行程序，知道下一个断点或结束
+
+&gt; (gdb) c
+</code></pre>
+<hr>
+<pre><code>next
+Execute next program line (after stopping); step over any function calls in the line.下一步(step out)
+
+&gt; (gdb) n
+</code></pre>
+<hr>
+<pre><code>edit [file:]function
+look at the program line where it is presently stopped.
+</code></pre>
+<hr>
+<pre><code>list [file:]function
+type the text of the program in the vicinity of where it is presently stopped.显示程序内容
+
+&gt; (gdb) l            # 查看程序的十行代码
+&gt; (gdb) fun         # 查看fun函数源码
+&gt; (gdb) file:fun     # 查看file文件中的fun函数源码
+&gt; (gdb) 2,10         # 查看从第2行到第10行源代码
+&gt; (gdb)  ,15         # 查看最多到第15行的源代码
+</code></pre>
+<hr>
+<pre><code>info break
+Status of specified breakpoints (all user-settable breakpoints if no argument).查看断点设置信息
+
+&gt; (gdb) i b)
+</code></pre>
+<hr>
+<pre><code>step
+Execute next program line (after stopping); step into any function calls in the line.进入程序(step in)
+
+&gt; (gdb) s
+</code></pre>
+<hr>
+<pre><code>help [name]
+Show information about GDB command name, or general information about using GDB.
+
+&gt; (gdb) help    
+</code></pre>
+<hr>
+<pre><code>quit
+Exit from GDB.退出
+</code></pre>
+<h3 id="1-2-GDB-多线程多进程调试"><a href="#1-2-GDB-多线程多进程调试" class="headerlink" title="1.2.GDB 多线程多进程调试"></a>1.2.GDB 多线程多进程调试</h3><p>1.Debugging 已经运行的进程。<br>这种方法不是很好，有很多限制。遇到多进程通信等问题，调试起来完全没用。具体的使用方法是：</p>
+<pre><code># 假如现在需要debug一个已经运行的程序，PID为804
+$ gdb
+(gdb) attach 804
+</code></pre>
+<p>剩下的就是一般的操作方法了。</p>
+<p>当完成GDB调试的时候，应该detach该程序。让该程序脱离调试模式</p>
+<pre><code>(gdb) detach
+</code></pre>
+<p>2.比较原始古老的系统平台，GDB支持进程使用<code>fork</code>和<code>vfork</code>功能的调试模式。内核版本为2.5.46或者版本更高都支持该功能。</p>
+<p>在默认的情况下，当程序<code>fork</code>以后，GDB继续调试父进程，并不会阻塞子进程的运行。<br>但是如果想调试子进程，可以使用以下该命令<code>set follow-fork-mode</code>。</p>
+<pre><code>(gdb) set follow-fork-mode mode
+parent 
+    # 默认的情况下，是调试父进程。
+child
+    # 当程序`fork`和`vfork`的时候，产生一个子进程，该mode将会调试子进程。
+</code></pre>
+<hr>
+<pre><code>(gdb) show follow-fork-mode
+# 显示是调试子进程还是父进程。
+</code></pre>
+<p>3.如果实在Linux平台，同时想要调试父进程和子进程，可以使用如下命令<code>set detach-on-fork mode</code></p>
+<pre><code>(gdb) set detach-on-fork mode
+# 设置gdb是否分离其中一个进程，或者保留对它们的控制
+
+on
+    默认的情况下是分离子进程,并允许它独立运行。(因为该选项依赖于`follow-fork-mode`，而`follow-fork-mode`的默认值是父进程，如果想分离父进程，需将`follow-fork-mode`设置为child)
+
+off
+    GDB控制父进程和子进程。通常先调试哪个进程，还是依赖于`follow-fork-mode`
+
+
+(gdb) show detach-on-fork
+# 显示detach-on-fork的方式
+
+(gdb) info inferiors 
+# 显示所有的进程
+
+(gdb) inferiors n
+# 跳入第n个进程
+</code></pre>
+<p>set follow-exec-mode mode</p>
+<pre><code>follow-exec-mode can be:
+
+new
+
+    新建一个inferior给执行起来的子进程。而父进程的inferior仍然保留，当前保留的inferior的程序状态是没有执行。
+    For example:
+
+    (gdb) info inferiors
+    (gdb) info inferior
+      Id   Description   Executable
+    * 1    &lt;null&gt;        prog1
+    (gdb) run
+    process 12020 is executing new program: prog2
+    Program exited normally.
+    (gdb) info inferiors
+      Id   Description   Executable
+      1    &lt;null&gt;        prog1
+    * 2    &lt;null&gt;        prog2
+
+same
+    
+    当发生exec的时候，在执行exec的inferior上控制子进程。
+    
+    For example:
+
+    (gdb) info inferiors
+      Id   Description   Executable
+    * 1    &lt;null&gt;        prog1
+    (gdb) run
+    process 12020 is executing new program: prog2
+    Program exited normally.
+    (gdb) info inferiors
+      Id   Description   Executable
+    * 1    &lt;null&gt;        prog2
+
+
+
+&lt;gdb&gt; info threads                # 查询线程
+&lt;gdb&gt; thread &lt;thread number&gt;    # 切换调试线程
+</code></pre>
+<p>example:</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: gdb.c
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: 2017年03月01日 星期三 08时51分59秒
+ ************************************************************************/
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;pthread.h&gt;
+void process1();
+void process2();
+void *process_worker(void *args);
+int main(int argc, const char *argv[])
+&#123;
+    int pid;
+    pid = fork();
+    if(pid != 0)
+        process1();
+    else
+        process2();
+    return 0;
+&#125;
+void process1()
+&#123;
+    pid_t pid  = getpid();
+    char prefix[] = &quot;process1&quot;;
+    char tprefix[] = &quot;thread&quot;;
+    pthread_t p;
+    int status;
+    printf(&quot;%s %d %s\n&quot;,prefix,pid,&quot;step1&quot;);
+    status = pthread_create(&amp;p,NULL,process_worker,NULL);
+    if(status != 0)
+    &#123;
+        printf(&quot;process1 cannt create new thread.\n&quot;);
+    &#125;
+    process_worker(NULL);
+    sleep(1);
+&#125;
+void *process_worker(void *args)
+&#123;
+    pid_t pid = getpid();
+    pthread_t p = pthread_self();
+    char prefix[] = &quot;process1&quot;;
+    char tprefix[] = &quot;thread&quot;;
+    printf(&quot;%s:%d %s %ld %s\n&quot;,prefix,pid,tprefix,p,&quot;step2&quot;);
+    printf(&quot;%s:%d %s %ld %s\n&quot;,prefix,pid,tprefix,p,&quot;step3&quot;);
+    return NULL;
+&#125;
+void process2()
+&#123;
+    pid_t pid = getpid();
+    char prefix[] = &quot;process2&quot;;
+    printf(&quot;%s:%d %s\n&quot;,prefix,pid,&quot;step1&quot;);
+    printf(&quot;%s:%d %s\n&quot;,prefix,pid,&quot;step2&quot;);
+    printf(&quot;%s:%d %s\n&quot;,prefix,pid,&quot;step3&quot;);
+&#125;
+</code></pre>
+<p>调试：1、调试主进程，阻塞子进程</p>
+<pre><code>GNU gdb (GDB) Red Hat Enterprise Linux (7.2-90.el6)
+Copyright (C) 2010 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type &quot;show copying&quot;
+and &quot;show warranty&quot; for details.
+This GDB was configured as &quot;x86_64-redhat-linux-gnu&quot;.
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;...
+Reading symbols from /root/test/debug...done.
+</code></pre>
+<hr>
+<pre><code>(gdb) set detach-on-fork off
+(gdb) show detach-on-fork
+Whether gdb will detach the child of a fork is off.
+(gdb) catch fork
+Catchpoint 1 (fork)
+(gdb) r
+Starting program: /root/test/debug 
+[Thread debugging using libthread_db enabled]
+Catchpoint 1 (forked process 123522), 0x00007ffff78d8cbd in __libc_fork ()
+    at ../nptl/sysdeps/unix/sysv/linux/fork.c:132
+132       pid = ARCH_FORK ();
+(gdb) break gdb.c:24
+Breakpoint 2 at 0x4006fb: file gdb.c, line 24.
+(gdb) c
+Continuing.
+[New process 123522]
+[Thread debugging using libthread_db enabled]
+Breakpoint 2, main (argc=1, argv=0x7fffffffe568) at gdb.c:24
+24          if(pid != 0)
+(gdb) info inferiors
+  Num  Description       Executable        
+  2    process 123522    /root/test/debug  
+* 1    process 123519    /root/test/debug 
+</code></pre>
+<p>2、切换到子进程：</p>
+<pre><code>(gdb) inferior 2
+[Switching to inferior 2 [process 125780] (/root/test/debug)]
+[Switching to thread 2 (Thread 0x7ffff7fe9700 (LWP 125780))] 
+#0  0x00007ffff78d8cbd in __libc_fork () at ../nptl/sysdeps/unix/sysv/linux/fork.c:132
+132       pid = ARCH_FORK ();
+(gdb) info inferiors
+  Num  Description       Executable        
+* 2    process 125780    /root/test/debug  
+  1    process 125777    /root/test/debug  
+(gdb) inferior 1
+[Switching to inferior 1 [process 125777] (/root/test/debug)]
+[Switching to thread 1 (Thread 0x7ffff7fe9700 (LWP 125777))] 
+#0  main (argc=1, argv=0x7fffffffe568) at gdb.c:24
+24          if(pid != 0)
+(gdb) info inferiors
+  Num  Description       Executable        
+  2    process 125780    /root/test/debug  
+* 1    process 125777    /root/test/debug  
+</code></pre>
+<hr>
+<p>3、设断点继续调试主进程，主进程产生两个子线程：</p>
+<pre><code>(gdb) b gdb.c:59
+Breakpoint 3 at 0x40082a: file gdb.c, line 59. (2 locations)
+(gdb) c
+Continuing.
+process1 127053 step1
+[New Thread 0x7ffff782b700 (LWP 127146)]
+process1:127053 thread 140737354045184 step2
+process1:127053 thread 140737345926912 step2
+[Switching to Thread 0x7ffff782b700 (LWP 127146)]
+Breakpoint 3, process_worker (args=0x0) at gdb.c:59
+59          printf(&quot;%s:%d %s %ld %s\n&quot;,prefix,pid,tprefix,p,&quot;step3&quot;);
+(gdb) info inferiors
+  Num  Description       Executable        
+  2    process 127056    /root/test/debug  
+* 1    process 127053    /root/test/debug  
+(gdb) info threads
+* 3 Thread 0x7ffff782b700 (LWP 127146)  process_worker (args=0x0) at gdb.c:59
+  2 Thread 0x7ffff7fe9700 (LWP 127056)  0x00007ffff78d8cbd in __libc_fork () at ../nptl/sysdeps/unix/sysv/linux/fork.c:132
+  1 Thread 0x7ffff7fe9700 (LWP 127053)  process_worker (args=0x0) at gdb.c:59
+</code></pre>
+<p>4、切换到主进程中的子线程，注意：线程2为前面产生的子进程(gdb) thread 3</p>
+<pre><code>(gdb) thread 3
+[Switching to thread 3 (Thread 0x7ffff782b700 (LWP 127146))]#0  process_worker (args=0x0) at gdb.c:59
+59          printf(&quot;%s:%d %s %ld %s\n&quot;,prefix,pid,tprefix,p,&quot;step3&quot;);
+(gdb) thread 1
+[Switching to thread 1 (Thread 0x7ffff7fe9700 (LWP 127053))]#0  process_worker (args=0x0) at gdb.c:59
+59          printf(&quot;%s:%d %s %ld %s\n&quot;,prefix,pid,tprefix,p,&quot;step3&quot;);
+</code></pre>
+<p>5、查看断点</p>
+<pre><code>(gdb) bt
+#0  process_worker (args=0x0) at gdb.c:59
+#1  0x00000000004007ab in process1 () at gdb.c:45
+#2  0x000000000040070b in main (argc=1, argv=0x7fffffffe568) at gdb.c:25
+</code></pre>
+<h3 id="2-strace-backtrace-backtrace-symbols"><a href="#2-strace-backtrace-backtrace-symbols" class="headerlink" title="2.strace/backtrace/backtrace_symbols"></a>2.strace/backtrace/backtrace_symbols</h3><p>首先strace是一个非常有用的一个诊断、指导、调试的工具。运维、开发人员都可以使用它。这里我说的是strace命令。</p>
+<p>但是还有一个系统调用的API backstrace/backstrace_symbols。在使用该API的时候，需要加上编译选项-rdynamic 否则不会打印堆栈。详细见Zabbix源码，或者看里面中的一篇文章。或者如下<a target="_blank" rel="noopener" href="http://man7.org/linux/man-pages/man3/backtrace.3.html">链接</a></p>
+<p>这里还是主要讲解strace命令吧</p>
+<pre><code>-c 统计每一系统调用的所执行的时间,次数和出错的次数等. 
+-d 输出strace关于标准错误的调试信息. 
+-f 跟踪由fork调用所产生的子进程. 
+-ff 如果提供-o filename,则所有进程的跟踪结果输出到相应的filename.pid中,pid是各进程的进程号. 
+-F 尝试跟踪vfork调用.在-f时,vfork不被跟踪. 
+-h 输出简要的帮助信息. 
+-i 输出系统调用的入口指针. 
+-q 禁止输出关于脱离的消息. 
+-r 打印出相对时间关于,,每一个系统调用. 
+-t 在输出中的每一行前加上时间信息. 
+-tt 在输出中的每一行前加上时间信息,微秒级. 
+-ttt 微秒级输出,以秒了表示时间. 
+-T 显示每一调用所耗的时间. 
+-v 输出所有的系统调用.一些调用关于环境变量,状态,输入输出等调用由于使用频繁,默认不输出. 
+-V 输出strace的版本信息. 
+-x 以十六进制形式输出非标准字符串 
+-xx 所有字符串以十六进制形式输出. 
+-a column 
+设置返回值的输出位置.默认 为40. 
+-e expr 
+指定一个表达式,用来控制如何跟踪.格式如下: 
+[qualifier=][!]value1[,value2]... 
+qualifier只能是 trace,abbrev,verbose,raw,signal,read,write其中之一.value是用来限定的符号或数字.默认的 qualifier是 trace.感叹号是否定符号.例如: 
+-eopen等价于 -e trace=open,表示只跟踪open调用.而-etrace!=open表示跟踪除了open以外的其他调用.有两个特殊的符号 all 和 none. 
+注意有些shell使用!来执行历史记录里的命令,所以要使用\\. 
+-e trace=set 
+只跟踪指定的系统 调用.例如:-e trace=open,close,rean,write表示只跟踪这四个系统调用.默认的为set=all. 
+-e trace=file 
+只跟踪有关文件操作的系统调用. 
+-e trace=process 
+只跟踪有关进程控制的系统调用. 
+-e trace=network 
+跟踪与网络有关的所有系统调用. 
+-e strace=signal 
+跟踪所有与系统信号有关的 系统调用 
+-e trace=ipc 
+跟踪所有与进程通讯有关的系统调用 
+-e abbrev=set 
+设定 strace输出的系统调用的结果集.-v 等与 abbrev=none.默认为abbrev=all. 
+-e raw=set 
+将指 定的系统调用的参数以十六进制显示. 
+-e signal=set 
+指定跟踪的系统信号.默认为all.如 signal=!SIGIO(或者signal=!io),表示不跟踪SIGIO信号. 
+-e read=set 
+输出从指定文件中读出 的数据.例如: 
+-e read=3,5 
+-e write=set 
+输出写入到指定文件中的数据. 
+-o filename 
+将strace的输出写入文件filename 
+-p pid 
+跟踪指定的进程pid. 
+-s strsize 
+指定输出的字符串的最大长度.默认为32.文件名一直全部输出. 
+-u username 
+以username 的UID和GID执行被跟踪的命令
+</code></pre>
+<p>当Linux C开发人员使用的时候：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: test_strace.c
+    &gt; Author: Lin
+    &gt; Mail: 1010361011@qq.com
+    &gt; Created Time: Mon 13 Aug 2018 01:24:51 PM CST
+************************************************************************/
+#include &lt;stdio.h&gt;
+int main(void)
+&#123;
+    FILE * fp;
+
+    fp = fopen(&quot;test_strace&quot;,&quot;r&quot;);
+    return 0;
+&#125;
+</code></pre>
+<hr>
+<pre><code>$ gcc test_strace.c -o test_strace
+$ strace ./test_strace
+</code></pre>
+<hr>
+<p>1、它会显示所有的系统调用，使用运行选项，或者其他过滤命令grep，awk等将想要的系统调用过滤出来。<br>2、它会追踪发送给进程的信号。<br>3、它会追踪系统调用运行时间，哪个系统调用使用时间最长等问题。<br>4、它还可通过pid追踪正在运行的进程。</p>
+<p>下面只是简单使用，但是已经够用了，如果实在想深入研究以下可以使用<code>man strace</code>，详细阅读man 手册。</p>
+<p>如果您使用过其他Unix系统，这与“truss”类似。另一个（更全面）是Sun的Dtrace。<br>gcc -dynamic   显示动态段的信息</p>
+<p>1、追踪二进制文件</p>
+<pre><code>$ strace ls
+</code></pre>
+<p>如果最终特别的系统调用，可以加上-e选项，例如想追踪open，access系统调用</p>
+<pre><code>$ strace -e open,access ls
+或者
+$ strace -e trace=open,access ls
+</code></pre>
+<p>当然也可以使用如下命令,但是不止显示<code>open</code>和<code>access</code>调用</p>
+<pre><code>$ strace ls | grep open  | access
+</code></pre>
+<p>追踪网络信息</p>
+<pre><code>$ strace -e network ifconfig # 或
+$ strace -e trace=network ifconfig  # 或
+</code></pre>
+<p>2、将追踪的信息重定向到文件中。使用 -o选项即可。</p>
+<pre><code>$ strace -o strace.txt ls
+$ cat strace.txt
+</code></pre>
+<p>3、如果想要追踪正在运行的进程。</p>
+<pre><code>$ ps -ef | grep httpd # 获取httpd的进程的pid
+$ strace -p pid
+</code></pre>
+<p>4、在打印追踪的前面打上时间，可以使用-t,-tt,-ttt。具体可打印结果</p>
+<pre><code>[strace@strace ~]$ strace -t -e access ls
+14:32:23 access(&quot;/etc/ld.so.preload&quot;, R_OK) = -1 ENOENT (No such file or directory)
+14:32:23 access(&quot;/etc/selinux/config&quot;, F_OK) = 0
+doc  test  tmp
+14:32:23 +++ exited with 0 +++
+[strace@strace ~]$ strace -tt -e access ls
+14:32:30.163516 access(&quot;/etc/ld.so.preload&quot;, R_OK) = -1 ENOENT (No such file or directory)
+14:32:30.169202 access(&quot;/etc/selinux/config&quot;, F_OK) = 0
+doc  test  tmp
+14:32:30.170608 +++ exited with 0 +++
+[strace@strace ~]$ strace -ttt -e access ls
+1534141953.107069 access(&quot;/etc/ld.so.preload&quot;, R_OK) = -1 ENOENT (No such file or directory)
+1534141953.112797 access(&quot;/etc/selinux/config&quot;, F_OK) = 0
+doc  test  tmp
+1534141953.114338 +++ exited with 0 +++
+[strace@strace ~]$ date
+Mon Aug 13 14:32:38 CST 2018
+</code></pre>
+<p>5、打印每个系统调用花费的时间，请使用-r选项。</p>
+<p> -r          Print a relative timestamp upon entry to each system call.  This records the time difference between the beginning of successive system calls.</p>
+<pre><code>[strace@strace ~]$ strace -re access ls
+ 0.000000 access(&quot;/etc/ld.so.preload&quot;, R_OK) = -1 ENOENT (No such file or directory)
+ 0.005669 access(&quot;/etc/selinux/config&quot;, F_OK) = 0
+doc  test  tmp
+ 0.001535 +++ exited with 0 +++
+ 
+</code></pre>
+<p>6、类似与报表之类的东西，统计系统调用使用时间比率。<br>  -c             count time, calls, and errors for each syscall and report summary</p>
+<pre><code>[strace@strace ~]$ strace -c ls
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 21.03    0.000082           3        27           mmap
+ 21.03    0.000082           5        18           mprotect
+ 11.79    0.000046           4        11           open
+ 11.54    0.000045           5        10           read
+  7.44    0.000029           2        14           close
+  5.38    0.000021          11         2           munmap
+  4.36    0.000017           2        11           fstat
+  4.36    0.000017           9         2         2 statfs
+  2.82    0.000011           6         2           getdents
+  1.54    0.000006           3         2           ioctl
+  1.54    0.000006           3         2         1 access
+  1.28    0.000005           5         1         1 stat
+  1.03    0.000004           1         3           brk
+  1.03    0.000004           2         2           rt_sigaction
+  1.03    0.000004           4         1           openat
+  0.77    0.000003           3         1           set_tid_address
+  0.51    0.000002           2         1           rt_sigprocmask
+  0.51    0.000002           2         1           getrlimit
+  0.51    0.000002           2         1           arch_prctl
+  0.51    0.000002           2         1           set_robust_list
+  0.00    0.000000           0         1           execve
+------ ----------- ----------- --------- --------- -----    
+</code></pre>
+<p><a target="_blank" rel="noopener" href="http://hokstad.com/5-simple-ways-to-troubleshoot-using-strace">链接1</a><br><a target="_blank" rel="noopener" href="https://www.thegeekstuff.com/2011/11/strace-examples/">链接2</a><br><a target="_blank" rel="noopener" href="https://www.linuxnix.com/10-strace-command-examples-linuxunix/">链接3</a><br><a target="_blank" rel="noopener" href="http://www.man7.org/linux/man-pages/man1/strace.1.html">链接4</a><br><a target="_blank" rel="noopener" href="https://huoding.com/2015/10/16/474">链接5</a></p>
+<h3 id="3-Valgrind"><a href="#3-Valgrind" class="headerlink" title="3.Valgrind"></a>3.Valgrind</h3><pre><code>$ valgrind --leak-check=full ./program
+</code></pre>
+<h3 id="4-perf"><a href="#4-perf" class="headerlink" title="4.perf"></a>4.perf</h3><p>perf 是用来进行软件性能分析的工具</p>
+<p>支持基于PMC / tracepoint 的采样</p>
+<p>可进行整个系统级的性能分析，原始采样事件数据可以输出作其他分析之用</p>
+<p>例子：</p>
+<pre><code>sudo perf record -a -g -- ./x
+sudo perf report # 显示报表
+sudo perf annotate # 显示标注源代码
+</code></pre>
+<p>perf 能触发的事件分为三类：</p>
+<pre><code>perf top
+</code></pre>
+<p>实时显示系统/进程的性能统计信息</p>
+<pre><code>perf stat
+</code></pre>
+<p>分析系统/进程的整体性能概况</p>
+<pre><code>perf record
+</code></pre>
+<p>记录一段时间内系统/进程的性能时间</p>
+<p>hardware : 由 PMU 产生的事件，比如 cache-misses、cpu-cycles、instructions、branch-misses …等等，通常是当需要了解程序对硬件特性使用情况时使用<br>software : 是核心程序产生的事件，比如 context-switches、page-faults、cpu-clock、cpu-migrations …等等<br>tracepoint : 是核心中的静态 tracepoint 所触发的事件，这些 tracepoint 用來判断在程序执行时期核心的行为</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/GDB/">GDB</a>, <a href="/tags/strace/">strace</a>, <a href="/tags/valgrind/">valgrind</a>, <a href="/tags/perf/">perf</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

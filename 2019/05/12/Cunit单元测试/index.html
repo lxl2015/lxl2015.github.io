@@ -1,0 +1,395 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Cunit单元测试 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="CUnit是C单元测试系统,它用C语言编写和管理的。这里主要介绍的是版本2的CUnit API和使用方法。因为老版本已经不建议使用，详情见文档或者READ文件。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Cunit单元测试"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2019-05-12T06:48:19.000Z"><a href="/2019/05/12/Cunit单元测试/">2019-05-12</a></time>
+        
+  
+    <h1 class="title">Cunit单元测试</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4"><span class="toc-text">1. 使用步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4%E4%B8%AD%E6%B5%8B%E8%AF%95%E6%A8%A1%E5%BC%8F"><span class="toc-text">2. 4中测试模式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-Automated-Mode"><span class="toc-text">2.1 Automated Mode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-Basic-Mode"><span class="toc-text">2.2 Basic Mode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-Interactive-Console-Mode"><span class="toc-text">2.3 Interactive Console Mode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-Interactive-Curses-Mode"><span class="toc-text">2.4 Interactive Curses Mode</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B"><span class="toc-text">3. 测试用例</span></a></li></ol>
+    </div>
+
+        <p>CUnit是C单元测试系统,它用C语言编写和管理的。这里主要介绍的是版本2的CUnit API和使用方法。<br>因为老版本已经不建议使用，详情见文档或者READ文件。</p>
+<span id="more"></span>
+
+<h3 id="1-使用步骤"><a href="#1-使用步骤" class="headerlink" title="1. 使用步骤"></a>1. 使用步骤</h3><p>典型使用CUnit框架步骤</p>
+<ol>
+<li>编写测试函数（必要的时候需要编写初始化/清理函数）</li>
+<li>调用CU_initialize_registry()函数初始化测试注册单元</li>
+<li>调用CU_add_suite()函数将测试包添加到注册单元</li>
+<li>调用CU_add_test()将测试用例添加到测试包中</li>
+<li>使用合适接口运行测试用例</li>
+<li>调用CU_cleanup_registry函数清理测试单元</li>
+</ol>
+<p>注意：</p>
+<ul>
+<li><p>test registry - 注册测试单元</p>
+</li>
+<li><p>test suite - 测试包</p>
+<ol>
+<li>Write functions for tests (and suite init/cleanup if necessary).</li>
+<li>Initialize the test registry - CU_initialize_registry()</li>
+<li>Add suites to the test registry - CU_add_suite()</li>
+<li>Add tests to the suites - CU_add_test()</li>
+<li>Run tests using an appropriate interface, e.g. CU_console_run_tests</li>
+<li>Cleanup the test registry - CU_cleanup_registry</li>
+</ol>
+</li>
+</ul>
+<h3 id="2-4中测试模式"><a href="#2-4中测试模式" class="headerlink" title="2. 4中测试模式"></a>2. 4中测试模式</h3><p>Unit有四种单元测试模式，如下.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Interface</th>
+<th align="center">Platform</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Automated</td>
+<td align="center">all</td>
+<td align="left">non-interactive with output to xml files</td>
+</tr>
+<tr>
+<td align="center">Basic</td>
+<td align="center">all</td>
+<td align="left">non-interactive with optional output to stdout</td>
+</tr>
+<tr>
+<td align="center">Console</td>
+<td align="center">all</td>
+<td align="left">interactive console mode under user control</td>
+</tr>
+<tr>
+<td align="center">Curses</td>
+<td align="center">Linux/Unix</td>
+<td align="left">interactive curses mode under user control</td>
+</tr>
+</tbody></table>
+<h4 id="2-1-Automated-Mode"><a href="#2-1-Automated-Mode" class="headerlink" title="2.1 Automated Mode"></a>2.1 Automated Mode</h4><p>The automated interface is non-interactive. Clients initiate a test run, and the results are output to an XML file. A listing of the registered tests and suites can also be reported to an XML file.</p>
+<p>The following functions comprise the automated interface API:</p>
+<pre><code>void CU_automated_run_tests(void)
+</code></pre>
+<p>Runs all tests in all registered (and active) suites. Test results are output to a file named ROOT-Results.xml. The filename ROOT can be set using CU_set_output_filename(), or else the default CUnitAutomated-Results.xml is used. Note that if a distict filename ROOT is not set before each run, the results file will be overwritten.</p>
+<p>The results file is supported by both a document type definition file (CUnit-Run.dtd) and XSL stylesheet (CUnit-Run.xsl). These are provided in the Share subdirectory of the source and installation trees.</p>
+<pre><code>U_ErrorCode CU_list_tests_to_file(void)
+</code></pre>
+<p>Lists the registered suites and associated tests to file. The listing file is named ROOT-Listing.xml. The filename ROOT can be set using CU_set_output_filename(), or else the default CUnitAutomated is used. Note that if a distict filename ROOT is not set before each run, the listing file will be overwritten.</p>
+<p>The listing file is supported by both a document type definition file (CUnit-List.dtd) and XSL stylesheet (CUnit-List.xsl). These are provided in the Share subdirectory of the source and installation trees.</p>
+<p>Note also that a listing file is not generated automatically by CU_automated_run_tests(). Client code must explicitly request a listing when one is desired.</p>
+<pre><code>void CU_set_output_filename(const char* szFilenameRoot)
+</code></pre>
+<p>Sets the output filenames for the results and listing files. szFilenameRoot is used to construct the filenames by appending -Results.xml and -Listing.xml, respectively.</p>
+<h4 id="2-2-Basic-Mode"><a href="#2-2-Basic-Mode" class="headerlink" title="2.2 Basic Mode"></a>2.2 Basic Mode</h4><p>The basic interface is also non-interactive, with results output to stdout. This interface supports running individual suites or tests, and allows client code to control the type of output displayed during each run. This interface provides the most flexibility to clients desiring simplified access to the CUnit API.</p>
+<p>The following public functions are provided:</p>
+<pre><code>CU_ErrorCode CU_basic_run_tests(void)
+</code></pre>
+<p>Runs all tests in all registered suites. Only active suites are executed, and it is not considered an error if inactive suites are encountered and skipped. Returns the 1st error code occurring during the test run. The type of output is controlled by the current run mode, which can be set using CU_basic_set_mode().</p>
+<pre><code>CU_ErrorCode CU_basic_run_suite(CU_pSuite pSuite)
+</code></pre>
+<p>Runs all tests in single specified suite. Returns the 1st error code occurring during the test run. CU_basic_run_suite itself sets CUE_NOSUITE if pSuite is NULL and CUE_SUITE_INACTIVE if pSuite is not active for execution. The type of output is controlled by the current run mode, which can be set using CU_basic_set_mode().</p>
+<pre><code>CU_ErrorCode CU_basic_run_test(CU_pSuite pSuite, CU_pTest pTest)
+</code></pre>
+<p>Runs a single test in a specified suite. Returns the 1st error code occurring during the test run. CU_basic_run_test itself sets CUE_NOSUITE if pSuite is NULL, CUE_NOTEST if pTest is NULL, CUE_SUITE_INACTIVE if pSuite is not active, CUE_TEST_NOT_IN_SUITE if pTest is not a registered test in pSuite, and CUE_TEST_INACTIVE if pTest is not active. The type of output is controlled by the current run mode, which can be set using CU_basic_set_mode().</p>
+<pre><code>void CU_basic_set_mode(CU_BasicRunMode mode)
+</code></pre>
+<p>Sets the basic run mode, which controls the output during test runs. Choices are:</p>
+<pre><code>CU_BRM_NORMAL     Failures and run summary are printed.
+CU_BRM_SILENT     No output is printed except error messages.
+CU_BRM_VERBOSE     Maximum output of run details.
+
+CU_BasicRunMode CU_basic_get_mode(void)
+</code></pre>
+<p>Retrieves the current basic run mode code.</p>
+<pre><code>void CU_basic_show_failures(CU_pFailureRecord pFailure)
+</code></pre>
+<p>Prints a summary of all failures to stdout. Does not depend on the run mode.</p>
+<h4 id="2-3-Interactive-Console-Mode"><a href="#2-3-Interactive-Console-Mode" class="headerlink" title="2.3 Interactive Console Mode"></a>2.3 Interactive Console Mode</h4><p>The console interface is interactive. All the client needs to do is initiate the console session, and the user controls the test run interactively. This includes selection &amp; running of registered suites and tests, and viewing test results. To start a console session, use</p>
+<pre><code>void CU_console_run_tests(void)
+</code></pre>
+<h4 id="2-4-Interactive-Curses-Mode"><a href="#2-4-Interactive-Curses-Mode" class="headerlink" title="2.4 Interactive Curses Mode"></a>2.4 Interactive Curses Mode</h4><p>The curses interface is interactive. All the client needs to do is initiate the curses session, and the user controls the test run interactively. This include selection &amp; running of registered suites and tests, and viewing test results. Use of this interface requires linking the ncurses library into the application. To start a curses session, use</p>
+<pre><code>void CU_curses_run_tests(void)
+</code></pre>
+<h3 id="3-测试用例"><a href="#3-测试用例" class="headerlink" title="3. 测试用例"></a>3. 测试用例</h3><p>在Cunit源码中有sample文件夹，里面有很多测试用例。<br>使用Cunit的一个要求就是不准污染源码，需要单独写测试文件，不准直接在测试源码中直接写测试程序。</p>
+<pre><code>// maxi.c
+int maxi(int i1, int i2)
+&#123;
+    return i1&gt;i2? i1: i2;
+&#125;
+
+
+// maxi.h
+int maxi(int i1, int i2);
+
+//test_maxi.c
+#include &lt;CUnit/Basic.h&gt;
+#include &lt;CUnit/Console.h&gt;
+#include &lt;CUnit/CUnit.h&gt;
+#include &lt;CUnit/TestDB.h&gt;
+#include &lt;stdlib.h&gt; 
+#include &quot;maxi.h&quot;
+
+/* test cases */
+
+void test_maxi_1(void)
+&#123;
+    CU_ASSERT(maxi(0,2)==2);  //  this case will pass
+&#125;
+
+void test_maxi_2(void)
+&#123;
+    CU_ASSERT(maxi(0,-2)==1);    // this case will fail
+&#125;
+
+void test_maxi_3(void)
+&#123;
+    CU_ASSERT(maxi(2,2)==2);    // this case will pass
+&#125;
+
+CU_TestInfo tests[] = &#123;
+    &#123;&quot;test 1&quot;, test_maxi_1 &#125;,
+    &#123;&quot;test 2&quot;, test_maxi_2 &#125;,
+    &#123;&quot;test 3&quot;, test_maxi_3 &#125;,
+    CU_TEST_INFO_NULL
+&#125;;
+
+/* suite init */
+int suite_init(void)&#123;return 0;&#125;
+
+int suite_clean(void)&#123;return 0;&#125;
+
+void suite_setup(void)&#123;&#125;
+
+void suite_teardown(void)&#123;&#125;
+
+CU_SuiteInfo suites[] = &#123;
+    &#123;&quot;suite 1&quot;, suite_init, suite_clean, suite_setup, suite_teardown, tests&#125;,
+    CU_SUITE_INFO_NULL
+&#125;;
+
+/* registry */
+
+int main(int argc, char* argv[])
+&#123;
+    CU_ErrorCode err;
+
+    /* init */
+    printf(&quot;init\n&quot;);
+    err = CU_initialize_registry();
+    if( err )&#123;
+        printf(&quot;CU_initialize_registry: %d\n&quot;, err);
+        return err;
+    &#125;
+
+    /* add suites and tests */
+    printf(&quot;add suites and tests\n&quot;);
+    err = CU_register_suites(suites);
+    if( err )
+    &#123;
+        printf(&quot;CU_register_suites: %d\n&quot;, err);
+    &#125;
+    CU_pTestRegistry reg = CU_get_registry();
+    printf(&quot;CU_get_registry: %d/%d/%u\n&quot;, reg-&gt;uiNumberOfSuites, reg-&gt;uiNumberOfTests, (long)reg-&gt;pSuite);
+
+    /* run auto */
+    printf(&quot;run auto\n&quot;);
+    /**** Automated Mode *****************/
+    CU_set_output_filename(&quot;TestMax&quot;);
+    CU_list_tests_to_file();
+    CU_automated_run_tests();
+    //************************************/
+
+    printf(&quot;run basic\n&quot;);
+    /***** Basice Mode *******************/
+    CU_basic_set_mode(CU_BRM_VERBOSE);
+    CU_basic_run_tests();
+    //************************************/
+
+    /*****Console Mode ********************
+    CU_console_run_tests();
+    //************************************/        
+    
+    /* end */
+    printf(&quot;end\n&quot;);
+    CU_cleanup_registry();
+    err = CU_get_error();
+    if( err )
+    &#123;
+        printf(&quot;error: %d&quot;, err);
+    &#125;
+    return err;
+
+&#125;    
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Cunit/">Cunit</a>, <a href="/tags/Unit-Test/">Unit Test</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

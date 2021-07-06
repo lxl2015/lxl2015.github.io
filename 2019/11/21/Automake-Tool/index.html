@@ -1,0 +1,735 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Automake | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="该教程只是一个简单的框架，详细资料请查询官网。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Automake"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2019-11-21T01:03:41.000Z"><a href="/2019/11/21/Automake-Tool/">2019-11-21</a></time>
+        
+  
+    <h1 class="title">Automake</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%89%A7%E8%A1%8C-autoscan-%E5%91%BD%E4%BB%A4"><span class="toc-text">1. 执行 autoscan 命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%BC%96%E8%BE%91configure-ac"><span class="toc-text">2. 编辑configure.ac</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%AE%8F"><span class="toc-text">3. 自定义宏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%BC%96%E5%86%99-Makefile-am-%E6%96%87%E4%BB%B6"><span class="toc-text">4. 编写 Makefile.am 文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-aclocal"><span class="toc-text">5. aclocal</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-autoconf"><span class="toc-text">6. autoconf</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-autoheader"><span class="toc-text">7. autoheader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-automake-a"><span class="toc-text">8. automake -a</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-automake"><span class="toc-text">9. automake</span></a></li></ol>
+    </div>
+
+        <p>该教程只是一个简单的框架，详细资料请查询官网。</p>
+<span id="more"></span>
+
+
+<p><a target="_blank" rel="noopener" href="https://www.gnu.org/software/automake/">Automake</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.gnu.org/software/autoconf/">Autoconf</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.lrde.epita.fr/~adl/autotools.html">The GNU Autotools:</a></p>
+<ul>
+<li>Autoconf</li>
+<li>Automake</li>
+<li>Libtool</li>
+<li>Gettext</li>
+</ul>
+<p>Automake是通过读取Makefile.am来生成GNU标准编码的Makefile.in，Automake根据Makefile.am中定义的某些变量和规则生成更专业的代码。</p>
+<p><img src="./Automake-Tool/Autoconf-automake-process.png" alt="screenshot came from wiki"></p>
+<hr>
+<ul>
+<li><code>autoscan</code>命令扫描源代码根目录，生成<code>configure.scan</code>,</li>
+<li>将configure.scan重命名为<code>configure.ac</code>,编辑<code>configure.ac</code>文件</li>
+<li>如果需要自定义宏的话，需要先编写<code>.m4</code>文件，一般来讲会创建一个<code>m4</code>的文件夹，将m4文件放到m4文件夹中</li>
+<li>如果有自定义宏，执行<code>aclocal -I m4</code>。否则执行<code>aclocal</code>命令。<br><code>aclocal</code>命令会扫描configure.ac文件中非autoconf的宏和自定义宏。后面会介绍宏的语法结构。</li>
+<li><code>autoconf</code>命令，将M4解析<code>configure.ac</code>解析成<code>configure</code>文件</li>
+<li>执行<code>autoheader</code>命令，扫描configure.ac,acconfig.h（如果存在），生成config.h.in文件</li>
+<li>执行<code>automake</code>命令，读取makefile.am，生成makefile.in文件</li>
+</ul>
+<p>整个编译流程如下</p>
+<pre><code>autoscan
+// 编辑confiure.ac文件
+// 自定义宏
+// 编写Makefile.am
+aclocal -I m4
+autoconf
+autoheader
+automake -a 
+automake
+</code></pre>
+<p>整个过程执行6条命令，修改<code>configure.ac</code>和编写<code>m4</code>文件</p>
+<h3 id="1-执行-autoscan-命令"><a href="#1-执行-autoscan-命令" class="headerlink" title="1. 执行 autoscan 命令"></a>1. 执行 autoscan 命令</h3><h3 id="2-编辑configure-ac"><a href="#2-编辑configure-ac" class="headerlink" title="2. 编辑configure.ac"></a>2. 编辑configure.ac</h3><p>2.1.  demo</p>
+<hr>
+<pre><code>[lxl@lxl am_hello]$ tree
+.
+├── include
+│   └── am_hello.h
+├── READ
+└── src
+    ├── am_hello.c
+    └── main.c
+
+2 directories, 4 files
+[lxl@lxl am_hello]$ pwd
+/home/lxl/test/am_hello
+[lxl@lxl am_hello]$ ls
+include  READ  src
+[lxl@lxl am_hello]$ autoscan
+[lxl@lxl am_hello]$ ls
+autoscan.log  configure.scan  include  READ  src
+[lxl@lxl am_hello]$ mv configure.scan  configure.ac
+[lxl@lxl am_hello]$ vi configure.ac
+[lxl@lxl am_hello]$ cat  configure.ac
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ([2.69])
+AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_CONFIG_SRCDIR([include/am_hello.h])
+AC_CONFIG_HEADERS([config.h])
+
+# Checks for programs.
+AC_PROG_CC
+
+# Checks for libraries.
+
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+AC_OUTPUT
+</code></pre>
+<p>从demo中的<code>configure.ac</code>布局发现，以<code>AC_INIT</code>开头，以<code>AC_OUTPUT</code>结束</p>
+<pre><code>AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+
+# Checks for programs.
+AC_PROG_CC
+
+# Checks for libraries.
+
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+AC_OUTPUT
+</code></pre>
+<p>2.2. 下面以zabbix的configure.ac为例解析。</p>
+<p>2.2.1 Automake 配置</p>
+<pre><code>AC_INIT([Zabbix],[5.0.0alpha1])
+AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
+AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
+
+AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
+
+AC_PROG_MAKE_SET
+
+AM_CONFIG_HEADER(include/config.h)
+
+AC_CANONICAL_HOST
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">宏</th>
+<th align="left">解析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AC_INIT</td>
+<td align="left">三个静态参数，第一个参数是软件名称，第二个参数是软件版本号，第三个参数是报告bug的Email地址。PACKAGE_NAME，PACKAGE_VERSION，PACKAGE_BUGREPORT</td>
+</tr>
+<tr>
+<td align="left">AC_CONFIG_SRCDIR</td>
+<td align="left">检查文件是否存在</td>
+</tr>
+<tr>
+<td align="left">AM_INIT_AUTOMAKE</td>
+<td align="left">Automake初始化编译选项，两个参数，</td>
+</tr>
+<tr>
+<td align="left">subdir-objects:将编译对象放在与源文件目录。大概意思是 如果源文件是subdir/file.cxx，则输出文件将是subdir/file.o。</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">filename-length-max=99:文件名不能超过99个字符</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">AC_MSG_NOTICE</td>
+<td align="left">打印输出信息，这里面的$PACKAGE_NAME $PACKAGE_VERSION来自于AC_INIT</td>
+</tr>
+<tr>
+<td align="left">AC_PROG_MAKE_SET</td>
+<td align="left">我也不知道什么意思，反正加上就对了</td>
+</tr>
+<tr>
+<td align="left">AM_CONFIG_HEADER</td>
+<td align="left">configure生成config.h</td>
+</tr>
+<tr>
+<td align="left">AC_CANONICAL_HOST</td>
+<td align="left">检测系统，得到如build host cpu等参数</td>
+</tr>
+<tr>
+<td align="left">注意：</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<pre><code>AC_INIT ([oops], [1.0]) # incorrect
+AC_INIT([hello], [1.0]) # good
+</code></pre>
+<p>2.2.2. Checks for programs</p>
+<pre><code>AC_PROG_CC([cc c99 gcc clang])
+AM_PROG_CC_C_O
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">宏</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AC_PROG_CC</td>
+<td align="left">检查系统所用的C编译器</td>
+</tr>
+<tr>
+<td align="left">AM_PROG_CC_C_O</td>
+<td align="left">这个宏正在被舍弃中，这个宏是检查C编译器是否同时支持-o和-c选项</td>
+</tr>
+</tbody></table>
+<p>2.2.3. Checks for header files </p>
+<pre><code>AC_CHECK_HEADERS(resolv.h, [], [], [
+#ifdef HAVE_SYS_TYPES_H
+#  include &lt;sys/types.h&gt;
+#endif
+#ifdef HAVE_NETINET_IN_H
+#  include &lt;netinet/in.h&gt;
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#  include &lt;arpa/nameser.h&gt;
+#endif
+#ifdef HAVE_NETDB_H
+#  include &lt;netdb.h&gt;
+#endif
+])
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">宏</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AC_CHECK_HEADER</td>
+<td align="left">检查单个头文件</td>
+</tr>
+<tr>
+<td align="left">AC_CHECK_HEADERS</td>
+<td align="left">检查多个头文件</td>
+</tr>
+</tbody></table>
+<p>因为历史遗留问题，检查这些头文件的时候需要参考一下<code>autoconf手册</code> [Existing Tests]-&gt;[Header Files]章节</p>
+<p>2.2.4. Checks for libraries </p>
+<pre><code>AC_CHECK_LIB(m, main)
+AC_CHECK_LIB(kvm, main)
+
+dnl check for DNS lookup functions
+found_resolv=&quot;no&quot;
+LIBRESOLV_CHECK_CONFIG([no])
+if test &quot;x$found_resolv&quot; != &quot;xyes&quot;; then
+    AC_MSG_ERROR([Unable to do DNS lookups (libresolv check failed)])
+fi
+LIBS=&quot;$&#123;LIBS&#125; $&#123;RESOLV_LIBS&#125;&quot;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">宏</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AC_SEARCH_LIBS (function, search-libs, [action-if-found], [action-if-not-found], [other-libraries])</td>
+<td align="left">该宏用来检查lib库中是否存在指定的函数。当测试成功时，执行shell命令action_if_found或者action_if_found当为空时，在输出变量LIBS中添加-llib。 action_if_not_found把-lother_libs选项传给link命令</td>
+</tr>
+</tbody></table>
+<pre><code>AC_SEARCH_LIBS(function, libraries-list, action-if-found, action-if-not-found, extra-libraries)
+
+function    
+    The name of the symbol to look for in the libraries. 
+
+libraries-list
+    A whitespace-separated list of libraries, in library-name format, that have to be searched for the function listed before. This list does not require the C library to be specified, as the first test will be done with just the libraries present in the LIBS variable. 
+
+action-if-found, action-if-not-found
+    As usual, the macro supports expanding code for success and failure. In this instance, each will be called at most once, and the default action-if-found code, adding the library to the LIBS variables, is always executed, even if a parameter is passed. 
+
+extra-libraries    
+    Technically, on some if not most operating systems, it is possible for libraries to have undefined symbols that require other libraries to be linked in to satisfy. This is the case for most static libraries, but it can also happen for some shared libraries.
+
+    To make it possible to search in the libraries, the macro provides this parameter. There is an implicit value for the parameter: the LIBS variable, which is always passed at link-time after the value of this parameter. This list is not added to the variable even on success.
+
+    It is important to note that if you were to find the symbol in one of these libraries, you&#39;d be hitting the same case as if the symbol is already available in the libraries listed in LIBS. 
+</code></pre>
+<p>2.2.5. Checks for type definitions and structures </p>
+<pre><code>dnl large file support
+largefile=yes
+
+dnl disable large file support on 32-bit Solaris as it&#39;s incompatible with procfs and swapctl
+case &quot;$&#123;host_os&#125;&quot; in
+    solaris*)
+        largefile=no
+        ;;
+esac
+
+if test &quot;x$largefile&quot; = &quot;xyes&quot;; then
+    AC_SYS_LARGEFILE
+fi
+
+AC_C_CONST
+AC_TYPE_PID_T
+
+AC_MSG_CHECKING(for socklen_t)
+AC_TRY_COMPILE([
+#include &lt;sys/types.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/socket.h&gt;
+],[socklen_t s;],
+AC_MSG_RESULT(yes),
+[AC_DEFINE(socklen_t, int, [Define socklen_t type.])
+AC_MSG_RESULT(no)])
+</code></pre>
+<p>源代码需要额什么定义和结构体，在这边定义。</p>
+<pre><code>AC_TRY_COMPILE (includes, function-body, [action-if-true],[action-if-false])
+Same as:
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[includes]],[[function-body]])],[action-if-true],[action-if-false])
+</code></pre>
+<p>2.2.6. Checks for functions</p>
+<pre><code>AC_MSG_CHECKING(for function sysctl (KERN_CPTIME,KERN_CPTIME2))
+AC_TRY_COMPILE(
+[
+#include &lt;sys/param.h&gt;
+#include &lt;sys/sysctl.h&gt;
+#if defined(HAVE_SYS_DKSTAT_H)
+#    include &lt;sys/dkstat.h&gt;
+#elif defined(HAVE_SYS_SCHED_H)
+#    include &lt;sys/sched.h&gt;
+#endif
+],
+[
+size_t    sz;
+int    i[] = &#123;CP_USER, CP_NICE, CP_SYS, CP_INTR, CP_IDLE&#125;;
+
+&#123;
+    long    states[CPUSTATES];
+    int    mib[2] = &#123;CTL_KERN, KERN_CPTIME&#125;;
+
+    sz = sizeof(states);
+    sysctl(mib, 2, &amp;states, &amp;sz, NULL, 0);
+&#125;
+
+&#123;
+    u_int64_t    states[CPUSTATES];
+    int        mib[3] = &#123;CTL_KERN, KERN_CPTIME2, 0&#125;;
+
+    sz = sizeof(states);
+    sysctl(mib, 3, &amp;states, &amp;sz, NULL, 0);
+&#125;
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_CPTIME,1,[Define to 1 if &#39;KERN_CPTIME,KERN_CPTIME2&#39; exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+</code></pre>
+<p>2.2.7. Checks for macros </p>
+<pre><code>AC_MSG_CHECKING(for macro __va_copy() in stdarg.h)
+AC_TRY_COMPILE(
+[
+#include &lt;stdarg.h&gt;
+],
+[
+    va_list    src,dst;
+
+    __va_copy(dst,src);
+],
+AC_DEFINE(HAVE___VA_COPY,1,[Define to 1 if macro &#39;__va_copy&#39; exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+</code></pre>
+<p>2.2.8. Checks for library functions </p>
+<pre><code>AC_TYPE_SIGNAL
+AC_REPLACE_FUNCS(getloadavg)
+AC_CHECK_FUNCS(hstrerror)
+AC_CHECK_FUNCS(getenv)
+AC_CHECK_FUNCS(putenv)
+AC_CHECK_FUNCS(sigqueue)
+AC_CHECK_FUNCS(round)
+</code></pre>
+<p>2.2.9. Checks for file system characteristics </p>
+<pre><code>AC_MSG_CHECKING(for /proc filesystem)
+if test -d /proc; then
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_PROC,1,[Define to 1 if &#39;/proc&#39; file system should be used.])
+else
+    AC_MSG_RESULT(no)
+fi
+</code></pre>
+<p>2.2.10. Checks for compiler characteristics</p>
+<pre><code>dnl Check for %qu format (FreeBSD 4.x)
+dnl FreeBSD 4.x does not support %llu
+AC_MSG_CHECKING(for long long format)
+AC_TRY_RUN(
+[
+#include &lt;sys/types.h&gt;
+int main()
+&#123;
+        uint64_t i;
+
+        sscanf(&quot;200000000010020&quot;, &quot;%qu&quot;, &amp;i);
+
+        if (i == 200000000010020) return 0;
+        else return -1;
+&#125;
+],
+AC_DEFINE(HAVE_LONG_LONG_QU, 1 ,[Define to 1 if format &#39;%qu&#39; exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no),
+AC_MSG_RESULT(no))
+</code></pre>
+<p>2.2.11. Checks for operating systems </p>
+<pre><code>AC_MSG_CHECKING(for libperfstat 5.2.0.40 fileset)
+AC_TRY_COMPILE([#include &lt;sys/protosw.h&gt;
+#include &lt;libperfstat.h&gt;],
+[perfstat_memory_total_t    memstats;
+memstats.virt_active = 0;
+],
+AC_DEFINE(HAVE_AIXOSLEVEL_520004,1,[Define to 1 if libperfstat 5.2.0.40 fileset exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+</code></pre>
+<p>2.2.12. Checks for options given on the command line</p>
+<pre><code>AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
+[case &quot;$&#123;enableval&#125;&quot; in
+  yes)
+    LDFLAGS=&quot;$&#123;LDFLAGS&#125; -static&quot;
+    AC_MSG_CHECKING(if static linking is possible)
+    AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
+      [AC_MSG_RESULT([yes])
+        static_linking=yes],
+      [AC_MSG_RESULT([no])
+        static_linking=no])
+      if test &quot;x$static_linking&quot; = &quot;xno&quot;; then
+        AC_MSG_ERROR([static linking is not possible on this system])
+      fi
+    ;;
+  no) ;;
+  *) AC_MSG_ERROR([bad value $&#123;enableval&#125; for --enable-static]) ;;
+esac])
+</code></pre>
+<p>2.2.13. Output configuration results</p>
+<pre><code>m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
+
+AC_OUTPUT([
+    Makefile
+    database/Makefile
+    database/ibm_db2/Makefile
+...
+</code></pre>
+<hr>
+<pre><code>AC_OUTPUT：要输出的Makefile的名字
+</code></pre>
+<h3 id="3-自定义宏"><a href="#3-自定义宏" class="headerlink" title="3. 自定义宏"></a>3. 自定义宏</h3><p>aclocal命令可以根据configure.ac文件生成aclocal.m4文件。<br>aclocal命令扫描所有它能找到的.m4文件，然后再扫描configure.ac，最后生成aclocal.m4<br>自定义的宏需要定义在aclocal.m4文件中，否则不能被autoconf识别。</p>
+<p>格式<br>    m4_include([m4/zlib.m4])</p>
+<p>zabbix的.m4文件都会放到m4文件夹下面。<br>当执行<code>aclocal -I m4</code>会自动添加到aclocal.m4中。需要在根目录下的Makefile.am中添加<code>ACLOCAL_AMFLAGS = -I m4</code><br>如果直接执行<code>aclocal</code>，手动将.m4文件添加到aclocal.m4中。</p>
+<p><code>aclocal</code>其他命令需要查询文档或者<code>aclocal --help</code></p>
+<pre><code>-I DIR                    add directory to search list for .m4 files
+</code></pre>
+<p>宏文件该如何写，<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000004104696">参考</a>。</p>
+<h3 id="4-编写-Makefile-am-文件"><a href="#4-编写-Makefile-am-文件" class="headerlink" title="4. 编写 Makefile.am 文件"></a>4. 编写 Makefile.am 文件</h3><p>Standard Directory Variables</p>
+<table>
+<thead>
+<tr>
+<th align="left">Directory</th>
+<th align="left">variable Default value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">prefix</td>
+<td align="left">/usr/local</td>
+</tr>
+<tr>
+<td align="left">exec_prefix</td>
+<td align="left">${prefix}</td>
+</tr>
+<tr>
+<td align="left">bindir</td>
+<td align="left">${exec_prefix}/bin</td>
+</tr>
+<tr>
+<td align="left">libdir</td>
+<td align="left">${exec_prefix}/lib</td>
+</tr>
+<tr>
+<td align="left">includedir</td>
+<td align="left">${prefix}/include</td>
+</tr>
+<tr>
+<td align="left">datarootdir</td>
+<td align="left">${prefix}/share</td>
+</tr>
+<tr>
+<td align="left">datadir</td>
+<td align="left">${datarootdir}</td>
+</tr>
+<tr>
+<td align="left">mandir</td>
+<td align="left">${datarootdir}/man</td>
+</tr>
+<tr>
+<td align="left">infodir</td>
+<td align="left">${datarootdir}/info</td>
+</tr>
+<tr>
+<td align="left">docdir</td>
+<td align="left">${datarootdir}/doc/${PACKAGE}</td>
+</tr>
+</tbody></table>
+<p>User 可以自己定义 prefix的路径</p>
+<pre><code>$ ./configure --prefix ~/usr
+
+$ make
+
+$ make install
+</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">说明</th>
+<th align="left">使用方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">PROGRAMS</td>
+<td align="left">可执行程序</td>
+<td align="left">bin_PROGRAMS</td>
+</tr>
+<tr>
+<td align="left">LIBRARIES</td>
+<td align="left">库文件</td>
+<td align="left">lib_LIBRARIES</td>
+</tr>
+<tr>
+<td align="left">LTLIBRARIES (Libtool libraries)</td>
+<td align="left">libtool库文件</td>
+<td align="left">lib_LTLIBRARIES</td>
+</tr>
+<tr>
+<td align="left">HEADERS</td>
+<td align="left">头文件</td>
+<td align="left">include_HEADERS</td>
+</tr>
+<tr>
+<td align="left">SCRIPTS</td>
+<td align="left">脚本文件，有可执行权限</td>
+<td align="left">test_SCRIPTS（需要自定义test目录）</td>
+</tr>
+<tr>
+<td align="left">DATA</td>
+<td align="left">数据文件，无可执行权限</td>
+<td align="left">conf_DATA(需要自定义conf目录)</td>
+</tr>
+</tbody></table>
+<h3 id="5-aclocal"><a href="#5-aclocal" class="headerlink" title="5. aclocal"></a>5. aclocal</h3><h3 id="6-autoconf"><a href="#6-autoconf" class="headerlink" title="6. autoconf"></a>6. autoconf</h3><h3 id="7-autoheader"><a href="#7-autoheader" class="headerlink" title="7. autoheader"></a>7. autoheader</h3><h3 id="8-automake-a"><a href="#8-automake-a" class="headerlink" title="8. automake -a"></a>8. automake -a</h3><h3 id="9-automake"><a href="#9-automake" class="headerlink" title="9. automake"></a>9. automake</h3><p>下面是一些比较有用的命令</p>
+<pre><code>- make all  
+Build programs, libraries, documentation, etc. (same as make).
+
+- make install  
+Install what needs to be installed, copying the files from the package’s tree to system-wide directories.
+
+- make install-strip    
+Same as make install, then strip debugging symbols. Some users like to trade space for useful bug reports. . .
+
+- make uninstall    
+The opposite of make install: erase the installed files. (This needs to be run from the same build tree that was installed.)
+
+- make clean    
+Erase from the build tree the files built by make all.
+
+- make distclean    
+Additionally erase anything ./configure created.
+
+- make check    
+Run the test suite, if any.
+
+- make installcheck   
+Check the installed programs or libraries, if supported.
+
+- make dist   
+Recreate package-version.tar.gz from all the source files.
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/06-Compile-Tools/">06. Compile Tools</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Makefile/">Makefile</a>, <a href="/tags/Automake/">Automake</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

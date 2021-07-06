@@ -1,0 +1,426 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux 本地通信AF_UNIX | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="一个简单的本地socket通信的例程，使用AF_UNIX协议簇，代码来自于man7官网">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux 本地通信AF_UNIX"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-09-28T09:57:55.000Z"><a href="/2017/09/28/Linux-本地通信AF-UNIX/">2017-09-28</a></time>
+        
+  
+    <h1 class="title">Linux 本地通信AF_UNIX</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        
+    </div>
+
+        <p>一个简单的本地socket通信的例程，使用AF_UNIX协议簇，代码来自于man7官网</p>
+<span id="more"></span>
+
+<p>服务端：</p>
+<pre><code>//server.c
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/un.h&gt;
+#include &lt;unistd.h&gt;
+
+
+#define SOCKET_NAME &quot;/tmp/local_socket&quot;
+#define BUFFER_SIZE 12
+
+int main(int argc, char *argv[])
+&#123;
+    struct sockaddr_un name;
+    int down_flag = 0;
+    int ret;
+    int connection_socket;
+    int data_socket;
+    int result;
+    char buffer[BUFFER_SIZE];
+
+    /*
+       如果程序在上次运行时无意中退出，删除文件。
+       */
+
+    unlink(SOCKET_NAME);
+
+    /*创建本地socket*/
+
+    connection_socket = socket(AF_UNIX, SOCK_SEQPACKET, 0);
+    if (connection_socket == -1) &#123;
+        perror(&quot;socket&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /*
+       初始化name
+       */
+
+    memset(&amp;name, 0, sizeof(struct sockaddr_un));
+
+    /*Bind socket to socket name.*/
+
+    name.sun_family = AF_UNIX;
+    strncpy(name.sun_path, SOCKET_NAME, sizeof(name.sun_path) - 1);
+
+    ret = bind(connection_socket, (const struct sockaddr *) &amp;name,
+            sizeof(struct sockaddr_un));
+    if (ret == -1) &#123;
+        perror(&quot;bind&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /*
+       监听20个
+       */
+
+    ret = listen(connection_socket, 20);
+    if (ret == -1) &#123;
+        perror(&quot;listen&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /* This is the main loop for handling connections. */
+
+    for (;;) &#123;
+
+        /* Wait for incoming connection. */
+
+        data_socket = accept(connection_socket, NULL, NULL);
+        if (data_socket == -1) &#123;
+            perror(&quot;accept&quot;);
+            exit(EXIT_FAILURE);
+        &#125;
+
+        result = 0;
+        for(;;) &#123;
+
+            /* Wait for next data packet. */
+
+            ret = read(data_socket, buffer, BUFFER_SIZE);
+            if (ret == -1) &#123;
+                perror(&quot;read&quot;);
+                exit(EXIT_FAILURE);
+            &#125;
+
+            /* Ensure buffer is 0-terminated. */
+
+            buffer[BUFFER_SIZE - 1] = 0;
+
+            /* Handle commands. */
+
+            if (!strncmp(buffer, &quot;DOWN&quot;, BUFFER_SIZE)) &#123;
+                down_flag = 1;
+                break;
+            &#125;
+
+            if (!strncmp(buffer, &quot;END&quot;, BUFFER_SIZE)) &#123;
+                break;
+            &#125;
+
+            /* Add received summand. */
+
+            result += atoi(buffer);
+        &#125;
+
+        /* Send result. */
+
+        sprintf(buffer, &quot;%d&quot;, result);
+        ret = write(data_socket, buffer, BUFFER_SIZE);
+
+        if (ret == -1) &#123;
+            perror(&quot;write&quot;);
+            exit(EXIT_FAILURE);
+        &#125;
+
+        /* Close socket. */
+
+        close(data_socket);
+
+        /* Quit on DOWN command. */
+
+        if (down_flag) &#123;
+            break;
+        &#125;
+    &#125;
+
+    close(connection_socket);
+
+    /* Unlink the socket. */
+
+    unlink(SOCKET_NAME);
+
+    exit(EXIT_SUCCESS);
+&#125;
+</code></pre>
+<p>客户端：</p>
+<pre><code>//client.c
+#include &lt;errno.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/un.h&gt;
+#include &lt;unistd.h&gt;
+#define SOCKET_NAME &quot;/tmp/local_socket&quot;
+#define BUFFER_SIZE 12
+
+int main(int argc, char *argv[])
+&#123;
+    struct sockaddr_un addr;
+    int i;
+    int ret;
+    int data_socket;
+    char buffer[BUFFER_SIZE];
+
+    /* Create local socket. */
+
+    data_socket = socket(AF_UNIX, SOCK_SEQPACKET, 0);
+    if (data_socket == -1) &#123;
+        perror(&quot;socket&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /*
+     * For portability clear the whole structure, since some
+     * implementations have additional (nonstandard) fields in
+     * the structure.
+     */
+
+    memset(&amp;addr, 0, sizeof(struct sockaddr_un));
+
+    /* Connect socket to socket address */
+
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, SOCKET_NAME, sizeof(addr.sun_path) - 1);
+
+    ret = connect (data_socket, (const struct sockaddr *) &amp;addr,
+            sizeof(struct sockaddr_un));
+    if (ret == -1) &#123;
+        fprintf(stderr, &quot;The server is down.\n&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /* Send arguments. */
+
+    for (i = 1; i &lt; argc; ++i) &#123;
+        ret = write(data_socket, argv[i], strlen(argv[i]) + 1);
+        if (ret == -1) &#123;
+            perror(&quot;write&quot;);
+            break;
+        &#125;
+    &#125;
+
+    /* Request result. */
+
+    strcpy (buffer, &quot;END&quot;);
+    ret = write(data_socket, buffer, strlen(buffer) + 1);
+    if (ret == -1) &#123;
+        perror(&quot;write&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /* Receive result. */
+
+    ret = read(data_socket, buffer, BUFFER_SIZE);
+    if (ret == -1) &#123;
+        perror(&quot;read&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /* Ensure buffer is 0-terminated. */
+
+    buffer[BUFFER_SIZE - 1] = 0;
+
+    printf(&quot;Result = %s\n&quot;, buffer);
+
+    /* Close socket. */
+
+    close(data_socket);
+
+    exit(EXIT_SUCCESS);
+&#125;
+</code></pre>
+<p>运行：</p>
+<pre><code># gcc server.c -o server
+# gcc client.c -o client
+
+# ./server &amp;
+[1] 5194
+# ./client 3 4     
+Result = 7
+# ./client 11 -5
+Result = 6
+# ./client DOWN
+Result = 0
+[1]+  已完成               ./server
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/socket/">socket</a>, <a href="/tags/AF-UNIX/">AF_UNIX</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

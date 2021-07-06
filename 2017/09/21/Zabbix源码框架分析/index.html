@@ -1,0 +1,332 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Zabbix源码框架分析 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="Zabbix 源码框架分析">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Zabbix源码框架分析"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-09-21T06:44:31.000Z"><a href="/2017/09/21/Zabbix源码框架分析/">2017-09-21</a></time>
+        
+  
+    <h1 class="title">Zabbix源码框架分析</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E8%AE%BE%E7%BD%AE%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%EF%BC%8C%E8%A7%A3%E6%9E%90%E5%91%BD%E4%BB%A4%E8%A1%8C%EF%BC%8C%E8%AF%BB%E5%8F%96%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">一、设置环境变量，解析命令行，读取配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%88%9B%E5%BB%BA%E5%90%8E%E5%8F%B0%E5%87%BD%E6%95%B0-%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B"><span class="toc-text">二、创建后台函数&#x2F;守护进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%BF%9B%E8%A1%8C%E7%9B%B8%E5%85%B3%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-text">三、进行相关的初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%8A%9F%E8%83%BD%E5%87%BD%E6%95%B0%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90"><span class="toc-text">四、功能函数简单分析</span></a></li></ol>
+    </div>
+
+        <p>Zabbix 源码框架分析</p>
+<span id="more"></span>
+
+
+<p>源码版本：Zabbix-3.2.x</p>
+<h2 id="一、设置环境变量，解析命令行，读取配置文件"><a href="#一、设置环境变量，解析命令行，读取配置文件" class="headerlink" title="一、设置环境变量，解析命令行，读取配置文件"></a>一、设置环境变量，解析命令行，读取配置文件</h2><p>在main()函数里面</p>
+<pre><code>/*
+根据不同的平台(Linux，Aix等)设置argc和argc参数，并设置环境变量
+*/
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+    argv = setproctitle_save_env(argc, argv);
+#endif
+
+
+/*
+解析命令行
+*/
+ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)
+
+
+/*
+读取配置文件，设置默认值
+*/
+zbx_load_config(&amp;t);
+</code></pre>
+<h2 id="二、创建后台函数-守护进程"><a href="#二、创建后台函数-守护进程" class="headerlink" title="二、创建后台函数/守护进程"></a>二、创建后台函数/守护进程</h2><p>在main()函数最后会有daemon_start()函数。里面禁止root用户启动，使用zabbix用户启动，创建守护进程的流程，创建pid文件，设置信号处理函数。</p>
+<h2 id="三、进行相关的初始化"><a href="#三、进行相关的初始化" class="headerlink" title="三、进行相关的初始化"></a>三、进行相关的初始化</h2><p>此时进入MAIN_ZABBIX_ENTRY()函数。</p>
+<pre><code>//cache和ids的初始化
+/*
+创建信号量，申请共享内存，创建hash队列
+*/
+init_database_cache();
+
+//config的初始化
+init_configuration_cache();
+
+//collector的初始化
+init_selfmon_collector();
+
+//vmware的初始化
+/* initialize vmware support */
+if (0 != CONFIG_VMWARE_FORKS)
+    zbx_vmware_init();
+
+//初始化vc_cache
+/* initialize history value cache */
+zbx_vc_init();
+
+//在进行轮询前先将配置信息从数据库中读取到内存中
+/* make initial configuration sync before worker processes are forked */
+DCsync_configuration();
+</code></pre>
+<h2 id="四、功能函数简单分析"><a href="#四、功能函数简单分析" class="headerlink" title="四、功能函数简单分析"></a>四、功能函数简单分析</h2><p>1、ZBX_THREAD_ENTRY(dbconfig_thread, args)<br>该进程定期同步数据库数据到内存缓存中。默认60S一次。里面有两个函数分别是：</p>
+<pre><code>    /*
+    主要是hosts和items表变动最多，所以主要是同步这两个表
+    */
+    DCsync_configuration();
+    /*
+    
+    */
+    DCupdate_hosts_availability();
+</code></pre>
+<p>2、ZBX_THREAD_ENTRY(watchdog_thread, args)<br>每DB_PING_FREQUENCY秒连接一次数据库，如果数据库连接失败，通知管理员。    </p>
+<pre><code>    if (ZBX_DB_OK != DBconnect(ZBX_DB_CONNECT_ONCE))
+    &#123;
+        /*
+        连接数据库失败，发送报警
+        */
+        send_alerts();
+    &#125;
+    else if (nextsync &lt;= (now = (int)time(NULL)))
+    &#123;
+        /*
+        数据库连接正常，同步发送报警的媒介列表防止数据库宕机。
+        */
+        sync_config();
+    &#125;
+</code></pre>
+<p>3、ZBX_THREAD_ENTRY(poller_thread, args)<br>该进程根据传进来的轮询类型，进行获取数据。<br>轮询类型有<br>    ZBX_PROCESS_TYPE_POLLER<br>    ZBX_PROCESS_TYPE_UNREACHABLE<br>    ZBX_PROCESS_TYPE_IPMIPOLLER<br>    ZBX_PROCESS_TYPE_JAVAPOLLER        </p>
+<p>调用get_values会items的类型去获取数据，在get_values中调用dc_add_history函数将获取的数据存放到history表的内存缓存中，并且DCpoller_requeue_items要更新item的状态（normal、unreachable）</p>
+<p>4、ZBX_THREAD_ENTRY(trapper_thread, args)</p>
+<p>简单来说，该进程就是一个Server，等待客户端来连接进行数据交互的。里面逻辑很简单，无非是有个select的IO复用。接收主动模式的代理和主动模式的agent的连接。</p>
+<p>5、ZBX_THREAD_ENTRY(pinger_thread, args)</p>
+<p>周期性针对每个item上的ip进行ping操作。在DCsync_configuration()中根据item的type的类型放到config-&gt;queue[]的类型中去。</p>
+<pre><code>    //获取要进行ping操作的items
+    get_pinger_hosts(&amp;items, &amp;items_alloc, &amp;items_count);
+    //进行ping操作
+    process_pinger_hosts(items, items_count);
+    
+    
+    
+</code></pre>
+<p>6、ZBX_THREAD_ENTRY(alerter_thread, args)</p>
+<p>周期（默认30s）检查alerts表（联表查询media_type），如果需要将发送警报。</p>
+<pre><code>        //首先查询数据库，如果查询到数据，执行execute_action。
+        execute_action(&amp;alert, &amp;mediatype, error, sizeof(error));
+        
+        //execute_action执行成功之后，将这条警报由    ALERT_STATUS_NOT_SENT 改成 ALERT_STATUS_SENT。如果发送失败改成ALERT_STATUS_FAILED
+        
+
+        
+</code></pre>
+<p>7、ZBX_THREAD_ENTRY(housekeeper_thread, args)<br>定时对数据库中一些过期的数据进行清理删除。</p>
+<pre><code>    hk_period = get_housekeeping_period(time_slept);
+    now = time(NULL);
+
+    DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+    zbx_config_get(&amp;cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);//cfg全局变量
+    d_history_and_trends = housekeeping_history_and_trends(now);
+    d_cleanup = housekeeping_cleanup();
+    d_events = housekeeping_events(now);
+    d_problems = housekeeping_problems(now);
+    d_sessions = housekeeping_sessions(now);
+    d_services = housekeeping_services(now);
+    d_audit = housekeeping_audit(now);    
+</code></pre>
+<p>8、ZBX_THREAD_ENTRY(timer_thread, args)<br>周期更新与时间相关的是触发器。</p>
+<pre><code>    //flush the correlated events that were queued for closing 
+    flush_correlated_events
+    //重新计算并更新时间驱动函数的值
+    process_time_functions(&amp;tr_count, &amp;ev_count);        
+    
+    
+    
+</code></pre>
+<p>9、ZBX_THREAD_ENTRY(httppoller_thread, args)</p>
+<p>周期性的通过调用libcurl库检测httptest表中定义的http服务是否运行正常。</p>
+<pre><code>    httptests_count += process_httptests(process_num, now);    
+                                    ↓
+                                    process_httptest()；
+                                    
+                                    
+                                    
+                                    
+</code></pre>
+<p>10、ZBX_THREAD_ENTRY(discoverer_thread, args)    </p>
+<p>周期尝试发信新的主机和任务</p>
+<pre><code>//根据数据库中配置的发现规则获取IP，并判断是否可用。根据发现规则执行process_rule()。
+rule_count += process_discovery(now);                                    
+</code></pre>
+<p>11、ZBX_THREAD_ENTRY(dbsyncer_thread, args);<br>定期将内存缓冲区中的数据同步到数据库中     </p>
+<p>12、ZBX_THREAD_ENTRY(escalator_thread, args);<br>周期轮询 将触发器事件和所要执行的动作联系起来的一个表。</p>
+<p>13、ZBX_THREAD_ENTRY(snmptrapper_thread, args);<br>SNMP trap 读取的入口点 ，读取trapfile，解析关键字。通过关键字获取接口数组、主机列表，item列表。根据ite列表获取agent_result并同步历史表。</p>
+<p>14、zbx_thread_start(proxypoller_thread, &amp;thread_args);</p>
+<p>用于主动连接代理，并且获取代理上接收的history数据 </p>
+<p>15、ZBX_THREAD_ENTRY(selfmon_thread, args);<br>根据进程类型统计进程的状态。</p>
+<p>16、ZBX_THREAD_ENTRY(vmware_thread, args);<br>vmware collector 的主循环   </p>
+<p>17、zbx_thread_start(taskmanager_thread, &amp;thread_args);<br>暂时还没实现完</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/11-Open-Source/">11.Open Source</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Zabbix/">Zabbix</a>, <a href="/tags/源码/">源码</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

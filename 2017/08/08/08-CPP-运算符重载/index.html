@@ -1,0 +1,319 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux CPP 运算符重载 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="运算符重载概述">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux CPP 运算符重载"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-08T09:48:01.000Z"><a href="/2017/08/08/08-CPP-运算符重载/">2017-08-08</a></time>
+        
+  
+    <h1 class="title">Linux CPP 运算符重载</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD%E6%A6%82%E8%BF%B0"><span class="toc-text">运算符重载概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">运算符重载的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E7%9B%AE%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">单目运算符重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E7%9B%AE%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">双目运算符重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gt-%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">-&gt;运算符重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">赋值运算符重载</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E2%80%9C-%E2%80%9D%E5%92%8C%E2%80%9C-%E2%80%9D%E7%9A%84%E9%87%8D%E8%BD%BD"><span class="toc-text">运算符“+&#x3D;”和“-&#x3D;”的重载</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E2%80%9C-%E2%80%9D%E7%9A%84%E9%87%8D%E8%BD%BD"><span class="toc-text">运算符“&#x3D;”的重载</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E6%A0%87%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">下标运算符重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6new%E4%B8%8Edelete%E9%87%8D%E8%BD%BD"><span class="toc-text">运算符new与delete重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%97%E5%8F%B7%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">逗号运算符重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">类型转换运算符重载</span></a></li></ol>
+    </div>
+
+        <h3 id="运算符重载概述"><a href="#运算符重载概述" class="headerlink" title="运算符重载概述"></a>运算符重载概述</h3><span id="more"></span>
+
+
+<ul>
+<li>运算符重载是对已有的运算符赋予多重含义，同一个运算符作用于不同类型的数据导致不同类型的行为。C++中预定义的运算符的操作对象只能是基本数据类型，实际上，对于很多用户自定义类型，也需要有类似的运算操作，这就提出了对运算符进行重新定义，赋予已有符号以新功能的要求。</li>
+<li>运算符重载的实质就是函数重载。在实现过程中，首先把指定的运算表达式转化为对运算符函数的调用，运算对象转化为运算符函数的实参，然后根据实参的类型来确定需要调用的函数，这个过程是在编译过程中完成的。 </li>
+<li>运算符重载的规则如下：<ol>
+<li>C++中的运算符除了少数几个以外，全部可以重载，而且只能重载已有的这些运算符。</li>
+<li>重载之后运算符的优先级和结合性都不会改变。</li>
+<li>运算符重载是针对新类型数据的实际需要，对原有运算符进行适当的改造。一般来讲，重载的功能应当与原有功能相类似，不能改变原运算符的操作对象个数，同时至少要有一个操作对象是自定义类型。 </li>
+</ol>
+</li>
+</ul>
+<h3 id="运算符重载的实现"><a href="#运算符重载的实现" class="headerlink" title="运算符重载的实现"></a>运算符重载的实现</h3><p>运算符的重载形式有两种：重载为类的成员函数和重载为类的友元函数。</p>
+<p>运算符重载为类的成员函数的语法形式如下：</p>
+<pre><code>&lt;函数类型&gt; operator &lt;运算符&gt;（&lt;形参表&gt;）
+&#123;
+    &lt;函数体&gt;；
+&#125;
+   
+friend &lt;函数类型&gt; operator &lt;运算符&gt;（&lt;形参表&gt;）
+&#123;
+    &lt;函数体&gt;；
+&#125;
+</code></pre>
+<ul>
+<li>其中，&lt;函数类型&gt;指定了重载运算符的返回值类型，operator是定义运算符重载函数的关键词，&lt;运算符&gt;给定了要重载的运算符名称，是C++中可重载的运算符，形参表中给出重载运算符所需要的参数和类型。对于运算符重载为友元函数的情况，还要在函数类型说明之前使用friend关键词来说明。 </li>
+<li>当运算符重载为类的成员函数时，函数的参数个数比原来的运算数个数要少一个（后缀++、–除外）；当重载为类的友元函数时，参数个数与原运算数的个数相同。</li>
+<li>一般来讲，单目运算符最好重载为成员函数，而双目运算符则最好重载为友元函数。运算符重载的主要优点就是允许改变使用于系统内部的运算符的操作方式，以适应用户新定义类型的类似运算。 </li>
+</ul>
+<h3 id="单目运算符重载"><a href="#单目运算符重载" class="headerlink" title="单目运算符重载"></a>单目运算符重载</h3><ul>
+<li><p>类的单目运算符可重载为一个没有参数的非静态成员函数或者带有一个参数的非成员函数，参数必须是用户字定义类型的对象或者是对该对象的引用。</p>
+</li>
+<li><p>在C++中，单目运算符有++和–，它们是变量自动增1和自动减1的运算符。在类中可以对这两个单目运算符进行重载。</p>
+</li>
+<li><p>如同“++”运算符有前缀、后缀两种使用形式，“++”和“–”重载运算符也有前缀和后缀两种运算符重载形式，以“++”重载运算符为例，其语法格式如下：</p>
+<pre><code>  &lt;函数类型&gt; operator ++（）；            //前缀运算
+  &lt;函数类型&gt; operator ++（int）；         //后缀运算 
+</code></pre>
+</li>
+<li><p>使用前缀运算符的语法格式如下：</p>
+<pre><code>  ++&lt;对象&gt;；
+</code></pre>
+</li>
+<li><p>使用后缀运算符的语法格式如下：</p>
+<pre><code>  &lt;对象&gt;++；
+</code></pre>
+</li>
+<li><p>使用运算符前缀时，对对象（操作数）进行增量修改，然后再返回该对象。所以前缀运算符操作时，参数与返回的是同一个对象。这与基本数据类型的运算符前缀类似，返回的也是左值。</p>
+</li>
+<li><p>使用运算符后缀时，必须再增量之前返回原有的对象值。为此，需要创建一个临时对象，存放原有的对象，以便对操作数（对象）进行增量修改时，保存最初的值。运算符后缀操作时返回的时原有对象值，不是原有对象，原有对象已经被增量修改，所以，返回的应该是存放原有对象值的临时对象。 </p>
+</li>
+</ul>
+<h3 id="双目运算符重载"><a href="#双目运算符重载" class="headerlink" title="双目运算符重载"></a>双目运算符重载</h3><ul>
+<li>对于双目运算符，一个运算数是对象本身的数据，由this指针给出，另一个运算数则需要通过运算符重载函数的参数表来传递。下面分别介绍这两种情况。<ol>
+<li>对于双目运算符B，如果要重载B为类的成员函数，使之能够实现表达式“oprd1 B oprd2”，其中oprd1为A类的对象，则应当把B重载为A类的成员函数，该函数只有一个形参，形参的类型是oprd2所属的类型。经过重载之后，表达式oprd1 B oprd2就相当于函数调用“oprd1.operator B（oprd2）”。 </li>
+</ol>
+</li>
+</ul>
+<ol start="2">
+<li>运算符也可以重载为类的友元函数，这样，它就可以自由地访问该类的任何数据成员。这时，运算符所需要的运算数都需要通过函数的形参表来传递，在参数表中形参从左到右的顺序就是运算符运算数的顺序。 </li>
+</ol>
+<h3 id="gt-运算符重载"><a href="#gt-运算符重载" class="headerlink" title="-&gt;运算符重载"></a>-&gt;运算符重载</h3><ul>
+<li><p>“-&gt;”运算符是成员访问运算符，这种一元的运算符只能被重载为成员函数，所以也决定了它不能定义任何参数。一般成员访问运算符的典型用法是：</p>
+<pre><code>  对象-&gt;成员
+  成员访问运算符“-&gt;”函数重载的一般形式为：
+  type class_name::operator-&gt;（）；
+</code></pre>
+</li>
+</ul>
+<h3 id="赋值运算符重载"><a href="#赋值运算符重载" class="headerlink" title="赋值运算符重载"></a>赋值运算符重载</h3><ul>
+<li>在C++中有两种类型的赋值运算符：一类是“+=”和“-=”等先计算后赋值的运算符，另一类是“=”即直接赋值的运算符。下面分别进行讨论。</li>
+</ul>
+<h4 id="运算符“-”和“-”的重载"><a href="#运算符“-”和“-”的重载" class="headerlink" title="运算符“+=”和“-=”的重载"></a>运算符“+=”和“-=”的重载</h4><ul>
+<li>对于标准数据类型，“+=”和“-=”的作用是将一个数据与另一个数据进行加法或减法运算后再将结果回送给赋值号左边的变量中。对它们重载后，使其实现其他相关的功能。 </li>
+</ul>
+<h4 id="运算符“-”的重载"><a href="#运算符“-”的重载" class="headerlink" title="运算符“=”的重载"></a>运算符“=”的重载</h4><ul>
+<li><p>赋值运算符“=”的原有含义是将赋值号右边表达式的结果拷贝给赋值号左边的变量，通过运算符“=”的重载将赋值号右边对象的私有数据依次拷贝到赋值号左边对象的私有数据中。在正常情况下，系统会为每一个类自动生成一个默认的完成上述功能的赋值运算符，当然，这种赋值只限于由一个类类型说明的对象之间赋值。</p>
+</li>
+<li><p>如果一个类包含指针成员，采用这种默认的按成员赋值，那么当这些成员撤消后，内存的使用将变得不可靠。</p>
+</li>
+<li><p>可以重载运算符“=”来解决这个问题。重载该运算符的成员函数如下：    </p>
+</li>
+</ul>
+<pre><code>    Sample &amp;operator = (Sample &amp;s)
+    &#123;
+         delete p;
+         p=new char[strlen(s.p)+1];
+         strcpy(p,s.p);
+         return *this;
+    &#125;
+
+    //把s.p的内存复制到this.p的内存中，而不是仅仅进行指针复制
+</code></pre>
+<h3 id="下标运算符重载"><a href="#下标运算符重载" class="headerlink" title="下标运算符重载"></a>下标运算符重载</h3><ul>
+<li>下标运算符“[ ]”通常用于在数组中标识数组元素的位置，下标运算符重载可以实现数组数据的赋值和取值。下标运算符重载函数只能作为类的成员函数，不能作为类的友元函数。</li>
+<li>下标运算符“[ ]”函数重载的一般形式为：</li>
+</ul>
+<pre><code>    type class_name::operator[ ]（arg_）；
+</code></pre>
+<ul>
+<li>其中arg为该重载函数的参数。重载了的下标运算符只能且必须带一个参数，该参数给出下标的值。重载函数operator[ ]的返回值类型type是引用类型。 </li>
+</ul>
+<h3 id="运算符new与delete重载"><a href="#运算符new与delete重载" class="headerlink" title="运算符new与delete重载"></a>运算符new与delete重载</h3><ul>
+<li><p>C++提供了new与delete两个运算符用于内存管理，但有些情况下用户需要自己管理内存，为自己所定义的类体系建立一种新的动态内存管理算法，以克服new与delete的不足。这就要重载运算符new与delete，使其按照要求完成对内存的管理。</p>
+</li>
+<li><p>new和delete只能被重载为类的成员函数，不能重载为友元。而且，无论是否使用关键字static进行修饰，重载了的new和delete均为类的静态成员函数。</p>
+</li>
+<li><p>运算符new重载的一般形式为：</p>
+<pre><code>  void *class_name::operator new（size_t，&lt;arg_list&gt;）；
+</code></pre>
+</li>
+</ul>
+<p>new重载应返回一个无值型的指针，且至少有一个类型为size_t的参数。若该重载带有多于一个的参数，则其第一个参数的类型必须为size_t。</p>
+<ul>
+<li>运算符delete重载的一般形式为：</li>
+</ul>
+<pre><code>    void *class_name::operator delete（void *，&lt;size_t&gt;）;
+</code></pre>
+<p>delete重载应返回一个无值型的指针，且至少有一个类型为无值型指针的参数。该重载最多可以带有两个参数，若有第二个参数，则其第二个参数的类型必须为size_t。 </p>
+<h3 id="逗号运算符重载"><a href="#逗号运算符重载" class="headerlink" title="逗号运算符重载"></a>逗号运算符重载</h3><ul>
+<li>逗号运算符是双目运算符，和其他运算符一样，也可以通过重载逗号运算符来完成期望完成的工作。逗号运算符构成的表达式为“左运算数，右运算数”，该表达式返回右运算数的值。如果用类的成员函数来重载逗号运算符，则只带一个右运算数，而左运算数由指针this提供。 </li>
+</ul>
+<h3 id="类型转换运算符重载"><a href="#类型转换运算符重载" class="headerlink" title="类型转换运算符重载"></a>类型转换运算符重载</h3><ul>
+<li>类型转换运算符重载函数的格式如下：</li>
+</ul>
+<pre><code>    operator &lt;类型名&gt;（）
+    &#123;
+        &lt;函数体&gt;；
+    &#125;
+</code></pre>
+<ul>
+<li>与以前的重载运算符函数不同的是，类型转换运算符重载函数没有返回类型，因为&lt;类型名&gt;就代表了它的返回类型，而且也没有任何参数。在调用过程中要带一个对象实参。 </li>
+<li>实际上，类型转换运算符将对象转换成类型名规定的类型。转换时的形式就像强制转换一样。如果没有转换运算符定义，直接用强制转换是不行的，因为强制转换只能对标准数据类型进行操作，对类类型的操作是没有定义的。</li>
+<li>另外，转换运算符重载的缺点是无法定义其类对象运算符操作的真正含义，因为只能进行相应对象成员数据和一般数据变量的转换操作。</li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/01-CPP-基础/">01. CPP 基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

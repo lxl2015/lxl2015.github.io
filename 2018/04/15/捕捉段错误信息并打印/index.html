@@ -1,0 +1,562 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>捕捉段错误信息并打印 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="C语言最大的难点就是一个产品说不定哪一天就突然出现segment default，当运行的主机没有开启coredump，同时又无法重现该错误，那该怎么办？">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="捕捉段错误信息并打印"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2018-04-15T05:44:29.000Z"><a href="/2018/04/15/捕捉段错误信息并打印/">2018-04-15</a></time>
+        
+  
+    <h1 class="title">捕捉段错误信息并打印</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        
+    </div>
+
+        <p>C语言最大的难点就是一个产品说不定哪一天就突然出现segment default，当运行的主机没有开启coredump，同时又无法重现该错误，那该怎么办？</p>
+<span id="more"></span>
+
+<p>现代Unix系统都在ucontext.h中提供用于上下文切换的函数，这些函数有getcontext, setcontext，swapcontext 和makecontext。其中，getcontext用于保存当前上下文，setcontext用于切换上下文，swapcontext会保存当前上下文并切换到另一个上下文，makecontext创建一个新的上下文。实现用户线程的过程是：我们首先调用getcontext获得当前上下文，然后修改ucontext_t指定新的上下文。同样的，我们需要开辟栈空间，但是这次实现的线程库要涉及栈生长的方向。然后我们调用makecontext切换上下文，并指定用户线程中要执行的函数。<br>使用sigaction捕捉段错误。同时打印出出内存寄存器信息，内存map信息，backtrace的信息，同时使用addr2line命令，就会立刻定位内存报错代码的位置。<br>主要的函数在下面。</p>
+<pre><code>/*************************************************************************
+  &gt; File Name: sighander.c
+  &gt; Author: Lin
+  &gt; Created Time: Tue 17 Apr 2018 10:03:47 PM CST
+ ************************************************************************/
+#include &quot;sighander.h&quot;
+
+
+#define SIG_CHECK_PARAMS(sig, siginfo, context)     \
+    if(NULL == siginfo)                             \
+    printf(&quot;Received [signal:%d(%s)] with NULL siginfo\n&quot;, sig, get_signal_name(sig));    \
+    if(NULL == context)                             \
+    printf(&quot;Received [signal:%d(%s)] with NULL siginfo\n&quot;, sig, get_signal_name(sig));
+
+
+
+
+
+static void print_fatal_signal(int sig, siginfo_t *siginfo, void *context)
+&#123;
+    SIG_CHECK_PARAMS(sig, siginfo, context);
+    printf(&quot;Got signal [signal:%d(%s),reason:%d,refaddr:%p]. Crashing ...\n&quot;, 
+            sig, get_signal_name(sig), SIG_CHECKED_FIELD(siginfo, si_code), 
+            SIG_CHECKED_FIELD_TYPE(siginfo, si_addr, void *));
+&#125;
+
+
+
+
+
+static const char    *get_signal_name(int sig)
+&#123;
+    /* either strsignal() or sys_siglist[] could be used to */
+    /* get signal name, but these methods are not portable */
+
+    /* not all POSIX signals are available on all platforms, */
+    /* so we list only signals that we react to in our handlers */
+
+    switch (sig)
+    &#123;
+        case SIGALRM:    return &quot;SIGALRM&quot;;
+        case SIGILL:    return &quot;SIGILL&quot;;
+        case SIGFPE:    return &quot;SIGFPE&quot;;
+        case SIGSEGV:    return &quot;SIGSEGV&quot;;
+        case SIGBUS:    return &quot;SIGBUS&quot;;
+        case SIGQUIT:    return &quot;SIGQUIT&quot;;
+        case SIGINT:    return &quot;SIGINT&quot;;
+        case SIGTERM:    return &quot;SIGTERM&quot;;
+        case SIGPIPE:    return &quot;SIGPIPE&quot;;
+        case SIGUSR1:    return &quot;SIGUSR1&quot;;
+        default:    return &quot;unknown&quot;;
+    &#125;
+&#125;
+
+
+static const char    *get_register_name(int reg)
+&#123;
+    switch (reg)
+    &#123;
+
+        /* i386 */
+
+#ifdef    REG_GS
+        case REG_GS:    return &quot;gs&quot;;
+#endif
+#ifdef    REG_FS
+        case REG_FS:    return &quot;fs&quot;;
+#endif
+#ifdef    REG_ES
+        case REG_ES:    return &quot;es&quot;;
+#endif
+#ifdef    REG_DS
+        case REG_DS:    return &quot;ds&quot;;
+#endif
+#ifdef    REG_EDI
+        case REG_EDI:    return &quot;edi&quot;;
+#endif
+#ifdef    REG_ESI
+        case REG_ESI:    return &quot;esi&quot;;
+#endif
+#ifdef    REG_EBP
+        case REG_EBP:    return &quot;ebp&quot;;
+#endif
+#ifdef    REG_ESP
+        case REG_ESP:    return &quot;esp&quot;;
+#endif
+#ifdef    REG_EBX
+        case REG_EBX:    return &quot;ebx&quot;;
+#endif
+#ifdef    REG_EDX
+        case REG_EDX:    return &quot;edx&quot;;
+#endif
+#ifdef    REG_ECX
+        case REG_ECX:    return &quot;ecx&quot;;
+#endif
+#ifdef    REG_EAX
+        case REG_EAX:    return &quot;eax&quot;;
+#endif
+#ifdef    REG_EIP
+        case REG_EIP:    return &quot;eip&quot;;
+#endif
+#ifdef    REG_CS
+        case REG_CS:    return &quot;cs&quot;;
+#endif
+#ifdef    REG_UESP
+        case REG_UESP:    return &quot;uesp&quot;;
+#endif
+#ifdef    REG_SS
+        case REG_SS:    return &quot;ss&quot;;
+#endif
+
+                        /* x86_64 */
+
+#ifdef    REG_R8
+        case REG_R8:    return &quot;r8&quot;;
+#endif
+#ifdef    REG_R9
+        case REG_R9:    return &quot;r9&quot;;
+#endif
+#ifdef    REG_R10
+        case REG_R10:    return &quot;r10&quot;;
+#endif
+#ifdef    REG_R11
+        case REG_R11:    return &quot;r11&quot;;
+#endif
+#ifdef    REG_R12
+        case REG_R12:    return &quot;r12&quot;;
+#endif
+#ifdef    REG_R13
+        case REG_R13:    return &quot;r13&quot;;
+#endif
+#ifdef    REG_R14
+        case REG_R14:    return &quot;r14&quot;;
+#endif
+#ifdef    REG_R15
+        case REG_R15:    return &quot;r15&quot;;
+#endif
+#ifdef    REG_RDI
+        case REG_RDI:    return &quot;rdi&quot;;
+#endif
+#ifdef    REG_RSI
+        case REG_RSI:    return &quot;rsi&quot;;
+#endif
+#ifdef    REG_RBP
+        case REG_RBP:    return &quot;rbp&quot;;
+#endif
+#ifdef    REG_RBX
+        case REG_RBX:    return &quot;rbx&quot;;
+#endif
+#ifdef    REG_RDX
+        case REG_RDX:    return &quot;rdx&quot;;
+#endif
+#ifdef    REG_RAX
+        case REG_RAX:    return &quot;rax&quot;;
+#endif
+#ifdef    REG_RCX
+        case REG_RCX:    return &quot;rcx&quot;;
+#endif
+#ifdef    REG_RSP
+        case REG_RSP:    return &quot;rsp&quot;;
+#endif
+#ifdef    REG_RIP
+        case REG_RIP:    return &quot;rip&quot;;
+#endif
+#ifdef    REG_CSGSFS
+        case REG_CSGSFS:    return &quot;csgsfs&quot;;
+#endif
+#ifdef    REG_OLDMASK
+        case REG_OLDMASK:    return &quot;oldmask&quot;;
+#endif
+#ifdef    REG_CR2
+        case REG_CR2:    return &quot;cr2&quot;;
+#endif
+
+                        /* i386 and x86_64 */
+
+#ifdef    REG_EFL
+        case REG_EFL:    return &quot;efl&quot;;
+#endif
+#ifdef    REG_ERR
+        case REG_ERR:    return &quot;err&quot;;
+#endif
+#ifdef    REG_TRAPNO
+        case REG_TRAPNO:    return &quot;trapno&quot;;
+#endif
+
+                            /* unknown */
+
+        default:    return &quot;unknown&quot;;
+    &#125;
+&#125;
+
+void    print_fatal_info(void *context)
+&#123;
+#ifdef    HAVE_SYS_UCONTEXT_H
+
+    ucontext_t    *uctx = (ucontext_t *)context;
+
+    /* look for GET_PC() macro in sigcontextinfo.h files */
+    /* of glibc if you wish to add more CPU architectures */
+
+#    if    defined(__i386__)    /* i386 */
+
+#        define GET_REG(uctx, reg)    (uctx)-&gt;uc_mcontext.gregs[reg]
+#        define GET_PC(uctx)        GET_REG(uctx, REG_EIP)
+
+#    elif    defined(__x86_64__)    /* x86_64 */
+
+#        define GET_REG(uctx, reg)    (uctx)-&gt;uc_mcontext.gregs[reg]
+#        define GET_PC(uctx)        GET_REG(uctx, REG_RIP)
+
+#    endif
+
+#endif    /* HAVE_SYS_UCONTEXT_H */
+
+#ifdef    HAVE_EXECINFO_H
+
+#    define    BACKTRACE_SIZE    60
+
+    char    **bcktrc_syms;
+    void    *bcktrc[BACKTRACE_SIZE];
+    int    bcktrc_sz;
+
+#endif    /* HAVE_EXECINFO_H */
+
+    int    i;
+    FILE    *fd;
+
+    printf( &quot;====== Fatal information: ======\n&quot;);
+
+
+#ifdef    HAVE_SYS_UCONTEXT_H
+
+    printf( &quot;Program counter: %p\n&quot;, GET_PC(uctx));
+    printf( &quot;=== Registers: ===\n&quot;);
+
+    for (i = 0; i &lt; NGREG; i++)
+    &#123;
+        printf( &quot;%-7s = %16lx = %20lu = %20ld\n&quot;, get_register_name(i),
+                GET_REG(uctx, i), GET_REG(uctx, i), GET_REG(uctx, i));
+    &#125;
+#ifdef    REG_EBP    /* dump a bit of stack frame for i386 */
+    printf( &quot;=== Stack frame: ===\n&quot;);
+
+    for (i = 16; i &gt;= 2; i--)
+    &#123;
+        printf( &quot;+0x%02x(%%ebp) = ebp + %2d = %08x = %10u = %11d%s\n&quot;,
+                i * PTR_SIZE, i * PTR_SIZE,
+                *(unsigned int *)((void *)GET_REG(uctx, REG_EBP) + i * PTR_SIZE),
+                *(unsigned int *)((void *)GET_REG(uctx, REG_EBP) + i * PTR_SIZE),
+                *(unsigned int *)((void *)GET_REG(uctx, REG_EBP) + i * PTR_SIZE),
+                i == 2 ? &quot; &lt;--- call arguments&quot; : &quot;&quot;);
+    &#125;
+    printf( &quot;+0x%02x(%%ebp) = ebp + %2d = %08x%28s&lt;--- return address\n&quot;,
+            PTR_SIZE, PTR_SIZE,
+            *(unsigned int *)((void *)GET_REG(uctx, REG_EBP) + PTR_SIZE), &quot;&quot;);
+    printf( &quot;     (%%ebp) = ebp      = %08x%28s&lt;--- saved ebp value\n&quot;,
+            *(unsigned int *)((void *)GET_REG(uctx, REG_EBP)), &quot;&quot;);
+
+    for (i = 1; i &lt;= 16; i++)
+    &#123;
+        printf( &quot;-0x%02x(%%ebp) = ebp - %2d = %08x = %10u = %11d%s\n&quot;,
+                i * PTR_SIZE, i * PTR_SIZE,
+                *(unsigned int *)((void *)GET_REG(uctx, REG_EBP) - i * PTR_SIZE),
+                *(unsigned int *)((void *)GET_REG(uctx, REG_EBP) - i * PTR_SIZE),
+                *(unsigned int *)((void *)GET_REG(uctx, REG_EBP) - i * PTR_SIZE),
+                i == 1 ? &quot; &lt;--- local variables&quot; : &quot;&quot;);
+    &#125;
+#endif    /* REG_EBP */
+#else
+    printf( &quot;program counter not available for this architecture\n&quot;);
+    printf( &quot;=== Registers: ===\n&quot;);
+    printf( &quot;register dump not available for this architecture\n&quot;);
+
+#endif    /* HAVE_SYS_UCONTEXT_H */
+
+
+    printf( &quot;=== Backtrace: ===\n&quot;);
+
+#ifdef    HAVE_EXECINFO_H
+    bcktrc_sz = backtrace(bcktrc, BACKTRACE_SIZE);
+    bcktrc_syms = backtrace_symbols(bcktrc, bcktrc_sz);
+
+    if (NULL == bcktrc_syms)
+    &#123;
+        printf( &quot;error in backtrace_symbols(): %s\n&quot;, strerror(errno));
+
+        for (i = 0; i &lt; bcktrc_sz; i++)
+            printf( &quot;%d: %p\n&quot;, bcktrc_sz - i - 1, bcktrc[i]);
+    &#125;
+    else
+    &#123;
+        for (i = 0; i &lt; bcktrc_sz; i++)
+            printf( &quot;%d: %s\n&quot;, bcktrc_sz - i - 1, bcktrc_syms[i]);
+
+        free(bcktrc_syms);
+    &#125;
+#else
+    printf( &quot;backtrace not available for this platform\n&quot;);
+
+#endif    /* HAVE_EXECINFO_H */
+
+
+    printf( &quot;=== Memory map: ===\n&quot;);
+
+    if (NULL != (fd = fopen(&quot;/proc/self/maps&quot;, &quot;r&quot;)))
+    &#123;
+        char line[1024];
+
+        while (NULL != fgets(line, sizeof(line), fd))
+        &#123;
+            printf( &quot;%s&quot;, line);
+        &#125;
+
+        fclose(fd);
+    &#125;
+
+
+
+    printf(&quot;================================\n&quot;);
+    printf(&quot;Please consider attaching a disassembly listing to your bug report.\n&quot;);
+    printf(&quot;This listing can be produced with, e.g., objdump -DSswx program-name.\n&quot;);
+    printf(&quot;================================\n&quot;);
+&#125;
+
+
+
+/* ------------------------------------------------------------------*/
+/**
+ * @Function  fatal_signal_handler 
+ *
+ * @Param     sig
+ * @Param     siginfo
+ * @Param     context
+ */
+/* ------------------------------------------------------------------*/
+static void fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
+&#123;
+    print_fatal_signal(sig, siginfo, context);
+    print_fatal_info(context);
+    exit(EXIT_FAILURE);
+&#125;
+
+
+
+/* ------------------------------------------------------------------*/
+/**
+ * @Function  set_signal_handlers
+ * catch fatal signal
+ * @Returns  NULL 
+ */
+/* ------------------------------------------------------------------*/
+void set_signal_handlers(void)
+&#123;
+
+    struct sigaction phan;
+
+    sigemptyset(&amp;phan.sa_mask);
+
+    phan.sa_flags = SA_SIGINFO;
+
+
+
+
+    phan.sa_sigaction = fatal_signal_handler;
+
+    sigaction(SIGILL, &amp;phan, NULL);
+    sigaction(SIGFPE, &amp;phan, NULL);
+    sigaction(SIGSEGV, &amp;phan, NULL);
+    sigaction(SIGBUS, &amp;phan, NULL);
+
+&#125;
+</code></pre>
+<p>在获取到了<code>Program counter: 0x4010d5</code>的地址后，使用<br><code>addr2line -e sigment_fault  0x4010d5</code>就可以定位段错误出现在哪个位置了</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/jxgz_leo/article/details/53458366">addr2line</a></p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/C/">C</a>, <a href="/tags/预定义宏/">预定义宏</a>, <a href="/tags/跨平台/">跨平台</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

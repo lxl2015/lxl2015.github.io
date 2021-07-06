@@ -1,0 +1,342 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux CPP 异常处理 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="异常处理概述">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux CPP 异常处理"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-14T09:48:01.000Z"><a href="/2017/08/14/14-CPP-异常处理/">2017-08-14</a></time>
+        
+  
+    <h1 class="title">Linux CPP 异常处理</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%A6%82%E8%BF%B0"><span class="toc-text">异常处理概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="toc-text">异常处理的基本思想</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C-%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">C++异常处理的实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E8%AF%AD%E6%B3%95"><span class="toc-text">异常处理的语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%9A%84%E8%A7%84%E5%88%99"><span class="toc-text">异常处理的规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%87%E5%87%86-C-%E5%BA%93%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8%E7%B1%BB"><span class="toc-text">标准 C++库中的异常类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E8%B7%AF%E6%8D%95%E8%8E%B7"><span class="toc-text">多路捕获</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%AB%E6%9C%89%E5%BC%82%E5%B8%B8%E7%9A%84%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1"><span class="toc-text">含有异常的程序设计</span></a></li></ol>
+    </div>
+
+        <h3 id="异常处理概述"><a href="#异常处理概述" class="headerlink" title="异常处理概述"></a>异常处理概述</h3><span id="more"></span>
+
+<ul>
+<li><p>程序可能按编程者的意愿终止, 也可能因为程序中发生了错误而终止 。 例如, 程序执行时遇到除数为0或下标越界, 这时将产生系统中断, 从而导致正在执行的程序提前终止 。</p>
+</li>
+<li><p>程序的错误有两种, 一种是编译错误, 即语法错误 。 如果使用了错误的语法, 函数, 结构和类, 程序就无法被生成运行代码 。 另一种是在运行时发生的错误, 它分为不可预料的逻辑错误和可以预料的运行异常 。</p>
+</li>
+<li><p>为处理可预料的错误, 常用的典型方法是让被调用函数返回某一个特别的值 （ 或将某个按引用调用传递的参数设置为一个特别的值 ）, 而外层的调用程序则检查这个错误标志, 从而确定是否产生了某一类型的错误 。 另一种典型方法是当错误发生时跳出当前的函数体, 控制转向某个专门的错误处理程序, 从而中断正常的控制流 。 这两种方法都是权宜之计, 不能形成强有力的结构化异常处理模式 。</p>
+</li>
+<li><p>异常处理机制是用于管理程序运行期间错误的一种结构化方法。所谓结构化是指程序的控制不会由于产生异常而随意跳转。异常处理机制将程序中的正常处理代码与异常处理代码显式区别开来，提高了程序的可读性。</p>
+</li>
+</ul>
+<h3 id="异常处理的基本思想"><a href="#异常处理的基本思想" class="headerlink" title="异常处理的基本思想"></a>异常处理的基本思想</h3><ul>
+<li><p>对于中小型程序，一旦发生异常，一般是将程序立即中断执行，从而无条件释放系统所有资源。而对于比较大的程序来说，如果出现异常，应该允许恢复和继续执行。恢复的过程就是把产生异常所造成的恶劣影响去掉，中间一般要涉及一系列的函数调用链的退栈，对象的析构，资源的释放等。继续运行就是异常处理之后，在紧接着异常处理的代码区域中继续运行。</p>
+<h3 id="C-异常处理的实现"><a href="#C-异常处理的实现" class="headerlink" title="C++异常处理的实现"></a>C++异常处理的实现</h3></li>
+<li><p>C++语言异常处理机制的基本思想是将异常的检测与处理分离 。 当在一个函数体中检测到异常条件存在,但无法确定相应的处理方法时, 将引发一个异常, 并由函数的直接或间接调用检测并处理这个异常 。 这一基本思想用 3个保留字实现,throw,try和 catch。 其作用是：</p>
+<ol>
+<li>try：标识程序中异常语句块的开始 。</li>
+<li>throw：用来创建用户自定义类型的异常错误 。</li>
+<li>catch：标识异常错误处理模块的开始。</li>
+</ol>
+</li>
+<li><p>在一般情况下，被调用函数直接检测到异常条件的存在并使用 throw引发一个异常（注意,C++语言的异常是由程序员控制引发的，而不是由计算机硬件或程序运行环境控制的）；在上层调用函数中使用 try检测函数调用是否引发异常，检测到的各种异常由 catch捕获并作相应处理。</p>
+<h3 id="异常处理的语法"><a href="#异常处理的语法" class="headerlink" title="异常处理的语法"></a>异常处理的语法</h3></li>
+</ul>
+<p>在 C++程序中，任何需要检测异常的语句（包括函数调用）都必须在 try语句块中执行，异常必须由紧跟着try语句后面的 catch语句来捕获并处理。因而,try与catch总是结合使用。 throw,try和 catch语句的一般语法如下：</p>
+<pre><code>throw &lt;表达式 &gt;；
+try
+&#123;
+//try语句块
+&#125;
+catch（ 类型 1 参数 1）
+&#123;
+//针对类型 1的异常处理
+&#125;
+catch （ 类型 2 参数 2）
+&#123;
+//针对类型 2的异常处理
+&#125;
+…
+catch （ 类型 n 参数 n）
+&#123;
+//针对类型 n的异常处理
+&#125;
+</code></pre>
+<p>异常处理的执行过程如下：</p>
+<ol>
+<li>控制通过正常的顺序执行到达try语句, 然后执行try块内的保护段 。</li>
+<li>如果在保护段执行期间没有引起异常, 那么跟在try块后的catch子句就不执行, 程序从异常被抛掷的try块后跟随的最后一个catch子句后面的语句继续执行下去 。</li>
+<li>如果在保护段执行期间或在保护段调用的任何函数中有异常被抛掷, 则从通过 throw运算数创建的对象中创建一个异常对象 。 编译器从能够处理抛掷类型的异常的更高执行上下文中寻找一个 catch子句（或一个能处理任何类型异常的 catch处理程序 ） 。 catch处理程序按其在 try块后出现的顺序被检查 。 如果没有找到合适的处理程序, 则继续检查下一个动态封闭的 try块 。 此处理继续下去直到最外层的封闭 try块被检查完 。</li>
+<li>如果匹配的处理器未找到, 则运行函数terminate将被自动调用, 而函数 terminate的默认功能是调用 abort终止程序 。</li>
+<li>如果找到了一个匹配的 catch处理程序，且它通过值进行捕获，则其形参通过拷贝异常对象进行初始化。如果它通过引用进行捕获，则参量初始化为指向异常对象。在形参被初始化之后，开始“循环展开栈”的过程，这包括对那些在与 catch处理器相对应的try块开始和异常丢弃地点之间创建的（但尚未析构的）所有自动对象的析构。析构以与构造相反的顺序进行。然后执行 catch处理程序，接下来程序跳转到跟随在最后处理程序之后的语句。</li>
+</ol>
+<p>注意,catch处理程序的出现顺序很重要，因为在一个 try块中，异常处理程序是按照它出现的顺序被检查的。</p>
+<h3 id="异常处理的规则"><a href="#异常处理的规则" class="headerlink" title="异常处理的规则"></a>异常处理的规则</h3><ul>
+<li>try分程序必须出现在前, catch紧跟出现在后 。catch之后的圆括号中必须含有数据类型, 捕获是利用数据类型匹配实现的 。</li>
+<li>如果程序内有多个异常错误处理模块，则当异常错误发生时，系统自动查找与该异常错误类型相匹配的 catch模块,查找次序为 catch出现的次序。</li>
+<li>如果异常错误类型为 C++的类，并且该类有其基类，则应该将派生类的错误处理程序放在前面，基类的错误处理程序放在后面。</li>
+<li>如果一个异常错误发生后，系统找不到一个与该错误类型相匹配的异常错误处理模块，则调用预定义的运行时刻终止函数，默认情况下是 abort。<h3 id="标准-C-库中的异常类"><a href="#标准-C-库中的异常类" class="headerlink" title="标准 C++库中的异常类"></a>标准 C++库中的异常类</h3></li>
+</ul>
+<p>标准 C++库中包含 9个异常类, 它们可以分为运行时异常和逻辑异常：</p>
+<pre><code>length_error //运行时长度异常
+domain_error //运行时域异常
+out_of_range_error //运行时越界异常
+invalid_argument //运行时参数异常
+range_error //逻辑异常, 范围异常
+overflow_error //逻辑异常, 溢出 （ 上 ） 异常
+overflow_error //逻辑异常，溢出（下）异常
+</code></pre>
+<p>标准 C++库中的这些异常类并没有全部被显式使用，因为 C++标准库中很少发生异常，但是这些标准C++库中的异常类可以为编程人员，特别式自己类库的开发者提供一些经验。标准异常定义在 <exception> 中，我们可以在程序中使用这些标准的异常。它们是以父子类层次结构组织起来的，如下所示：</p>
+<table>
+<thead>
+<tr>
+<th align="left">异常</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">std::exception</td>
+<td align="left">该异常是所有标准 C++ 异常的父类。</td>
+</tr>
+<tr>
+<td align="left">std::bad_alloc</td>
+<td align="left">该异常可以通过 new 抛出。</td>
+</tr>
+<tr>
+<td align="left">std::bad_cast</td>
+<td align="left">该异常可以通过 dynamic_cast 抛出。</td>
+</tr>
+<tr>
+<td align="left">std::bad_exception</td>
+<td align="left">这在处理 C++ 程序中无法预期的异常时非常有用。</td>
+</tr>
+<tr>
+<td align="left">std::bad_typeid</td>
+<td align="left">该异常可以通过 typeid 抛出。</td>
+</tr>
+<tr>
+<td align="left">std::logic_error</td>
+<td align="left">理论上可以通过读取代码来检测到的异常。</td>
+</tr>
+<tr>
+<td align="left">std::domain_error</td>
+<td align="left">当使用了一个无效的数学域时，会抛出该异常。</td>
+</tr>
+<tr>
+<td align="left">std::invalid_argument</td>
+<td align="left">当使用了无效的参数时，会抛出该异常。</td>
+</tr>
+<tr>
+<td align="left">std::length_error</td>
+<td align="left">当创建了太长的 std::string 时，会抛出该异常。</td>
+</tr>
+<tr>
+<td align="left">std::out_of_range</td>
+<td align="left">该异常可以通过方法抛出，例如 std::vector 和 std::bitset&lt;&gt;::operator<a href=""></a>。</td>
+</tr>
+<tr>
+<td align="left">std::runtime_error</td>
+<td align="left">理论上不可以通过读取代码来检测到的异常。</td>
+</tr>
+<tr>
+<td align="left">std::overflow_error</td>
+<td align="left">当发生数学上溢时，会抛出该异常。</td>
+</tr>
+<tr>
+<td align="left">std::range_error</td>
+<td align="left">当尝试存储超出范围的值时，会抛出该异常。</td>
+</tr>
+<tr>
+<td align="left">std::underflow_error</td>
+<td align="left">当发生数学下溢时，会抛出该异常。</td>
+</tr>
+</tbody></table>
+<h3 id="多路捕获"><a href="#多路捕获" class="headerlink" title="多路捕获"></a>多路捕获</h3><p>很多程序可能有若干不同种类的运行错误，它们可以使用异常处理机制，每种错误可与一个类，一种数据类型或一个值相关。这样，在程序中就会出现多路捕获。</p>
+<h3 id="含有异常的程序设计"><a href="#含有异常的程序设计" class="headerlink" title="含有异常的程序设计"></a>含有异常的程序设计</h3><ul>
+<li><p>何时避免异常<br>异常并不能处理所发生的所有问题 。 实际上若对异常过分的考虑, 将会遇到许多麻烦 。 下面的段落指出异常不能被保证的情况 。</p>
+<ol>
+<li>异步事件</li>
+<li>普通错误情况</li>
+<li>流控制</li>
+<li>不强迫使用异常</li>
+<li>新异常, 老代码</li>
+</ol>
+</li>
+<li><p>异常的典型使用</p>
+<ol>
+<li>随时使用异常规格说明</li>
+<li>起始于标准异常</li>
+<li>套装用户自己的异常</li>
+<li>使用异常层次</li>
+<li>多重继承</li>
+<li>用, 引用, 而非, 值, 去捕获</li>
+<li>在构造函数中抛出异常</li>
+<li>不要在析构函数中导致异常</li>
+<li>避免无保护的指针</li>
+</ol>
+</li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/01-CPP-基础/">01. CPP 基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

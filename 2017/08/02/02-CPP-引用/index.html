@@ -1,0 +1,309 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux CPP 中引用 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="引用变量是一个别名，也就是说，它是某个已存在变量的另一个名字。一旦把引用初始化为某个变量，就可以使用该引用名称或变量名称来指向变量。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux CPP 中引用"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-02T09:48:01.000Z"><a href="/2017/08/02/02-CPP-引用/">2017-08-02</a></time>
+        
+  
+    <h1 class="title">Linux CPP 中引用</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#CPP-%E5%BC%95%E7%94%A8%E7%9A%84%E8%AF%AD%E6%B3%95"><span class="toc-text">CPP 引用的语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E4%BD%9C%E4%B8%BA%E5%8F%82%E6%95%B0"><span class="toc-text">引用作为参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E4%BD%9C%E4%B8%BA%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="toc-text">引用作为返回值</span></a></li></ol>
+    </div>
+
+        <p>引用变量是一个别名，也就是说，它是某个已存在变量的另一个名字。一旦把引用初始化为某个变量，就可以使用该引用名称或变量名称来指向变量。</p>
+<span id="more"></span>
+
+
+<p>引用很容易与指针混淆，它们之间有三个主要的不同：</p>
+<ul>
+<li>不存在空引用。引用必须连接到一块合法的内存。</li>
+<li>一旦引用被初始化为一个对象，就不能被指向到另一个对象。指针可以在任何时候指向到另一个对象。</li>
+<li>引用必须在创建时被初始化。指针可以在任何时间被初始化。</li>
+</ul>
+<p>引用更加符合面向对象和隐藏实现细节的原则，而指针是更底层的机制。引用是一个对象的别名，可以使其他作用域的代码通过这个别名访问到这个对象。</p>
+<h3 id="CPP-引用的语法"><a href="#CPP-引用的语法" class="headerlink" title="CPP 引用的语法"></a>CPP 引用的语法</h3><pre><code>int i =17;
+int&amp; r = i;
+</code></pre>
+<hr>
+<p><strong>&amp;</strong> 读作引用。因此，第一个声明可以读作 <strong>r 是一个初始化为 i 的整型引用</strong>。</p>
+<h3 id="引用作为参数"><a href="#引用作为参数" class="headerlink" title="引用作为参数"></a>引用作为参数</h3><p>引用作为参数：C++ 支持把引用作为参数传给函数，这比传一般的参数更安全。</p>
+<p>如何使用指针来实现引用调用函数。下面的实例使用了引用来实现引用调用函数。</p>
+<pre><code>/*************************************************************************
+  &gt; File Name: test.cpp
+  &gt; Author: Lin
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+void swap(int&amp; x, int&amp; y);
+
+int main ()
+&#123;
+    int a = 100;
+    int b = 200;
+
+    cout &lt;&lt; &quot;交换前，a 的值：&quot; &lt;&lt; a &lt;&lt; endl;
+    cout &lt;&lt; &quot;交换前，b 的值：&quot; &lt;&lt; b &lt;&lt; endl;
+
+    /* 调用函数来交换值 */
+    swap(a, b);
+
+    cout &lt;&lt; &quot;交换后，a 的值：&quot; &lt;&lt; a &lt;&lt; endl;
+    cout &lt;&lt; &quot;交换后，b 的值：&quot; &lt;&lt; b &lt;&lt; endl;
+
+    return 0;
+&#125;
+
+void swap(int&amp; x, int&amp; y)
+&#123;
+    int temp;
+    temp = x; /* 保存地址 x 的值 */
+    x = y;    /* 把 y 赋值给 x */
+    y = temp; /* 把 x 赋值给 y  */
+
+    return;
+&#125;
+</code></pre>
+<p>编译：</p>
+<pre><code>$ g++ test.cpp -o test
+$ ./test 
+交换前，a 的值：100
+交换前，b 的值：200
+交换后，a 的值：200
+交换后，b 的值：100
+</code></pre>
+<h3 id="引用作为返回值"><a href="#引用作为返回值" class="headerlink" title="引用作为返回值"></a>引用作为返回值</h3><p>引用作为返回值：可以从 C++ 函数中返回引用，就像返回其他数据类型一样。</p>
+<p>通过使用引用来替代指针，会使 C++ 程序更容易阅读和维护。C++ 函数可以返回一个引用，方式与返回一个指针类似。<br>当函数返回一个引用时，则返回一个指向返回值的隐式指针。这样，函数就可以放在赋值语句的左边。例如，请看下面这个简单的程序：</p>
+<pre><code>/*************************************************************************
+  &gt; File Name: test.cpp
+  &gt; Author: Lin
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+double vals[] = &#123;10.1, 12.6, 33.1, 24.1, 50.0&#125;;
+
+double&amp; setValues( int i )
+&#123;
+    return vals[i];   // 返回第 i 个元素的引用
+&#125;
+
+int main ()
+&#123;
+
+    cout &lt;&lt; &quot;改变前的值&quot; &lt;&lt; endl;
+    for ( int i = 0; i &lt; 5; i++ )
+    &#123;
+        cout &lt;&lt; &quot;vals[&quot; &lt;&lt; i &lt;&lt; &quot;] = &quot;;
+        cout &lt;&lt; vals[i] &lt;&lt; endl;
+    &#125;
+
+    setValues(1) = 20.23; // 改变第 2 个元素
+    setValues(3) = 70.8;  // 改变第 4 个元素
+
+    cout &lt;&lt; &quot;改变后的值&quot; &lt;&lt; endl;
+    for ( int i = 0; i &lt; 5; i++ )
+    &#123;
+        cout &lt;&lt; &quot;vals[&quot; &lt;&lt; i &lt;&lt; &quot;] = &quot;;
+        cout &lt;&lt; vals[i] &lt;&lt; endl;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>编译：</p>
+<pre><code>$ g++ test.cpp -o test  
+$ ./test 
+改变前的值
+vals[0] = 10.1
+vals[1] = 12.6
+vals[2] = 33.1
+vals[3] = 24.1
+vals[4] = 50
+改变后的值
+vals[0] = 10.1
+vals[1] = 20.23
+vals[2] = 33.1
+vals[3] = 70.8
+vals[4] = 50
+</code></pre>
+<p>当返回一个引用时，要注意被引用的对象不能超出作用域。所以返回一个对局部变量的引用是不合法的，但是，可以返回一个对静态变量的引用。</p>
+<pre><code>int&amp; func() &#123;
+int q;
+//! return q; // 在编译时发生错误
+static int x;
+return x;     // 安全，x 在函数作用域外依然是有效的
+&#125;
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/01-CPP-基础/">01. CPP 基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,626 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Ping实现原理 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="原文章《用C语言实现Ping程序功能》，写的不错，但是程序有一些错误，稍做整理，以备用。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Ping实现原理"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2018-04-05T13:13:27.000Z"><a href="/2018/04/05/Ping实现原理/">2018-04-05</a></time>
+        
+  
+    <h1 class="title">Ping实现原理</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#IP%E6%8A%A5%E5%A4%B4%E6%A0%BC%E5%BC%8F"><span class="toc-text">IP报头格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ICMP%E6%8A%A5%E5%A4%B4%E6%A0%BC%E5%BC%8F"><span class="toc-text">ICMP报头格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ICMP%E6%95%B0%E6%8D%AE%E6%8A%A5"><span class="toc-text">ICMP数据报</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%9F%E8%AE%A1"><span class="toc-text">数据统计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E5%88%AB%E6%B3%A8%E6%84%8F"><span class="toc-text">特别注意</span></a></li></ol>
+    </div>
+
+        <p>原文章《<a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/linux/network/ping/">用C语言实现Ping程序功能</a>》，写的不错，但是程序有一些错误，稍做整理，以备用。</p>
+<span id="more"></span>
+
+<p>ping命令是用来查看网络上另一个主机系统的网络连接是否正常的一个工具。ping命令的工作原理是：向网络上的另一个主机系统发送ICMP报文，如果指定系统得到了报文，它将把报文一模一样地传回给发送者，这有点象潜水艇声纳系统中使用的发声装置。</p>
+<p>例如，在Linux终端上执行<code>ping localhost</code>命令将会看到以下结果:</p>
+<pre><code>PING localhost (127.0.0.1) 56(84) bytes of data.
+64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.033 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=2 ttl=64 time=0.096 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=3 ttl=64 time=0.094 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=4 ttl=64 time=0.115 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=5 ttl=64 time=0.093 ms
+
+--- localhost ping statistics ---
+6 packets transmitted, 6 received, 0% packet loss, time 5001ms
+rtt min/avg/max/mdev = 0.033/0.091/0.116/0.028 ms
+</code></pre>
+<p>由上面的执行结果可以看到，ping命令执行后显示出被测试系统主机名和相应IP地址、返回给当前主机的ICMP报文顺序号、ttl生存时间和往返时间rtt（单位是毫秒，即千分之一秒）。要写一个模拟ping命令，这些信息有启示作用。</p>
+<p>要真正了解ping命令实现原理，就要了解ping命令所使用到的TCP/IP协议。</p>
+<p>ICMP(Internet Control Message,网际控制报文协议)是为网关和目标主机而提供的一种差错控制机制，使它们在遇到差错时能把错误报告给报文源发方。ICMP协议是IP层的一个协议，但是由于差错报告在发送给报文源发方时可能也要经过若干子网，因此牵涉到路由选择等问题，所以ICMP报文需通过IP协议来发送。ICMP数据报的数据发送前需要两级封装：首先添加ICMP报头形成ICMP报文，再添加IP报头形成IP数据报。</p>
+<h2 id="IP报头格式"><a href="#IP报头格式" class="headerlink" title="IP报头格式"></a>IP报头格式</h2><p>由于IP层协议是一种点对点的协议，而非端对端的协议，它提供无连接的数据报服务，没有端口的概念，因此很少使用bind()和connect()函数，若有使用也只是用于设置IP地址。发送数据使用sendto()函数，接收数据使用recvfrom()函数。IP报头网上随便搜一下。</p>
+<p>在Linux中，IP报头格式数据结构(&lt;netinet/ip.h&gt;)定义如下：</p>
+<pre><code>/*
+ * Structure of an internet header, naked of options.
+*/ 
+struct ip
+  &#123;
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    unsigned int ip_hl:4;       /* header length */
+    unsigned int ip_v:4;        /* version */
+#endif
+#if __BYTE_ORDER == __BIG_ENDIAN
+    unsigned int ip_v:4;        /* version */
+    unsigned int ip_hl:4;       /* header length */
+#endif
+    u_int8_t ip_tos;            /* type of service */
+    u_short ip_len;         /* total length */
+    u_short ip_id;          /* identification */
+    u_short ip_off;         /* fragment offset field */
+#define IP_RF 0x8000            /* reserved fragment flag */
+#define IP_DF 0x4000            /* dont fragment flag */
+#define IP_MF 0x2000            /* more fragments flag */
+#define IP_OFFMASK 0x1fff       /* mask for fragmenting bits */
+    u_int8_t ip_ttl;            /* time to live */
+    u_int8_t ip_p;          /* protocol */
+    u_short ip_sum;         /* checksum */
+    struct in_addr ip_src, ip_dst;  /* source and dest address */
+  &#125;;
+</code></pre>
+<p>其中ping程序只使用以下数据：</p>
+<ul>
+<li>IP报头长度IHL（Internet Header Length）以４字节为一个单位来记录IP报头的长度，是上述IP数据结构的ip_hl变量。</li>
+<li>生存时间TTL（Time To Live）以秒为单位，指出IP数据报能在网络上停留的最长时间，其值由发送方设定，并在经过路由的每一个节点时减一，当该值为０时，数据报将被丢弃，是上述IP数据结构的ip_ttl变量。</li>
+</ul>
+<h2 id="ICMP报头格式"><a href="#ICMP报头格式" class="headerlink" title="ICMP报头格式"></a>ICMP报头格式</h2><p>ICMP报文分为两种，一是错误报告报文，二是查询报文。每个ICMP报头均包含类型、编码和校验和这三项内容，长度为８位，８位和１６位，其余选项则随ICMP的功能不同而不同。</p>
+<p>Ping命令只使用众多ICMP报文中的两种：”请求回送’(ICMP_ECHO)和”请求回应’(ICMP_ECHOREPLY)。在Linux中定义如下：</p>
+<pre><code>#define ICMP_ECHO   0
+#define ICMP_ECHOREPLY  8
+</code></pre>
+<p>这两种ICMP类型报头格式如下：</p>
+<pre><code>类型TYPE（8或0）|| 编码CODE（没有使用）|| 校验和CHECKSUM || 标志符Identifier || 顺序号Sequence NO
+</code></pre>
+<p>在Linux中ICMP数据结构(&lt;netinet/ip_icmp.h&gt;)定义如下：</p>
+<pre><code>struct icmp
+&#123;
+  u_int8_t  icmp_type;  /* type of message, see below */
+  u_int8_t  icmp_code;  /* type sub code */
+  u_int16_t icmp_cksum; /* ones complement checksum of struct */
+  union
+  &#123;
+    u_char ih_pptr;     /* ICMP_PARAMPROB */
+    struct in_addr ih_gwaddr;   /* gateway address */
+    struct ih_idseq     /* echo datagram */
+    &#123;
+      u_int16_t icd_id;
+      u_int16_t icd_seq;
+    &#125; ih_idseq;
+    u_int32_t ih_void;
+    /* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
+    struct ih_pmtu
+    &#123;
+      u_int16_t ipm_void;
+      u_int16_t ipm_nextmtu;
+    &#125; ih_pmtu;
+    struct ih_rtradv
+    &#123;
+      u_int8_t irt_num_addrs;
+      u_int8_t irt_wpa;
+      u_int16_t irt_lifetime;
+    &#125; ih_rtradv;
+  &#125; icmp_hun;
+#define icmp_pptr   icmp_hun.ih_pptr
+#define icmp_gwaddr icmp_hun.ih_gwaddr
+#define icmp_id     icmp_hun.ih_idseq.icd_id
+#define icmp_seq        icmp_hun.ih_idseq.icd_seq
+#define icmp_void   icmp_hun.ih_void
+#define icmp_pmvoid icmp_hun.ih_pmtu.ipm_void
+#define icmp_nextmtu    icmp_hun.ih_pmtu.ipm_nextmtu
+#define icmp_num_addrs  icmp_hun.ih_rtradv.irt_num_addrs
+#define icmp_wpa    icmp_hun.ih_rtradv.irt_wpa
+#define icmp_lifetime   icmp_hun.ih_rtradv.irt_lifetime
+  union
+  &#123;
+    struct
+    &#123;
+      u_int32_t its_otime;
+      u_int32_t its_rtime;
+      u_int32_t its_ttime;
+    &#125; id_ts;
+    struct
+    &#123;
+      struct ip idi_ip;
+      /* options and then 64 bits of data */
+    &#125; id_ip;
+    struct icmp_ra_addr id_radv;
+    u_int32_t   id_mask;
+    u_int8_t    id_data[1];
+  &#125; icmp_dun;
+#define icmp_otime  icmp_dun.id_ts.its_otime
+#define icmp_rtime  icmp_dun.id_ts.its_rtime
+#define icmp_ttime  icmp_dun.id_ts.its_ttime
+#define icmp_ip     icmp_dun.id_ip.idi_ip
+#define icmp_radv   icmp_dun.id_radv
+#define icmp_mask   icmp_dun.id_mask
+#define icmp_data   icmp_dun.id_data
+&#125;;
+</code></pre>
+<p>使用宏定义令表达更简洁,其中ICMP报头为８字节,数据报长度最大为64K字节。</p>
+<ul>
+<li>校验和算法 这一算法称为网际校验和算法，把被校验的数据１６位进行累加，然后取反码，若数据字节长度为奇数，则数据尾部补一个字节的０以凑成偶数。此算法适用于IPv4、ICMPv4、IGMPV4、ICMPv6、UDP和TCP校验和，更详细的信息请参考RFC1071，校验和字段为上述ICMP数据结构的icmp_cksum变量。</li>
+<li>标识符 用于唯一标识ICMP报文, 为上述ICMP数据结构的icmp_id宏所指的变量。</li>
+<li>顺序号 ping命令的icmp_seq便由这里读出，代表ICMP报文的发送顺序，为上述ICMP数据结构的icmp_seq宏所指的变量。</li>
+</ul>
+<h2 id="ICMP数据报"><a href="#ICMP数据报" class="headerlink" title="ICMP数据报"></a>ICMP数据报</h2><p>Ping命令中需要显示的信息，包括icmp_seq和ttl都已有实现的办法，但还缺rtt往返时间。为了实现这一功能，可利用ICMP数据报携带一个时间戳。使用以下函数生成时间戳：</p>
+<pre><code>int gettimeofday(struct timeval *tp,void *tzp);
+</code></pre>
+<p>其中timeval结构如下：</p>
+<pre><code>    struct timeval&#123;
+        long tv_sec;
+        long tv_usec;
+    &#125;
+</code></pre>
+<p>其中tv_sec为秒数，tv_usec微秒数。在发送和接收报文时由gettimeofday分别生成两个timeval结构，两者之差即为往返时间,即ICMP报文发送与接收的时间差，而timeval结构由ICMP数据报携带,tzp指针表示时区，一般都不使用，赋NULL值.</p>
+<h2 id="数据统计"><a href="#数据统计" class="headerlink" title="数据统计"></a>数据统计</h2><p>系统自带的ping命令当它接送完所有ICMP报文后，会对所有发送和所有接收的ICMP报文进行统计，从而计算ICMP报文丢失的比率。为达此目的，定义两个全局变量：接收计数器和发送计数器，用于记录ICMP报文接受和发送数目。丢失数目=发送总数-接收总数，丢失比率=丢失数目/发送总数。</p>
+<p>现给出模拟Ping程序功能的代码如下：</p>
+<pre><code>/*************************************************************************
+  &gt; File Name: ping.c
+  &gt; Author: Lin
+  &gt; Mail: 1010361011@qq.com
+  &gt; Created Time: Wed 04 Apr 2018 10:22:58 PM EDT
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;netinet/ip.h&gt;
+#include &lt;netinet/ip_icmp.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;setjmp.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#define PACKET_SIZE 4096
+#define MAX_WAIT_TIME   5
+#define MAX_NO_PACKETS  3
+
+static char send_packets[PACKET_SIZE];
+static char recv_packets[PACKET_SIZE];
+static int sockfd,datalen = 56;
+static int nsend = 0,nreceived = 0;
+
+static struct sockaddr_in dest_addr, from;
+static pid_t pid;
+static struct timeval tv_recv;
+
+static void statistics(int signo)
+&#123;
+    printf(&quot;\n-----------------------ping statistics -----------------------------\n&quot;);
+    printf(&quot;%d packets transmitted, %d received, %%%d lost\n&quot;, nsend, nreceived,  \
+            (nsend - nreceived)/nsend * 100);
+    close(sockfd);
+
+    exit(EXIT_SUCCESS);
+&#125;
+
+
+/**
+ * @Function  cal_chksum 
+ *  校验和算法
+ * @Param     addr
+ * @Param     len
+ *
+ * @Returns   
+ */
+static unsigned short cal_chksum(unsigned short *addr, int len)
+&#123;
+    int nleft = len;
+    int sum = 0;
+    unsigned short *w = addr;
+    unsigned short answer = 0;
+
+    /*
+     * 把ICMP包头二进制数据以2字节为单位累加起来
+     * */
+
+    while(nleft &gt; 1)
+    &#123;
+        sum += *w++;
+        nleft -= 2;
+
+    &#125;
+
+
+    /*
+     * 若ICMP包头为奇数个字节，会剩下最后一个字节，把最后一个字节视为一个2字节数据的高字节，
+     * 这个2字节数据的低位字节为0，继续累加
+     * */
+    if(nleft == 1)
+    &#123;
+        *(unsigned char *)(&amp;answer) = *(unsigned char *)w;
+        sum+=answer;
+    &#125;
+
+    sum = (sum &gt;&gt; 16) + (sum &amp; 0xFFFF);
+    sum += (sum &gt;&gt; 16);
+    answer = ~sum;
+    return answer;
+
+&#125;
+
+
+/**
+ * @Function  set_icmp_packet_head 
+ * 设置ICMP报头
+ * @Param     pack_no
+ *
+ * @Returns   
+ */
+static int set_icmp_packet_head(int pack_no)
+&#123;
+    int i, packet_size;
+    struct icmp *icmp;
+    struct timeval *tval;
+
+    icmp = (struct icmp *)send_packets;
+    icmp-&gt;icmp_type = ICMP_ECHO;
+    icmp-&gt;icmp_code = 0;
+    icmp-&gt;icmp_cksum = 0;
+    icmp-&gt;icmp_seq = pack_no;
+    icmp-&gt;icmp_id = pid;
+
+    packet_size = 8 + datalen;
+
+    tval = (struct timeval *)icmp-&gt;icmp_data;
+
+    gettimeofday(tval, NULL);//记录发送时间
+
+    icmp-&gt;icmp_cksum = cal_chksum((unsigned short *)icmp, packet_size); //校验算法
+
+    return packet_size;
+&#125;
+
+
+/**
+ * @Function  send_packet 
+ * 发送三个ICMP报文
+ */
+static void send_packet()
+&#123;
+    int packet_size;
+
+    while(nsend &lt; MAX_NO_PACKETS)
+    &#123;
+        nsend++;
+        packet_size = set_icmp_packet_head(nsend); /*设置ICMP包头*/
+
+        if(sendto(sockfd, send_packets, packet_size, 0, \
+                    (struct sockaddr *)&amp;dest_addr, sizeof(dest_addr)) &lt; 0)
+        &#123;
+            perror(&quot;sendto errnor&quot;);
+            continue;
+        &#125;
+
+        sleep(1);
+
+    &#125;
+&#125;
+
+/*两个timeval结构相减*/
+static void tv_sub(struct timeval *out,struct timeval *in)
+&#123;       
+    if( (out-&gt;tv_usec-=in-&gt;tv_usec)&lt;0)
+    &#123;       
+        --out-&gt;tv_sec;
+        out-&gt;tv_usec+=1000000;
+    &#125;
+    out-&gt;tv_sec-=in-&gt;tv_sec;
+&#125;
+static int unpack(char *buf, int len)
+&#123;
+    int i, iphdrlen;
+    struct ip *ip;
+    struct icmp *icmp;
+    struct timeval *tvsend;
+
+    double rtt;
+    ip = (struct ip *)buf;
+    iphdrlen = ip-&gt;ip_hl&lt;&lt;2;    /*求ip报头长度,即ip报头的长度标志乘4*/
+    icmp = (struct icmp *)(buf+iphdrlen);  /*越过ip报头,指向ICMP报头*/
+    len -= iphdrlen;            /*ICMP报头及ICMP数据报的总长度*/
+    if( len&lt;8)                /*小于ICMP报头长度则不合理*/
+    &#123;       
+        printf(&quot;ICMP packets\&#39;s length is less than 8\n&quot;);
+        return -1;
+    &#125;
+    /*确保所接收的是我所发的的ICMP的回应*/
+    if( (icmp-&gt;icmp_type==ICMP_ECHOREPLY) &amp;&amp; (icmp-&gt;icmp_id==pid) )
+    &#123;   
+        tvsend = (struct timeval *) icmp-&gt;icmp_data;
+        tv_sub(&amp;tv_recv,tvsend);  /*接收和发送的时间差*/
+        rtt=tv_recv.tv_sec*1000+tv_recv.tv_usec/1000;  /*以毫秒为单位计算rtt*/
+        /*显示相关信息*/
+        printf(&quot;%d byte from %s: icmp_seq=%u ttl=%d rtt=%.3f ms\n&quot;,
+                len,
+                inet_ntoa(from.sin_addr),
+                icmp-&gt;icmp_seq,
+                ip-&gt;ip_ttl,
+                rtt);
+    &#125;
+    else    
+        return -1;
+
+&#125;
+
+/**
+ * @Function  recv_packet 
+ * 接收所有报文
+ */
+static void recv_packet()
+&#123;
+    int n, fromlen;
+    extern int errno;
+
+    signal(SIGALRM, statistics);
+
+
+    fromlen = sizeof(from);
+
+    while(nreceived &lt; nsend)
+    &#123;
+        alarm(MAX_WAIT_TIME);
+
+        if((n = recvfrom(sockfd, recv_packets, sizeof(recv_packets), 0 ,\
+                        (struct sockaddr *)&amp;from, &amp;fromlen)) &lt; 0)
+        &#123;
+            
+            if(errno == EINTR) 
+                continue;
+            perror(&quot;recvfrom error&quot;);
+            continue;
+        &#125;
+
+        gettimeofday(&amp;tv_recv, NULL);//记录接收时间
+        if(unpack(recv_packets, n) == -1)
+            continue;
+        nreceived++;
+    &#125;
+&#125;
+
+
+int main(int argc,char *argv[])
+&#123;       
+    struct hostent *host;
+    struct protoent *protocol;
+    unsigned long inaddr=0l;
+    int waittime=MAX_WAIT_TIME;
+    int size=50*1024;
+    if(argc&lt;2)
+    &#123;       
+        printf(&quot;usage:%s hostname/IP address\n&quot;,argv[0]);
+        exit(1);
+    &#125;
+    if( (protocol=getprotobyname(&quot;icmp&quot;) )==NULL)
+    &#123;       
+        perror(&quot;getprotobyname&quot;);
+        exit(1);
+    &#125;
+    /*生成使用ICMP的原始套接字,这种套接字只有root才能生成*/
+    if( (sockfd=socket(AF_INET,SOCK_RAW,protocol-&gt;p_proto) )&lt;0)
+    &#123;       
+        perror(&quot;socket error&quot;);
+        exit(1);
+    &#125;
+    /* 回收root权限,设置当前用户权限*/
+    setuid(getuid());
+    /*扩大套接字接收缓冲区到50K这样做主要为了减小接收缓冲区溢出的
+      的可能性,若无意中ping一个广播地址或多播地址,将会引来大量应答*/
+    setsockopt(sockfd,SOL_SOCKET,SO_RCVBUF,&amp;size,sizeof(size) );
+    //bzero(&amp;dest_addr,sizeof(dest_addr));
+    
+    memset(&amp;dest_addr, 0 , sizeof(dest_addr));
+    
+    dest_addr.sin_family=AF_INET;
+    /*判断是主机名还是ip地址*/
+    if( inaddr=inet_addr(argv[1])==INADDR_NONE)
+    &#123;       
+        if((host=gethostbyname(argv[1]) )==NULL) /*是主机名*/
+        &#123;       
+            perror(&quot;gethostbyname error&quot;);
+            exit(1);
+        &#125;
+        memcpy( (char *)&amp;dest_addr.sin_addr,host-&gt;h_addr,host-&gt;h_length);
+    &#125;
+    else    /*是ip地址*/
+        dest_addr.sin_addr.s_addr = inaddr;
+    
+    
+    /*获取main的进程id,用于设置ICMP的标志符*/
+    pid=getpid();
+    printf(&quot;PING %s(%s): %d bytes data in ICMP packets.\n&quot;,argv[1],
+            inet_ntoa(dest_addr.sin_addr),datalen);
+    send_packet();  /*发送所有ICMP报文*/
+    recv_packet();  /*接收所有ICMP报文*/
+    statistics(SIGALRM); /*进行统计*/
+    return 0;
+&#125;
+</code></pre>
+<h2 id="特别注意"><a href="#特别注意" class="headerlink" title="特别注意"></a>特别注意</h2><p>只有root用户才能利用socket()函数生成原始套接字，要让Linux的一般用户能执行以上程序，需进行如下的特别操作：</p>
+<p>用root登陆，编译以上程序：<code>gcc -o ping ping.c</code>，其目的有二：一是编译，二是让myping属于root用户。</p>
+<p>再执行<code>chmod u+s ping</code>，目的是把ping程序设成SUID的属性。</p>
+<p>退出root，用一般用户登陆，执行<code>./ping www.baidu.com</code>，有以下执行结果：</p>
+<pre><code>PING www.baidu.com(61.135.169.125): 56 bytes data in ICMP packets.
+64 byte from 61.135.169.125: icmp_seq=1 ttl=55 rtt=3001.000 ms
+64 byte from 61.135.169.125: icmp_seq=2 ttl=55 rtt=2001.000 ms
+64 byte from 61.135.169.125: icmp_seq=3 ttl=55 rtt=1000.000 ms
+
+-----------------------ping statistics -----------------------------
+3 packets transmitted, 3 received, %0 lost
+</code></pre>
+<p>由于ping.c是发送完所有的ICMP报文才去接收，因此第一、第二和第三个ICMP报文的往返时间依此是3秒，２秒，１秒，上述结果中rtt信息正反映这一事实。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/ping/">ping</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

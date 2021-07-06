@@ -1,0 +1,386 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux CPP 类的重载和重写 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="重载c++重载分为函数重载和运算符重载。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux CPP 类的重载和重写"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-07T09:48:01.000Z"><a href="/2017/08/07/07-CPP-多态/">2017-08-07</a></time>
+        
+  
+    <h1 class="title">Linux CPP 类的重载和重写</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E8%BD%BD"><span class="toc-text">重载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E9%87%8D%E8%BD%BD"><span class="toc-text">函数重载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="toc-text">运算符重载</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E5%86%99"><span class="toc-text">重写</span></a></li></ol>
+    </div>
+
+        <h2 id="重载"><a href="#重载" class="headerlink" title="重载"></a>重载</h2><p>c++重载分为函数重载和运算符重载。</p>
+<span id="more"></span>
+
+<p>函数重载条件：</p>
+<ul>
+<li>在同一个类内，函数的参数类型、参数的个数不同，才会构成重载。</li>
+</ul>
+<h3 id="函数重载"><a href="#函数重载" class="headerlink" title="函数重载"></a>函数重载</h3><pre><code>/*************************************************************************
+    &gt; File Name: overload.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 10:04:20 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+class animal
+&#123;
+public:
+    void sing(int song_num);
+    void sing(const char *song_name);
+&#125;;
+
+
+void animal::sing(int song_num)
+&#123;
+    cout &lt;&lt; &quot;song number is &quot; &lt;&lt; song_num &lt;&lt; endl;
+&#125;
+
+
+void animal::sing(const char *song_name)
+&#123;
+    cout &lt;&lt; &quot;song name is &quot; &lt;&lt; song_name &lt;&lt; endl;
+&#125;
+
+
+int main(int argc, char *argv[])
+&#123;
+    animal anm;
+    anm.sing(100);
+    anm.sing(&quot;Just for fun&quot;);
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果是：<br>    # g++ overload.cpp -o overload<br>    # ./overload<br>    song number is 100<br>    song name is Just for fun</p>
+<h3 id="运算符重载"><a href="#运算符重载" class="headerlink" title="运算符重载"></a>运算符重载</h3><p>一个简单的加法重载eg：</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: operator_overload.cpp
+    &gt; Author: Lin
+    &gt; Created Time: Tue 27 Mar 2018 10:17:10 AM EDT
+ ************************************************************************/
+
+#include &lt;iostream&gt;
+using namespace std;
+
+class animal
+&#123;
+private:
+    int sheep_nums;
+    int dog_nums;
+    int cat_nums;
+
+public:
+    void set_nums(int sheep_nums, int dog_nums, int cat_nums);
+    animal operator+(const animal &amp;a);
+    void show();
+
+&#125;;
+
+void animal::set_nums(int sheep_nums, int dog_nums, int cat_nums)
+&#123;
+    this-&gt;cat_nums = cat_nums;
+    this-&gt;sheep_nums = sheep_nums;
+    this-&gt;dog_nums = dog_nums;
+&#125;
+
+animal animal::operator+(const animal&amp; a)
+&#123;
+    animal tmp;
+
+    tmp.cat_nums = this-&gt;cat_nums + a.cat_nums;
+    tmp.dog_nums = this-&gt;dog_nums + a.dog_nums;
+    tmp.sheep_nums = this-&gt;sheep_nums + a.sheep_nums;
+
+    return tmp;
+&#125;
+
+void animal::show()
+&#123;
+    cout &lt;&lt; &quot;sheep nums: &quot; &lt;&lt; sheep_nums \
+        &lt;&lt; &quot;\ndog nums: &quot; &lt;&lt; dog_nums \
+        &lt;&lt; &quot;\ncat nums: &quot; &lt;&lt; cat_nums &lt;&lt; endl;
+&#125;
+
+
+int main(int agrc ,char **argv)
+&#123;
+    animal a1;
+    animal a2;
+    animal a3;
+
+    a1.set_nums(1,2,3);
+    a2.set_nums(10, 20, 30);
+    a3 = a1+ a2;
+    a3.show();
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果：</p>
+<pre><code># g++ operator_overload.cpp  -o operator_overload
+# ./operator_overload
+sheep nums: 11
+dog nums: 22
+cat nums: 33
+</code></pre>
+<h2 id="重写"><a href="#重写" class="headerlink" title="重写"></a>重写</h2><p>重写override：也叫做覆盖。子类重新定义父类中有相同名称和参数的虚函数。函数特征相同。但是具体实现不同，主要是在继承关系中出现的 。<br>重写需要注意：</p>
+<ol>
+<li><p> 被重写的函数不能是static的。必须是virtual的</p>
+</li>
+<li><p> 重写函数必须有相同的类型，名称和参数列表</p>
+</li>
+<li><p>重写函数的访问修饰符可以不同。尽管virtual是private的，派生类中重写改写为public,protected也是可以的。</p>
+<p> /*************************************************************************</p>
+<pre><code> &gt; File Name: override.cpp
+ &gt; Author: Lin
+ &gt; Created Time: Tue 27 Mar 2018 10:40:42 AM EDT
+</code></pre>
+<p>  ************************************************************************/</p>
+<p> #include <iostream><br> using namespace std;</p>
+<p> class animal<br> {</p>
+<pre><code> public:
+     void eat()
+     &#123;
+         cout &lt;&lt; &quot;animal eat&quot; &lt;&lt; endl;
+     &#125;
+     virtual void sleep()
+     &#123;
+         cout &lt;&lt; &quot;animal sleep&quot; &lt;&lt; endl;
+     &#125;
+
+     virtual void breath()
+     &#123;
+         cout &lt;&lt; &quot;animal breath&quot; &lt;&lt; endl;
+     &#125;
+</code></pre>
+<p> };</p>
+<p> class cat:public animal<br> {</p>
+<pre><code> public:
+     void breath()
+     &#123;
+         cout &lt;&lt; &quot;cat breath&quot; &lt;&lt; endl;
+     &#125;
+
+     void sleep()
+     &#123;
+         cout &lt;&lt; &quot;cat sleep&quot; &lt;&lt; endl;
+     &#125;
+</code></pre>
+<p> };</p>
+<p> int main(int argc ,char **argv)<br> {</p>
+<pre><code> cat c;
+ c.breath();
+ c.sleep();
+ c.eat();
+ return 0;
+</code></pre>
+<p> }</p>
+</li>
+</ol>
+<p>编译：</p>
+<pre><code># g++ override.cpp  -o override
+# ./override
+cat breath
+cat sleep
+animal eat
+</code></pre>
+<p>还有一种是重定义，又叫隐藏。</p>
+<p>1 成员函数重载特征：</p>
+<pre><code>相同的范围（在同一个类中）
+函数名字相同
+参数不同
+virtual关键字可有可无
+</code></pre>
+<p>2 重写（覆盖)是指派生类函数覆盖基类函数，特征是：</p>
+<pre><code>不同的范围，分别位于基类和派生类中
+函数的名字相同
+参数相同
+基类函数必须有virtual关键字
+</code></pre>
+<p>3 重定义(隐藏)是指派生类的函数屏蔽了与其同名的基类函数，规则如下：</p>
+<pre><code>如果派生类的函数和基类的函数同名，但是参数不同，此时，不管有无virtual，基类的函数被隐藏。
+如果派生类的函数与基类的函数同名，并且参数也相同，但是基类函数没有vitual关键字，此时，基类的函数被隐藏。
+</code></pre>
+<p>函数重载，函数重写，函数重定义。</p>
+<ul>
+<li><p>函数重载是在一个类内，函数名，返回值相同，参数列表不同</p>
+</li>
+<li><p>函数重写是在基类和派生类中，函数名，返回值，参数列表相同，基类的函数声明为virtual类型。</p>
+</li>
+<li><p>函数隐藏或函数重定义是发生在基类和派生类中，函数名，返回值，参数列表相同，基类的函数类型不需要virtual。</p>
+</li>
+</ul>
+<p>基类声明的纯虚函数，在派生类中必须实现。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/01-CPP-基础/">01. CPP 基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

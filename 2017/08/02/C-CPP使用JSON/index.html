@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C-CPP使用JSON | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1. Json什么是JSONJSON是一种取代XML的数据结构，和xml相比，它更小巧但描述能力却不差,由于它的小巧所以网络传输数据将减少更多流量从而加快速度。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C-CPP使用JSON"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-02T13:21:35.000Z"><a href="/2017/08/02/C-CPP使用JSON/">2017-08-02</a></time>
+        
+  
+    <h1 class="title">C-CPP使用JSON</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Json"><span class="toc-text">1. Json</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Jsoncpp"><span class="toc-text">Jsoncpp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E7%82%B9"><span class="toc-text">特点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E7%BA%BF%E5%AE%89%E8%A3%85"><span class="toc-text">在线安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E5%AF%B9%E8%B1%A1%E5%92%8C%E6%95%B0%E7%BB%84"><span class="toc-text">解析对象和数组</span></a></li></ol>
+    </div>
+
+        <h3 id="1-Json"><a href="#1-Json" class="headerlink" title="1. Json"></a>1. Json</h3><p>什么是JSON<br>JSON是一种取代XML的数据结构，和xml相比，它更小巧但描述能力却不差,由于它的小巧所以网络传输数据将减少更多流量从而加快速度。</p>
+<span id="more"></span>
+
+
+<p>JSON就是一串字符串 只不过元素会使用特定的符号标注。</p>
+<p>{} 双括号表示对象</p>
+<p>[] 中括号表示数组</p>
+<p>“” 双引号内是属性或值</p>
+<p>: 冒号表示后者是前者的值(这个值可以是字符串、数字、也可以是另一个数组或对象)</p>
+<p>所以 {“name”: “Michael”} 可以理解为是一个包含name为Michael的对象</p>
+<p>而[{“name”: “Michael”},{“name”: “Jerry”}]就表示包含两个对象的数组</p>
+<p>当然了，你也可以使用{“name”:[“Michael”,”Jerry”]}来简化上面一部,这是一个拥有一个name数组的对象</p>
+<p>下面是一个json的实例：</p>
+<p>{<br>    “company”: “google”,<br>    “people”: [<br>        {<br>            “firstName”: “Brett”,<br>            “lastName”: “McLaughlin”,<br>            “age”: 100<br>        },<br>        {<br>            “firstName”: “Jason”,<br>            “lastName”: “Hunter”,<br>            “age”: 80<br>        }<br>    ]<br>}</p>
+<h3 id="Jsoncpp"><a href="#Jsoncpp" class="headerlink" title="Jsoncpp"></a>Jsoncpp</h3><p>Jsoncpp是一个使用C++语言实现的面向对象的json库。</p>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><ol>
+<li>读写JSON文件。</li>
+<li>读JSON文件时，可以将C++风格的注释读取到JSON元素中。</li>
+<li>重写JSON文件，保留原始注释。</li>
+</ol>
+<p>注意：注释以前在JSON中受支持，但由于可移植性而被删除（Python不支持类似C的注释）。由于注释在配置/输入文件中很有用，因此保留了此功能。</p>
+<p>Jsoncpp提供的接口中有3个核心类：Reader、Writer、Value。<br>Reader类负责从字符串或者输入流中加载JSON文档，并进行解析，生成代表JSON文档的Value对象。<br>Writer类负责将内存中的Value对象转换成JSON文档，输出到文件或者是字符串中。<br>Value类的对象代表一个JSON值，既可以代表一个文档，也可以代表文档中一个值。如同JSON中定义的”值”一样，Value是递归的。</p>
+<h3 id="在线安装"><a href="#在线安装" class="headerlink" title="在线安装"></a>在线安装</h3><pre><code># centos
+yum install jsoncpp
+yum install jsoncpp-devel
+# ubuntu
+apt-get install libjsoncpp-dev
+</code></pre>
+<h3 id="解析对象和数组"><a href="#解析对象和数组" class="headerlink" title="解析对象和数组"></a>解析对象和数组</h3><pre><code>#include &lt;iostream&gt;
+#include &lt;jsoncpp/json/value.h&gt;
+#include &lt;string&gt;
+#include &lt;jsoncpp/json/json.h&gt;
+using namespace std;
+
+
+int main()
+&#123;
+
+    string str_array = &quot;&#123;\&quot;people\&quot;:[&#123;\&quot;firstName\&quot;:\&quot;Brett\&quot;,\&quot;lastName\&quot;:\&quot;McLaughlin\&quot;,\&quot;age\&quot;:100&#125;,&#123;\&quot;firstName\&quot;:\&quot;Jason\&quot;,\&quot;lastName\&quot;:\&quot;Hunter\&quot;,\&quot;age\&quot;:80&#125;]&#125;&quot;;
+    string str = &quot;&#123;\&quot;firstName\&quot;:\&quot;Brett\&quot;,\&quot;lastName\&quot;:\&quot;McLaughlin\&quot;&#125;&quot;;
+
+
+    Json::Reader reader;
+    Json::Value root;
+    if (reader.parse(str_array, root))
+    &#123;
+        string json_pp = root[&quot;people&quot;].toStyledString();
+        
+        // 打印people字段信息
+        cout &lt;&lt; &quot;打印people字段信息&quot; &lt;&lt; endl;
+        cout &lt;&lt; json_pp &lt;&lt; endl;
+        
+        
+        Json::Reader reader_pp;
+        Json::Value root_pp;
+        if (reader_pp.parse(json_pp, root_pp))
+        &#123;
+            cout &lt;&lt; &quot;打印people各个字段信息&quot; &lt;&lt; endl;
+            cout &lt;&lt; root_pp.toStyledString() &lt;&lt; endl;
+            for(int i = 0; i &lt; root_pp.size();i++)
+            &#123;
+                Json::Value obj = root_pp[i];
+                
+                cout &lt;&lt; &quot;第&quot; &lt;&lt; i &lt;&lt; &quot;字段信息是：&quot;&lt;&lt; endl;
+                cout &lt;&lt; &quot;firstName&quot; &lt;&lt; obj[&quot;firstName&quot;].asString()&lt;&lt; endl;
+                cout &lt;&lt; &quot;lastName&quot; &lt;&lt; obj[&quot;lastName&quot;].asString()&lt;&lt; endl;
+                cout &lt;&lt; &quot;age&quot; &lt;&lt; obj[&quot;age&quot;].asInt()&lt;&lt; endl;
+            &#125;
+            
+        &#125;
+
+    &#125;
+
+    &#123;
+        Json::Reader reader;
+        Json::Value root;
+        if (reader.parse(str, root))  // reader将Json字符串解析到root，root将包含Json里所有子元素
+        &#123;
+
+            cout &lt;&lt; &quot;移除对象前&quot;&lt;&lt; endl;
+            cout &lt;&lt; root.toStyledString() &lt;&lt; endl;
+
+            if(root.isMember(&quot;lastName&quot;))
+            &#123;
+                root.removeMember(&quot;lastName&quot;);
+                cout &lt;&lt; &quot;移除对象后&quot;&lt;&lt; endl;
+                cout &lt;&lt; root.toStyledString() &lt;&lt; endl;
+
+            &#125;
+            
+            cout &lt;&lt; &quot;添加对象数组前&quot;&lt;&lt; endl;
+            Json::Value toproot(Json::arrayValue);
+            toproot.append(root);
+            Json::Value subroot;
+            subroot[&quot;firstName&quot;] = &quot;zhangsan&quot;;
+            subroot[&quot;lastName&quot;] = &quot;lisi&quot;;
+            
+            toproot.append(subroot);
+            cout &lt;&lt; toproot.toStyledString() &lt;&lt; endl;
+    
+        &#125;
+
+    &#125;
+&#125;
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/C/">C</a>, <a href="/tags/cJSON/">cJSON</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Centos7-Vim配置 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="根据原作者做了部分修改，留作自己使用。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Centos7-Vim配置"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2018-04-14T07:15:10.000Z"><a href="/2018/04/14/Centos7-Vim配置/">2018-04-14</a></time>
+        
+  
+    <h1 class="title">Centos7-Vim配置</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E5%85%A8%E6%96%B0%E5%AE%89%E8%A3%85VIM"><span class="toc-text">1、全新安装VIM</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E4%B8%8B%E8%BD%BDYCM%E6%8F%92%E4%BB%B6"><span class="toc-text">2、下载YCM插件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E5%AE%89%E8%A3%85-vimrc%E7%9B%B8%E5%85%B3%E7%9A%84%E4%BE%9D%E8%B5%96%E5%8C%85"><span class="toc-text">3、安装.vimrc相关的依赖包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81%E5%AE%89%E8%A3%85%E6%89%80%E6%9C%89%E6%8F%92%E4%BB%B6"><span class="toc-text">4、安装所有插件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5%E3%80%81%E8%AF%A5%E6%8F%92%E4%BB%B6%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">5、该插件的快捷键</span></a></li></ol>
+    </div>
+
+        <p>根据<a target="_blank" rel="noopener" href="https://github.com/yangyangwithgnu/use_vim_as_ide">原作者</a>做了部分修改，留作自己使用。</p>
+<span id="more"></span>
+<p>Operating Sysytem    :Centos 7.4<br>Architecture        ：x86_64</p>
+<h4 id="1、全新安装VIM"><a href="#1、全新安装VIM" class="headerlink" title="1、全新安装VIM"></a>1、全新安装VIM</h4><p>现在官网YCM要求vim的最低版本为7.4.1578。<a target="_blank" rel="noopener" href="https://github.com/Valloric/YouCompleteMe">官网地址</a></p>
+<p>首先查看vim版本，如果自带的vim太低，需编译安装。</p>
+<p>1、首先查看vim版本，现在要求的最低版本是7.4.1578,如果低于这个版本，需要源码编译vim</p>
+<pre><code>//查看vim版本
+# vim -version
+</code></pre>
+<p>源码编译vim，但是需要先安装依赖包</p>
+<pre><code># yum install -y ruby ruby-devel lua lua-devel luajit \
+    luajit-devel ctags git python python-devel tcl-devel \
+    perl perl-devel perl-ExtUtils-ParseXS \
+    perl-ExtUtils-XSpp perl-ExtUtils-CBuilder \
+    perl-ExtUtils-Embed ncurses-devel gcc gcc-c++ cmake automake
+</code></pre>
+<p>现在vim源码</p>
+<pre><code># cd ~
+# git clone https://github.com/vim/vim.git
+# cd vim
+</code></pre>
+<p>条件预编译</p>
+<pre><code># ./configure --with-features=huge --enable-multibyte  \
+    --enable-rubyinterp=yes --enable-pythoninterp=yes \
+    --with-python-config-dir=/usr/lib64/python2.7/config \
+    --enable-python3interp=yes --enable-perlinterp=yes \
+    --enable-luainterp=yes --enable-gui=gtk2 --enable-cscope \
+    --prefix=/usr/local
+</code></pre>
+<p><code>--with-python-config-dir=/usr/lib64/python2.7/config</code>需要选对路径,如果需要python3，选择如下配置项<code>--with-python3-config-dir=/usr/lib64/python3.5/config</code>,但是python版本只能选择其中的一个。</p>
+<p>编译，安装。</p>
+<pre><code># make VIMRUNTIMEDIR=/usr/local/share/vim/vim80
+# make install
+</code></pre>
+<p>设置默认编辑器（Set vim as your default editor with update-alternatives）</p>
+<pre><code># sudo update-alternatives --install /usr/bin/editor editor /usr/local/bin/vim 1
+# sudo update-alternatives --set editor /usr/local/bin/vim
+# sudo update-alternatives --install /usr/bin/vi vi /usr/local/bin/vim 1
+# sudo update-alternatives --set vi /usr/local/bin/vim
+</code></pre>
+<h4 id="2、下载YCM插件"><a href="#2、下载YCM插件" class="headerlink" title="2、下载YCM插件"></a>2、下载YCM插件</h4><p>由于使用bundle安装太慢，所以下载下来。</p>
+<p>先安装Vundle，管理vim插件。</p>
+<pre><code># git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+</code></pre>
+<p>下载YCM</p>
+<pre><code># git clone https://github.com/Valloric/YouCompleteMe.git ~/.vim/bundle/YouCompleteMe
+</code></pre>
+<p>下载完成后，编译。</p>
+<pre><code># cd ~/.vim/bundle/YouCompleteMe
+# ./install.py --java-completer --js-completer --go-completer  --clang-completer --rust-completer
+</code></pre>
+<p>编译选项</p>
+<pre><code>--clang-completer     Enable C-family semantic completion engine.
+--go-completer        Enable Go semantic completion engine.
+--rust-completer      Enable Rust semantic completion engine.
+--js-completer        Enable JavaScript semantic completion engine.
+--java-completer      Enable Java semantic completion engine.
+</code></pre>
+<h4 id="3、安装-vimrc相关的依赖包"><a href="#3、安装-vimrc相关的依赖包" class="headerlink" title="3、安装.vimrc相关的依赖包"></a>3、安装.vimrc相关的依赖包</h4><pre><code># yum install clang libstdc++-devel libstdc++-docs wmctrl man-pages
+</code></pre>
+<ul>
+<li>clang                编译器</li>
+<li>libstdc++-docs    System api Document</li>
+<li>wmctrl            分屏软件</li>
+<li>man-pages            man guide</li>
+</ul>
+<h4 id="4、安装所有插件"><a href="#4、安装所有插件" class="headerlink" title="4、安装所有插件"></a>4、安装所有插件</h4><p>将我原作者提供的.vimrc放到 ~ 目录下面。</p>
+<p>在vim命令模式下执行<br><code>:BundleInstall</code></p>
+<p>当出现<code>Done! </code>.安装完成。</p>
+<h4 id="5、该插件的快捷键"><a href="#5、该插件的快捷键" class="headerlink" title="5、该插件的快捷键"></a>5、该插件的快捷键</h4><p>1、代码折叠</p>
+<pre><code>操作：za，打开或关闭当前折叠；zM，关闭所有折叠；zR，打开所有折叠。
+</code></pre>
+<p>2、*.cpp 和 *.h 间切换</p>
+<pre><code>键入 ;sw 就能在实现文件和接口文件间切换
+</code></pre>
+<p>3、代码收藏</p>
+<p> vim 命令模式下键入</p>
+<pre><code>:echo has(&#39;signs&#39;)
+</code></pre>
+<p>常用的操作也就如下几类：</p>
+<ul>
+<li>书签设定。mx，设定/取消当前行名为 x 的标签；m,，自动设定下一个可用书签名，前面提说，独立书签名是不能重复的，在你已经有了多个独立书签，当想再设置书签时，需要记住已经设定的所有书签名，否则很可能会将已有的书签冲掉，这可不好，所以，vim-signature 为你提供了 m, 快捷键，自动帮你选定下一个可用独立书签名；mda，删除当前文件中所有独立书签。</li>
+</ul>
+<ul>
+<li>书签罗列。m?，罗列出当前文件中所有书签，选中后回车可直接跳转；</li>
+</ul>
+<ul>
+<li>书签跳转。mn，按行号前后顺序，跳转至下个独立书签；mp，按行号前后顺序，跳转至前个独立书签。书签跳转方式很多，除了这里说的行号前后顺序，还可以基于书签名字母顺序跳转、分类书签同类跳转、分类书签不同类间跳转等等。</li>
+</ul>
+<p>4、标识符列表</p>
+<p>标签系统</p>
+<p><code>ctags -R --c++-kinds=+p+l+x+c+d+e+f+g+m+n+s+t+u+v --fields=+liaS --extra=+q --language-force=c++</code></p>
+<p>打开一个 C/C++ 源码文件，键入 ilt，将在左侧的 tagbar 窗口中将可看到标签列表</p>
+<p>5、代码开发</p>
+<p>快速开关注释<br>常用操作：</p>
+<ul>
+<li><leader>cc，注释当前选中文本，如果选中的是整行则在每行首添加 //，如果选中一行的部分内容则在选中部分前后添加分别 /、/；</li>
+</ul>
+<ul>
+<li><leader>cu，取消选中文本块的注释。<br>6、代码跳转</li>
+</ul>
+<p><code>Ctrl + ]</code>  查看函数原型和定义<br><code>Ctrl + o</code>  返回函数跳转的位置</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/05-Linux-Operation/">05. Linux Operation</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/vim/">vim</a>, <a href="/tags/环境搭建/">环境搭建</a>, <a href="/tags/Centos7/">Centos7</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

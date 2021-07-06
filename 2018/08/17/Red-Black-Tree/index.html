@@ -1,0 +1,766 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Red Black Tree | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1. Concept">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Red Black Tree"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2018-08-17T15:04:07.000Z"><a href="/2018/08/17/Red-Black-Tree/">2018-08-17</a></time>
+        
+  
+    <h1 class="title">Red Black Tree</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Concept"><span class="toc-text">1. Concept</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Operations"><span class="toc-text">2. Operations</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-Insert"><span class="toc-text">2.1 Insert</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-Removal"><span class="toc-text">2.2 Removal</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+        <h2 id="1-Concept"><a href="#1-Concept" class="headerlink" title="1. Concept"></a>1. Concept</h2><span id="more"></span>
+
+<p>为什么还需要红黑树。那是因为在最坏的情况下，二叉查找树会变成链表。</p>
+<p>首先红黑树是每个节点都带有颜色属性的二叉查找树，颜色不是黑色就是红色。红黑树除了满足二叉查找树的性质意外，还需要满足以下要求：</p>
+<ul>
+<li>所有节点是红色或黑色。</li>
+<li>根是黑色。</li>
+<li>所有叶子节点都是黑色（叶子是NIL节点）。叶子节点是没有数据的。</li>
+<li>每个红色节点必须有两个黑色的子节点。（从每个叶子到根的所有路径上不能有两个连续的红色节点。）</li>
+<li>从任一节点到其每个叶子的所有简单路径都包含相同数目的黑色节点。</li>
+</ul>
+<p>红黑树也是自平衡二叉树，所以它也具有自平衡二叉树的性质。时间复杂度是O(log n)。</p>
+<p>一个节点的深度是指从其根节点起，到达它一共需经过的父节点数目。<br>处于树底层的节点（再也没有子节点）成为叶子节点。<br>一个树的高度是指树中的处于最底层节点的深度。</p>
+<p>自平衡二叉搜索树(self-balance binary search tree)具有以下性质，它是一颗空树或它的左右子树的高度差的绝对值不超过1.<br>它的时间复杂度也是O(log n)。</p>
+<h2 id="2-Operations"><a href="#2-Operations" class="headerlink" title="2. Operations"></a>2. Operations</h2><p>RBT的难点在于它的插入和删除的时候，如何继续保持上面的五条性质。如果会了如何插入一个节点，那么删除节点也就会了。</p>
+<p>插入一个节点分很多种情况，最详细的解释相见<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Red-black_tree">Wiki</a>。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: rb.c
+    &gt; Author: Lin
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+
+#define BLACK   0
+#define RED     1
+
+
+typedef struct node
+&#123;
+    struct node* lchild, *rchild, *parent;
+    int colour;
+    void *data;
+&#125;rb_node;
+
+
+
+rb_node *init_tree(void * data)
+&#123;
+    rb_node *root = NULL;
+
+
+    root = malloc(sizeof(rb_node));
+
+    if(root == NULL )
+        goto out;
+
+    root-&gt;colour = BLACK;
+    root-&gt;data   = data;
+    root-&gt;lchild = NULL;
+    root-&gt;rchild = NULL;
+    root-&gt;parent = NULL;
+
+out:
+    return root;
+&#125;
+
+rb_node *get_parent(rb_node *node)
+&#123;
+    return node-&gt;parent;
+&#125;
+
+rb_node *get_grandparent(rb_node *node)
+&#123;
+    if (node-&gt;parent != NULL)
+        return get_parent(node-&gt;parent);
+    else
+        return NULL;
+&#125;
+
+rb_node *get_brother(rb_node *node)
+&#123;
+    rb_node *parent = get_parent(node);
+
+    if(parent != NULL)
+    &#123;
+        if (parent-&gt;lchild = node)
+            return parent-&gt;rchild;
+        else
+            return parent-&gt;lchild;
+    &#125;
+    else
+        return NULL;
+&#125;
+
+rb_node *get_uncle(rb_node *node)
+&#123;
+    rb_node *parent = get_parent(node);
+
+    if(parent != NULL)
+        return get_brother(parent);
+    else
+        return NULL;
+
+&#125;
+
+/**********************************************************
+
+            4
+          /   \
+         2     6
+       /  \   / \
+      1   3  5   8
+                / \
+               7   9
+
+2 rotate_left
+after:
+             4
+           /  \
+          3    6
+         /    / \
+        2    5   8
+       /        / \
+      1        7   9
+6 rotate_left
+after:
+            4
+          /  \  
+         2    8
+        / \  / \
+       1  3 6   9
+           / \ 
+          5   7
+ *********************************************************/
+void rotate_left(rb_node *node)
+&#123;
+    rb_node *new = node-&gt;rchild;
+    rb_node *parent = get_parent(node);
+
+    // the new can not be null
+    assert(new);
+
+    if (parent != NULL)
+        if(parent-&gt;lchild == node)
+            parent-&gt;lchild = new;
+        else
+            parent-&gt;rchild = new;
+
+    new-&gt;parent = parent;
+    node-&gt;parent = new;
+    new-&gt;lchild = node;
+    node-&gt;rchild = new-&gt;rchild;
+
+&#125;
+
+void rotate_right(rb_node *node)
+&#123;
+    rb_node *new = node-&gt;lchild;
+    rb_node *parent = get_parent(node);
+
+    assert(new);
+
+    if (parent != NULL)
+    &#123;
+        if (parent-&gt;rchild == node)
+            parent-&gt;rchild = new;
+        else
+            parent-&gt;lchild = new;
+    &#125;
+    new-&gt;parent = parent;
+    node-&gt;parent = new;
+    new-&gt;rchild = node;
+    node-&gt;lchild = new-&gt;lchild;
+
+&#125;
+
+
+rb_node *create_rb_node(void *data)
+&#123;
+    rb_node *node = NULL;
+
+    node = malloc(sizeof(rb_node));
+
+    if(node == NULL)
+        goto out;
+
+    node-&gt;colour = BLACK;
+    node-&gt;data   = data;
+    node-&gt;lchild = NULL;
+    node-&gt;rchild = NULL;
+    node-&gt;parent = NULL;
+
+out:
+
+    return node;
+&#125;
+</code></pre>
+<h4 id="2-1-Insert"><a href="#2-1-Insert" class="headerlink" title="2.1 Insert"></a>2.1 Insert</h4><p>在示意图中插入的节点(Node)用N表示，N的父节点标记为P(Parent)，N的祖父节点标记为G(Grandparent)，N的叔节点标记为U(Uncle)。</p>
+<ul>
+<li>先插入数据，再进行修复。</li>
+</ul>
+<p>修复有4种情况：</p>
+<ul>
+<li>N节点是根节点(root):直接将节点N颜色涂为黑色即可</li>
+<li>N节点的父节点(parent)是黑色:什么也不需要做</li>
+<li>父节点(parent)是红色且N节点的叔节点(U)也是红色:需要将父节点(parent)和叔节点(U)节点涂为黑色，祖父节点(grandparent)涂为红色，然后递归解决问题。</li>
+</ul>
+<p>父节点P是红色同时N的叔叔节点U是红色,那么它们都可以重新绘制为黑色并且祖父母G变为红色以保持属性5（从任何给定节点到其叶节点的所有路径包含相同数量的黑色节点）。 由于通过父或叔叔的任何路径必须通过祖父母，因此这些路径上的黑色节点的数量没有改变。 但是，祖父母G现在可能违反属性2（根是黑色），如果它是根或属性4（每个红色节点的两个子节点都是黑色），如果它有一个红色父节点。 为了解决这个问题，在G上重新运行树的红黑修复程序。递归运算。</p>
+<ul>
+<li>父节点(parent)是红色且N节点的叔节点(U)是黑色:需要两步才能完成</li>
+</ul>
+<ol start="4">
+<li>父节点P是红色同时叔叔节点U是黑色。</li>
+</ol>
+<p>情况4有四种情况，分为①父节点P和N节点不在同一边,②父节点P和N节点在同一边。<br>处理情况4要分两步，先将①父节点P和N节点不在同一边的旋转为②父节点P和N节点在同一边的情况，然后统一处理父节点P和N节点在同一边，变色。</p>
+<p>此时要分两种情况：</p>
+<p>①父节点P和N节点不在同一边。</p>
+<pre><code>        G                            G
+    /        \                  /         \
+  U          P                P           U
+/   \      /   \            /   \       /   \
+Nil Nil    N    Nil         Nil   N     Nil  Nil
+</code></pre>
+<p>②父节点P和N节点在同一边。</p>
+<pre><code>        G                           G
+   /        \                  /         \
+  U          P                P           U
+/   \      /   \            /   \       /   \
+Nil Nil  Nil    N          N    Nil    Nil  Nil
+
+
+rb_node *create_rb_node(void *data,int64_t key)
+&#123;
+    rb_node *node = NULL;
+
+    node = malloc(sizeof(rb_node));
+
+    if(node == NULL)
+        goto out;
+
+    node-&gt;colour = BLACK;
+    node-&gt;data   = data;
+    node-&gt;key    = key;
+    node-&gt;lchild = NULL;
+    node-&gt;rchild = NULL;
+    node-&gt;parent = NULL;
+
+out:
+
+    return node;
+&#125;
+
+
+
+void insert_recurse(rb_node *root,rb_node *node)
+&#123;
+    if (root != NULL)
+    &#123;
+        if(node-&gt;key &gt; root-&gt;key)
+        &#123;
+            if (root-&gt;rchild != NULL)
+            &#123;
+                insert_recurse(root-&gt;rchild,node);
+                return;
+            &#125;
+            else
+            &#123;
+                root-&gt;rchild = node;
+            &#125;
+        &#125;
+        else if(node-&gt;key &lt; root-&gt;key)
+        &#123;
+            if(root-&gt;lchild != NULL)
+            &#123;
+                insert_recurse(root-&gt;lchild,node);
+                return;
+            &#125;
+            else
+            &#123;
+                root-&gt;lchild = node;
+            &#125;
+        &#125;
+    &#125;
+
+    node-&gt;parent = root;
+&#125;
+
+void insert_repair(rb_node *node)
+&#123;
+
+    rb_node *parent = NULL;
+    rb_node *grandparent = NULL;
+    // case 1
+    if(get_parent(node) == NULL)
+    &#123;
+        node-&gt;colour = BLACK;
+    &#125;
+    // case 2
+    else if(get_parent(node)-&gt;colour == BLACK)
+    &#123;
+        return;
+    &#125;
+    // case 3
+    else if((get_parent(node)-&gt;colour == RED) &amp;&amp; (get_uncle(node)-&gt;colour == RED))
+    &#123;
+        get_parent(node)-&gt;colour = BLACK;
+        get_uncle(node)-&gt;colour = BLACK;
+        get_grandparent(node)-&gt;colour = RED;
+        insert_repair(get_grandparent(node));
+    &#125;
+    // case 4
+    else
+    &#123;
+        // step 4.1
+        parent = get_parent(node);
+        grandparent = get_grandparent(node);
+
+        if(node == parent-&gt;rchild &amp;&amp; parent == grandparent-&gt;lchild)
+        &#123;
+            rotate_left(parent);
+            node = node-&gt;lchild;
+        &#125;
+        
+        if(node == parent-&gt;lchild &amp;&amp; parent == grandparent-&gt;rchild)
+        &#123;
+            rotate_right(parent);
+            node = node-&gt;rchild;
+        &#125;
+        // step 4.2
+        // the node parent already change
+        parent = get_parent(node);
+        grandparent = get_grandparent(node);
+
+        if(node == parent-&gt;lchild)
+            rotate_right(grandparent);
+        else
+            rotate_right(grandparent);
+
+        parent-&gt;colour = BLACK;
+        grandparent-&gt;colour = RED;
+    &#125;
+
+&#125;
+
+rb_node *insert(rb_node *root,rb_node *node)
+&#123;
+    // 1. insert new node
+    insert_recurse(root,node);
+
+    // 2. repair the tree
+    insert_repair(node);
+
+    // 3. get the new root to return
+    root = node;
+
+    while (get_parent(root) != NULL)
+        root = get_parent(root);
+
+    return root;
+&#125;
+</code></pre>
+<hr>
+<p>还有一种不好的处理方法</p>
+<p>如果N是P的左子树，首先P向右旋转，</p>
+<pre><code>    G
+ /    \
+P     U
+</code></pre>
+<p>   /<br>   N</p>
+<p>变成</p>
+<pre><code>    G
+  /   \
+ N     G
+        \
+        U
+</code></pre>
+<p>之后再变色，转化为第三种情况后使用递归。</p>
+<p>如果N是P的右子树，首先P向左旋转</p>
+<pre><code>    G
+  /    \
+ P      U
+  \
+   N
+   
+</code></pre>
+<p>变成了</p>
+<pre><code>    G
+  /    \
+ N      U
+/
+</code></pre>
+<p>   P</p>
+<p>N继续向右旋转</p>
+<pre><code>    N
+  /   \
+ P     G
+         \
+          U
+</code></pre>
+<p>之后变色，转化为第三种情况后递归。</p>
+<hr>
+<h4 id="2-2-Removal"><a href="#2-2-Removal" class="headerlink" title="2.2 Removal"></a>2.2 Removal</h4><p>对于二叉查找树，在删除带有两个非叶子儿子的节点的时候，我们要么找到它左子树中的最大节点（前继节点）、要么找到它右子树中的最小元素（后继节点），并把它的值复制到要删除的节点后再删除。</p>
+<p>红黑树也是这样的操作，先找到前继节点，将要删除的节点的值复制到前继节点，则后继节点最多有一个非叶子的儿子。因为只是复制了一个值（没有复制颜色），不违反任何性质，这就把问题简化为如何删除最多有一个儿子的节点的问题。它不关心这个节点是最初要删除的节点还是我们从中复制出值的那个节点。</p>
+<p>我们只需要讨论删除只有一个儿子的节点（如果它两个儿子都为空，即均为叶子，我们任意将其中一个看作它的儿子）。</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD<br>如果我们删除一个<strong>红色节点</strong>（此时该节点的儿子将都为叶子节点），它的父亲和儿子一定是黑色的。所以我们可以简单的用它的黑色儿子替换它，并不会破坏性质3和性质4。通过被删除节点的所有路径只是少了一个红色节点，这样可以继续保证性质5。<br>另一种简单情况是在被删除节点是<strong>黑色</strong>而它的儿子是<strong>红色</strong>的时候。如果只是去除这个黑色节点，用它的红色儿子顶替上来的话，会破坏性质5，但是如果我们重绘它的儿子为黑色，则曾经通过它的所有路径将通过它的黑色儿子，这样可以继续保持性质5。<br>=======<br>如果我们删除一个红色节点（此时该节点的儿子将都为叶子节点），它的父亲和儿子一定是黑色的。所以我们可以简单的用它的黑色儿子替换它，并不会破坏性质3和性质4。通过被删除节点的所有路径只是少了一个红色节点，这样可以继续保证性质5。<br>另一种简单情况是在被删除节点是黑色而它的儿子是红色的时候。如果只是去除这个黑色节点，用它的红色儿子顶替上来的话，会破坏性质5，但是如果我们重绘它的儿子为黑色，则曾经通过它的所有路径将通过它的黑色儿子，这样可以继续保持性质5。</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>d77768478a200a23220a72a5292509b5a2c908ef</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>需要进一步讨论的是在要删除的节点和它的儿子二者都是黑色的时候，这是一种复杂的情况（这种情况下该结点的两个儿子都是叶子结点，否则若其中一个儿子是黑色非叶子结点，另一个儿子是叶子结点，那么从该结点通过非叶子结点儿子的路径上的黑色结点数最小为2，而从该结点到另一个叶子结点儿子的路径上的黑色结点数为1，违反了性质5）。我们首先把要删除的节点替换为它的儿子。出于方便，称呼这个儿子为N（在新的位置上），称呼它的兄弟（它父亲的另一个儿子）为S。在下面的示意图中，我们还是使用P称呼N的父亲，SL称呼S的左儿子，SR称呼S的右儿子。我们将使用下述函数找到兄弟节点： </p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD<br>数据结构可视化网站[<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html]">https://www.cs.usfca.edu/~galles/visualization/Algorithms.html]</a></p>
+<!-- https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91#%E5%88%A0%E9%99%A4 -->
+<p>=======<br><a target="_blank" rel="noopener" href="http://www.tianxiaobo.com/2018/01/11/%E7%BA%A2%E9%BB%91%E6%A0%91%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90/#33-%E5%88%A0%E9%99%A4">http://www.tianxiaobo.com/2018/01/11/%E7%BA%A2%E9%BB%91%E6%A0%91%E8%AF%A6%E7%BB%86%E5%88%86%E6%9E%90/#33-%E5%88%A0%E9%99%A4</a></p>
+<p>{<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91#%E5%88%A0%E9%99%A4}">https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91#%E5%88%A0%E9%99%A4}</a></p>
+<p>删除红黑树的一个节点首先是将红黑树当作是一个二叉查找树，找到该节点，并从该树中删除，然后通过”旋转和着色”来修正该树，使之满足红黑树的条件。</p>
+<p>如果需要删除的节点有两个儿子，那么问题可以被转化成删除另一个只有一个儿子的节点的问题（为了表述方便，这里所指的儿子，为非叶子节点的儿子）。对于二叉查找树，在删除带有两个非叶子儿子的节点的时候，我们要么找到它左子树中的最大元素、要么找到它右子树中的最小元素，并把它的值转移到要删除的节点中（如在这里所展示的那样）。我们接着删除我们从中复制出值的那个节点，它必定有少于两个非叶子的儿子。因为只是复制了一个值（没有复制颜色），不违反任何性质，这就把问题简化为如何删除最多有一个儿子的节点的问题。它不关心这个节点是最初要删除的节点还是我们从中复制出值的那个节点。</p>
+<p>在本文余下的部分中，我们只需要讨论删除只有一个儿子的节点（如果它两个儿子都为空，即均为叶子，我们任意将其中一个看作它的儿子）。如果我们删除一个红色节点（此时该节点的儿子将都为叶子节点），它的父亲和儿子一定是黑色的。所以我们可以简单的用它的黑色儿子替换它，并不会破坏性质3和性质4。通过被删除节点的所有路径只是少了一个红色节点，这样可以继续保证性质5。另一种简单情况是在被删除节点是黑色而它的儿子是红色的时候。如果只是去除这个黑色节点，用它的红色儿子顶替上来的话，会破坏性质5，但是如果我们重绘它的儿子为黑色，则曾经通过它的所有路径将通过它的黑色儿子，这样可以继续保持性质5。</p>
+<p>需要进一步讨论的是在要删除的节点和它的儿子二者都是黑色的时候，这是一种复杂的情况（这种情况下该结点的两个儿子都是叶子结点，否则若其中一个儿子是黑色非叶子结点，另一个儿子是叶子结点，那么从该结点通过非叶子结点儿子的路径上的黑色结点数最小为2，而从该结点到另一个叶子结点儿子的路径上的黑色结点数为1，违反了性质5）。我们首先把要删除的节点替换为它的儿子。出于方便，称呼这个儿子为N（在新的位置上），称呼它的兄弟（它父亲的另一个儿子）为S。在下面的示意图中，我们还是使用P称呼N的父亲，SL称呼S的左儿子，SR称呼S的右儿子。我们将使用下述函数找到兄弟节点：<br>    struct node *<br>    sibling(struct node *n)<br>    {<br>            if(n == n-&gt;parent-&gt;left)<br>                    return n-&gt;parent-&gt;right;<br>            else<br>                    return n-&gt;parent-&gt;left;<br>    }<br>我们可以使用下列代码进行上述的概要步骤，这里的函数replace_node替换child到n在树中的位置。出于方便，在本章节中的代码将假定空叶子被用不是NULL的实际节点对象来表示（在插入章节中的代码可以同任何一种表示一起工作）。</p>
+<pre><code>void
+delete_one_child(struct node *n)
+&#123;
+        /*
+        * Precondition: n has at most one non-null child.
+        */
+        struct node *child = is_leaf(n-&gt;right)? n-&gt;left : n-&gt;right;
+
+        replace_node(n, child);
+        if(n-&gt;color == BLACK)&#123;
+                if(child-&gt;color == RED)
+                        child-&gt;color = BLACK;
+                else
+                        delete_case1 (child);
+        &#125;
+        free (n);
+&#125;
+</code></pre>
+<p>如果N和它初始的父亲是黑色，则删除它的父亲导致通过N的路径都比不通过它的路径少了一个黑色节点。因为这违反了性质5，树需要被重新平衡。有几种情形需要考虑：</p>
+<p>将红黑树当作一颗二叉查找树，找到要删除的节点，将节点删除。这与”删除常规二叉查找树中删除节点的方法是一样的”。<br>分3种情况：<br>① 被删除节点没有儿子，即为叶节点。直接删除该节点。<br>② 被删除节点只有一个儿子。直接删除该节点，并将该节点的唯一子节点来顶替它的位置。<br>③ 被删除节点有两个儿子。那么，先找出它的后继节点；然后把”它的后继节点的内容”复制给”该节点的内容”；之后，删除”它的后继节点”。在这里，后继节点相当于替身，在将后继节点的内容复制给”被删除节点”之后，再将后继节点删除。这样就巧妙的将问题转换为”删除后继节点”的情况了，下面就考虑后继节点。 在”被删除节点”有两个非空子节点的情况下，它的后继节点不可能是双子非空。既然”的后继节点”不可能双子都非空，就意味着”该节点的后继节点”要么没有儿子，要么只有一个儿子。若没有儿子，则按”情况① “进行处理；若只有一个儿子，则按”情况② “进行处理。若一个节点有右子树，那么该节点的后继节点是其右子树中数值最小的节点.</p>
+<p>在示意图中删除的节点(Node)用N表示，N的父节点标记为P(Parent)，N的祖父节点标记为G(Grandparent)，N的叔节点标记为U(Uncle)，N的兄弟节点S。</p>
+<pre><code>void replace_node(struct node* n, struct node* child)
+&#123;
+    child-&gt;parent = n-&gt;parent;
+    if (n == n-&gt;parent-&gt;left)
+        n-&gt;parent-&gt;left = child;
+    else
+        n-&gt;parent-&gt;right = child;
+&#125;
+
+void delete_one_child(struct node* n)
+&#123;
+    /*
+     * Precondition: n has at most one non-leaf child.
+     */
+    struct node* child = is_leaf(n-&gt;right) ? n-&gt;left : n-&gt;right;
+
+    replace_node(n, child);
+    if (n-&gt;color == BLACK)
+    &#123;
+        if (child-&gt;color == RED)
+            child-&gt;color = BLACK;
+        else
+            delete_case1(child);
+    &#125;
+    free(n);
+&#125;
+</code></pre>
+<ol>
+<li><p>N是根节点，直接移除即可（释放内存或其他操作）<br> void delete_case1(struct node* n)<br> {</p>
+<pre><code> if (n-&gt;parent != NULL)
+     delete_case2(n);
+ else
+     return;// other operation such as free memory.
+</code></pre>
+<p> }</p>
+</li>
+<li><p>S是红色。在这种情形下我们在N的父亲上做左旋转，把红色兄弟转换成N的祖父，我们接着对调N的父亲和祖父的颜色。完成这两个操作后，尽管所有路径上黑色节点的数目没有改变，但现在N有了一个黑色的兄弟和一个红色的父亲（它的新兄弟是黑色因为它是红色S的一个儿子），所以我们可以接下去按情形4、情形5或情形6来处理。 </p>
+<p> void delete_case2(struct node* n)<br> {</p>
+<pre><code> struct node* s = sibling(n);
+
+ if (s-&gt;color == RED)
+ &#123;
+     n-&gt;parent-&gt;color = RED;
+     s-&gt;color = BLACK;
+     if (n == n-&gt;parent-&gt;left)
+         rotate_left(n-&gt;parent);
+     else
+         rotate_right(n-&gt;parent);
+ &#125;
+ delete_case3(n);
+</code></pre>
+<p> }</p>
+</li>
+<li><p>N的父亲、S和S的儿子都是黑色的。在这种情形下，我们简单的重绘S为红色。结果是通过S的所有路径，它们就是以前不通过N的那些路径，都少了一个黑色节点。因为删除N的初始的父亲使通过N的所有路径少了一个黑色节点，这使事情都平衡了起来。但是，通过P的所有路径现在比不通过P的路径少了一个黑色节点，所以仍然违反性质5。要修正这个问题，我们要从情形1开始，在P上做重新平衡处理。</p>
+<p>void delete_case3(struct node *n)<br>{</p>
+<pre><code>struct node *s = sibling(n);
+
+if ((n-&gt;parent-&gt;color == BLACK) &amp;&amp; (s-&gt;color == BLACK)
+        &amp;&amp; (s-&gt;left-&gt;color == BLACK) &amp;&amp; (s-&gt;right-&gt;color == BLACK))
+&#123;
+    s-&gt;color = RED;
+    delete_case1(n-&gt;parent);
+&#125;
+else
+    delete_case4(n);
+</code></pre>
+<p>}</p>
+</li>
+<li><p>S和S的儿子都是黑色，但是N的父亲是红色。在这种情形下，我们简单的交换N的兄弟和父亲的颜色。这不影响不通过N的路径的黑色节点的数目，但是它在通过N的路径上对黑色节点数目增加了一，添补了在这些路径上删除的黑色节点。</p>
+<p> void delete_case4(struct node* n)<br> {</p>
+<pre><code> struct node* s = sibling(n);
+
+ if ((n-&gt;parent-&gt;color == RED) &amp;&amp; (s-&gt;color == BLACK)
+         &amp;&amp; (s-&gt;left-&gt;color == BLACK) &amp;&amp; (s-&gt;right-&gt;color == BLACK))
+ &#123;
+     s-&gt;color = RED;
+     n-&gt;parent-&gt;color = BLACK;
+ &#125;
+ else
+     delete_case5(n);
+</code></pre>
+<p> }</p>
+</li>
+</ol>
+<ol start="5">
+<li><p>S是黑色，S的左儿子是红色，S的右儿子是黑色，而N是它父亲的左儿子。在这种情形下我们在S上做右旋转，这样S的左儿子成为S的父亲和N的新兄弟。我们接着交换S和它的新父亲的颜色。所有路径仍有同样数目的黑色节点，但是现在N有了一个黑色兄弟，他的右儿子是红色的，所以我们进入了情形6。N和它的父亲都不受这个变换的影响。<br> void delete_case5(struct node* n)<br> {</p>
+<pre><code> struct node* s = sibling(n);
+
+ if (s-&gt;color == BLACK)
+ &#123; /* this if statement is trivial,
+  due to case 2 (even though case 2 changed the sibling to a sibling&#39;s child,
+  the sibling&#39;s child can&#39;t be red, since no red parent can have a red child). */
+     /* the following statements just force the red to be on the left of the left of the parent,
+      or right of the right, so case six will rotate correctly. */
+     if ((n == n-&gt;parent-&gt;left) &amp;&amp; (s-&gt;right-&gt;color == BLACK)
+             &amp;&amp; (s-&gt;left-&gt;color == RED))
+     &#123; /* this last test is trivial too due to cases 2-4. */
+         s-&gt;color = RED;
+         s-&gt;left-&gt;color = BLACK;
+         rotate_right(s);
+     &#125;
+     else if ((n == n-&gt;parent-&gt;right) &amp;&amp; (s-&gt;left-&gt;color == BLACK)
+             &amp;&amp; (s-&gt;right-&gt;color == RED))
+     &#123;/* this last test is trivial too due to cases 2-4. */
+         s-&gt;color = RED;
+         s-&gt;right-&gt;color = BLACK;
+         rotate_left(s);
+     &#125;
+ &#125;
+ delete_case6(n);
+</code></pre>
+<p> }</p>
+</li>
+</ol>
+<ol start="6">
+<li> S是黑色，S的右儿子是红色，而N是它父亲的左儿子。在这种情形下我们在N的父亲上做左旋转，这样S成为N的父亲（P）和S的右儿子的父亲。我们接着交换N的父亲和S的颜色，并使S的右儿子为黑色。子树在它的根上的仍是同样的颜色，所以性质3没有被违反。但是，N现在增加了一个黑色祖先：要么N的父亲变成黑色，要么它是黑色而S被增加为一个黑色祖父。所以，通过N的路径都增加了一个黑色节点。</li>
+</ol>
+<p>此时，如果一个路径不通过N，则有两种可能性：</p>
+<pre><code>它通过N的新兄弟。那么它以前和现在都必定通过S和N的父亲，而它们只是交换了颜色。所以路径保持了同样数目的黑色节点。
+它通过N的新叔父，S的右儿子。那么它以前通过S、S的父亲和S的右儿子，但是现在只通过S，它被假定为它以前的父亲的颜色，和S的右儿子，它被从红色改变为黑色。合成效果是这个路径通过了同样数目的黑色节点。
+</code></pre>
+<p>在任何情况下，在这些路径上的黑色节点数目都没有改变。所以我们恢复了性质4。在示意图中的白色节点可以是红色或黑色，但是在变换前后都必须指定相同的颜色。 </p>
+<pre><code>void delete_case6(struct node* n)
+&#123;
+    struct node* s = sibling(n);
+
+    s-&gt;color = n-&gt;parent-&gt;color;
+    n-&gt;parent-&gt;color = BLACK;
+
+    if (n == n-&gt;parent-&gt;left)
+    &#123;
+        s-&gt;right-&gt;color = BLACK;
+        rotate_left(n-&gt;parent);
+    &#125;
+    else
+    &#123;
+        s-&gt;left-&gt;color = BLACK;
+        rotate_right(n-&gt;parent);
+    &#125;
+&#125;
+</code></pre>
+<p>同样的，函数调用都使用了尾部递归，所以算法是原地算法。此外，在旋转之后不再做递归调用，所以进行了恒定数目（最多3次）的旋转。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/04-Algorithm/">04. Algorithm</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

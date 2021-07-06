@@ -1,0 +1,738 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>二次打包zabbix-3.0.1.tar.gz打包RPM--SPEC文件详解 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="二次打包zabbix-3.0.1.tar.gz打包RPM
+此教程是将修改的zabbix源码打包成二进制的rpm包">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="二次打包zabbix-3.0.1.tar.gz打包RPM--SPEC文件详解"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-06-25T14:25:35.000Z"><a href="/2017/06/25/二次打包zabbix-3-0-1-tar-gz打包RPM-SPEC文件详解/">2017-06-25</a></time>
+        
+  
+    <h1 class="title">二次打包zabbix-3.0.1.tar.gz打包RPM--SPEC文件详解</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E7%BC%96%E5%86%99SPEC%E6%96%87%E4%BB%B6"><span class="toc-text">2、编写SPEC文件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E3%80%81SPEC%E8%AF%AD%E6%B3%95"><span class="toc-text">2.1、SPEC语法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E3%80%81SPEC%E6%96%87%E4%BB%B6%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%8F%98%E9%87%8F"><span class="toc-text">2.2、SPEC文件中常用的变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E3%80%81SPEC%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="toc-text">2.3、SPEC文件包含</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4%E3%80%81rpmbuild%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-text">2.4、rpmbuild的步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81zabbix-spec%E6%96%87%E4%BB%B6%E6%B3%A8%E9%87%8A"><span class="toc-text">3、zabbix.spec文件注释</span></a></li></ol></li></ol>
+    </div>
+
+        <p>二次打包zabbix-3.0.1.tar.gz打包RPM</p>
+<p>此教程是将修改的zabbix源码打包成二进制的rpm包</p>
+<span id="more"></span>
+
+<p>需要安装的依赖包，在下面的链接中中查找</p>
+<pre><code>http://repo.zabbix.com/non-supported/rhel/6/x86_64/
+</code></pre>
+<p>操作步骤</p>
+<pre><code>#安装rpm-build
+yum install rpm-build
+#创建admin用户
+useradd admin
+#切换admin用户
+su admin
+#创建rpmbuild目录
+mkdir /home/admin/rpmbuild
+#创建工程目录
+mkdir -pv ~/rpmbuild/&#123;BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS&#125;
+#更改rpm-build工作目录
+vi ~/.rpmmacros
+#添加
+%_topdir        /home/admin/rpmbuild
+#获取rpm包
+wget http://repo.zabbix.com/zabbix/3.0/rhel/6/SRPMS/zabbix-3.0.1-2.el6.src.rpm
+#解压源码包
+rpm2cpio zabbix-3.0.1-1.el6.src.rpm |cpio -div
+#准备构建rpm包
+mv zabbix.spec /home/admin/rpmbuild/SPECS
+
+
+mv * /home/admin/rpmbuild/SOURCES
+
+
+#重新打包二进制RPM包
+rpmbuild -bb /home/admin/rpmbuild/SPECS/zabbix.spec
+</code></pre>
+<p>所有的二进制rpm包在RPMS里面</p>
+<pre><code>-bp  #只执行spec的%pre 段(解开源码包并打补丁，即只做准备)
+
+-bc  #执行spec的%pre和%build 段(准备并编译)
+
+-bi  #执行spec中%pre，%build与%install(准备，编译并安装)
+
+-bl  #检查spec中的%file段(查看文件是否齐全)
+
+-ba  #建立源码与二进制包(常用)
+
+-bb  #只建立二进制包(常用)
+
+-bs  #只建立源码包
+</code></pre>
+<p>详解</p>
+<table>
+<thead>
+<tr>
+<th align="center">目录</th>
+<th align="center">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">BUILD</td>
+<td align="center">源代码解压后的存放目录</td>
+</tr>
+<tr>
+<td align="center">RPMS</td>
+<td align="center">制作完成后的RPM包存放目录，里面有与平台相关的子目录</td>
+</tr>
+<tr>
+<td align="center">SOURCES</td>
+<td align="center">收集的源材料，补丁的存放位置</td>
+</tr>
+<tr>
+<td align="center">SPECS</td>
+<td align="center">SPEC文件存放目录</td>
+</tr>
+<tr>
+<td align="center">SRPMS</td>
+<td align="center">存放SRMPS生成的目录</td>
+</tr>
+</tbody></table>
+<h2 id="2、编写SPEC文件"><a href="#2、编写SPEC文件" class="headerlink" title="2、编写SPEC文件"></a>2、编写SPEC文件</h2><h3 id="2-1、SPEC语法"><a href="#2-1、SPEC语法" class="headerlink" title="2.1、SPEC语法"></a>2.1、SPEC语法</h3><pre><code>%define name test  # 名字
+%define version 3.2  #version
+Name: %&#123;name&#125;   #name 就是使用的上面的宏指令
+Version: %&#123;version&#125;   #version 也是使用的上面的宏指令
+</code></pre>
+<h3 id="2-2、SPEC文件中常用的变量"><a href="#2-2、SPEC文件中常用的变量" class="headerlink" title="2.2、SPEC文件中常用的变量"></a>2.2、SPEC文件中常用的变量</h3><p>详细的宏文件在<code>/usr/lib/rpm/macro</code></p>
+<p>|变量|系统目录|<br>|：–|：–|<br>|RPM_BUILD_DIR|/$HOME/rpmbuild/BUILD|<br>|RPM_BUILD_ROOT|/$HOME/rpmbuild/BUILDROOT|<br>|%{_sysconfdir}|/etc|<br>|%{_sbindir}|/usr/sbin|<br>|%{_bindir}|/usr/bin|<br>|%{_datadir}|/usr/share|<br>|%{_mandir}|/usr/share/man|<br>|%{_libdir}|/usr/lib64|<br>|%{_prefix}|/usr|<br>|%{_localstatedir}|/usr/var|</p>
+<h3 id="2-3、SPEC文件包含"><a href="#2-3、SPEC文件包含" class="headerlink" title="2.3、SPEC文件包含"></a>2.3、SPEC文件包含</h3><ul>
+<li>%package段（文件头）： 定义一个子包</li>
+<li>%prep段：这个段是预处理段，通常用来执行一些解开源程序包的命令，为下一步的编译安装作准备。%prep和下面的%build，%install段一样，除了可以执行RPM所定义的宏命令（以%开头）以外，还可以执行SHELL命令，命令可以有很多行，如我们常写的tar解包命令。</li>
+<li>%build段：本段是建立段，所要执行的命令为生成软件包服务，如make 命令。</li>
+<li>%install段：本段是安装段，其中的命令在安装软件包时将执行，如make install命令。</li>
+<li>%files段：本段是文件段，用于定义软件包所包含的文件，分为三类–说明文档（doc），配置文件（config）及执行程序，还可定义文件存取权限，拥有者及组别。</li>
+<li>%changelog段：本段是修改日志段。你可以将软件的每次修改记录到这里，保存到发布的软件包中，以便查询之用。每一个修改日志都有这样一种格式：第一行是：* 星期 月日 年 修改人电子信箱。其中：星期、月份均用英文形式的前3个字母，用中文会报错。接下来的行写的是修改了什么地方，可写多行。一般以减号开始，便于后续的查阅。</li>
+</ul>
+<h3 id="2-4、rpmbuild的步骤"><a href="#2-4、rpmbuild的步骤" class="headerlink" title="2.4、rpmbuild的步骤"></a>2.4、rpmbuild的步骤</h3><pre><code>%prep预处理脚本程序(prep)开始执行&quot;
+%setup
+%build&quot;编译连接脚本程序(build)开始执行&quot;make
+%install&quot;安装脚本程序(install)开始执行&quot;make install
+%clean&quot;建包结束后清理脚本程序(clean)开始执行&quot;
+%pre&quot;安装前执行脚本程序(pre)开始执行&quot;
+%post&quot;安装后执行脚本程序(post)开始执行&quot;
+%preun&quot;卸载前执行脚本程序(preun)开始执行&quot;
+%postun&quot;卸载后执行脚本程序(postun)开始执行&quot;
+%veryfiscript &quot;软件包校验脚本程序(verifyscript)开始执行&quot;
+%triggerin -- xiuwu&quot;软件包安装时触发脚本程序(triggerin)开始执行&quot;
+%triggerun -- yuntaishan &lt; 2.0 &quot;软件包卸载前触发脚本程序(triggerun)开始执行&quot;
+%triggerpostun – dapubu&quot;软件包卸载后触发脚本程序(triggerpostun)开始执行&quot;
+%files
+%defattr (-,root,root)
+%config /etc/funkey.def
+%doc
+%changelog更改日志
+</code></pre>
+<h3 id="3、zabbix-spec文件注释"><a href="#3、zabbix-spec文件注释" class="headerlink" title="3、zabbix.spec文件注释"></a>3、zabbix.spec文件注释</h3><pre><code>Name:        zabbix        #软件包的名字
+Version:    3.0.1        #软件版本号
+Release:     2%&#123;?alphatag:.%&#123;alphatag&#125;&#125;%&#123;?dist&#125;        #软件包释出号。一般我们对该软件包做了一些小的补丁的时候就应该把释出号加1。
+Summary:    The Enterprise-class open source monitoring solution    #用一句话概括该软件包尽量多的信息。
+Group:        Applications/Internet                    #软件包所属类别
+License:    GPLv2+
+URL:        http://www.zabbix.com/                    #软件官网
+Source0:    zabbix-%&#123;version&#125;%&#123;?alphatag:%&#123;alphatag&#125;&#125;.tar.gz    #源程序软件包的名字
+#
+#
+#
+Patch0:        config.patch                #补丁
+#
+#
+#
+
+
+Buildroot:    %&#123;_tmppath&#125;/zabbix-%&#123;version&#125;-%&#123;release&#125;-root-%(%&#123;__id_u&#125; -n)
+#这个是安装或编译时使用的“虚拟目录”，考虑到多用户的环境，一般定义为：%&#123;_tmppath&#125;/%&#123;name&#125;-%&#123;version&#125;-%&#123;release&#125;-root
+#或%&#123;_tmppath&#125;/%&#123;name&#125;-%&#123;version&#125;-%&#123;release&#125;-buildroot-%(%&#123;__id_u&#125; -n&#125;该参数非常重要，后面可使用$RPM_BUILD_ROOT 
+#方式引用。因为在生成rpm的过程中，执行make install时就会把软件安装到上述的路径中，在打包的时候，同样依赖&quot;虚拟目录&quot;为&quot;根目录&quot;进行操作。
+
+
+
+
+
+
+%if 0%&#123;?rhel&#125; &gt;=6
+%define build_server 1
+%endif
+
+
+BuildRequires:    mysql-devel         #该rpm包所依赖的软件包名称
+#
+#
+#
+
+
+%description
+Zabbix is the ultimate enterprise-level software designed for
+real-time monitoring of millions of metrics collected from tens of
+thousands of servers, virtual machines and network devices.
+
+
+%package agent        #定义一个子包
+Summary:            Zabbix Agent
+Group:                Applications/Internet
+Requires:            logrotate
+Requires(pre):        /usr/sbin/useradd
+%if 0%&#123;?rhel&#125; &gt;= 7
+Requires(post):        systemd
+Requires(preun):    systemd
+Requires(preun):    systemd
+%else
+Requires(post):        /sbin/chkconfig
+Requires(preun):    /sbin/chkconfig
+Requires(preun):    /sbin/service
+Requires(postun):    /sbin/service
+%endif
+Obsoletes:            zabbix
+#在系统上存在某“能力”时，系统再安装相同能力的软件包，就会引发RPM包冲突(conflicts)。同时，当一个新版本的RPM包提供比其老版本的更新的“能力”时，就会导致原来“能力”的废弃(obsoletes)
+
+
+
+
+%description agent
+Zabbix agent to be installed on monitored systems.
+
+
+#
+#
+#
+
+
+
+
+
+
+%prep  #预处理
+%setup0 -q -n zabbix-%&#123;version&#125;%&#123;?alphatag:%&#123;alphatag&#125;&#125; #把源码包解压并放好
+%patch0 -p1
+%patch1 -p1
+%if 0%&#123;?rhel&#125; &gt;= 7
+%patch2 -p1
+%endif
+%patch10 -p1
+###############################################################################################
+%setup 不加任何选项，仅将软件包打开。 
+%setup -n newdir 将软件包解压在newdir目录。 
+%setup -c 解压缩之前先产生目录。 
+%setup -b num 将第num个source文件解压缩。 
+%setup -T 不使用default的解压缩操作。 
+%setup -T -b 0 将第0个源代码文件解压缩。 
+%setup -c -n newdir 指定目录名称newdir，并在此目录产生rpm套件。 
+%patch 最简单的补丁方式，自动指定patch level。 
+%patch 0 使用第0个补丁文件，相当于%patch ?p 0。 
+%patch -s 不显示打补丁时的信息。 
+%patch -T 将所有打补丁时产生的输出文件删除。
+###############################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+## remove font file
+rm -f frontends/php/fonts/DejaVuSans.ttf
+
+
+# remove .htaccess files
+rm -f frontends/php/app/.htaccess
+rm -f frontends/php/conf/.htaccess
+rm -f frontends/php/include/.htaccess
+rm -f frontends/php/local/.htaccess
+
+
+# remove translation source files and scripts
+find frontend/php/locale -name &#39;*.po&#39; | xargs rm -f
+find frontend/php/locale -name &#39;*.sh&#39; | xargs rm -f
+
+
+# traceroute command path for global script
+sed -i -e &#39;s|/usr/bin/traceroute|/bin/traceroute|&#39; database/mysql/data.sql
+sed -i -e &#39;s|/usr/bin/traceroute|/bin/traceroute|&#39; database/postgresql/data.sql
+sed -i -e &#39;s|/usr/bin/traceroute|/bin/traceroute|&#39; database/sqlite3/data.sql
+
+
+# change log directory for Java Gateway
+sed -i -e &#39;s|/tmp/zabbix_java.log|/var/log/zabbix/zabbix_java_gateway.log|g&#39; src/zabbix_java/lib/logback.xml
+
+
+%if 0%&#123;?build_server&#125;
+# copy sql files for servers
+cat database/mysql/schema.sql &gt; database/mysql/create.sql
+cat database/mysql/images.sql &gt;&gt; database/mysql/create.sql
+cat database/mysql/data.sql &gt;&gt; database/mysql/create.sql
+gzip database/mysql/create.sql
+
+
+cat database/postgresql/schema.sql &gt; database/postgresql/create.sql
+cat database/postgresql/images.sql &gt;&gt; database/postgresql/create.sql
+cat database/postgresql/data.sql &gt;&gt; database/postgresql/create.sql
+gzip database/postgresql/create.sql
+%endif
+
+
+# sql files for proxyes
+gzip database/mysql/schema.sql
+gzip database/postgresql/schema.sql
+gzip database/sqlite3/schema.sql
+
+
+
+
+%build
+#建立阶段如make
+build_flags=&quot;
+    --enable-dependency-tracking
+    --sysconfdir=/etc/zabbix
+    --libdir=%&#123;_libdir&#125;/zabbix
+    --enable-agent
+    --enable-proxy
+    --enable-ipv6
+    --enable-java
+    --with-net-snmp
+    --with-ldap
+    --with-libcurl
+    --with-openipmi
+    --with-unixodbc
+    --with-ssh2
+    --with-libxml2
+&quot;
+
+
+%if 0%&#123;?rhel&#125; &gt;=6
+build_flags=&quot;$build_flags --with-openssl&quot;
+%endif
+
+
+%if 0%&#123;?build_server&#125;
+build_flags=&quot;$build_flags --enable-server --with-jabber&quot;
+%endif
+
+
+%configure $build_flags --with-mysql
+make %&#123;?_smp_mflags&#125;
+%if 0%&#123;?build_server&#125;
+mv src/zabbix_server/zabbix_server src/zabbix_server/zabbix_server_mysql
+%endif
+mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_mysql
+
+
+%configure $build_flags --with-postgresql
+make %&#123;?_smp_mflags&#125;
+%if 0%&#123;?build_server&#125;
+mv src/zabbix_server/zabbix_server src/zabbix_server/zabbix_server_pgsql
+%endif
+mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_pgsql
+
+
+%configure $build_flags --with-sqlite3
+make %&#123;?_smp_mflags&#125;
+%if 0%&#123;?build_server&#125;
+mv src/zabbix_server/zabbix_server src/zabbix_server/zabbix_server_sqlite3
+%endif
+mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_sqlite3
+
+
+%if 0%&#123;?build_server&#125;
+touch src/zabbix_server/zabbix_server
+%endif
+touch src/zabbix_proxy/zabbix_proxy
+
+
+
+
+
+
+%install    #安装阶段
+
+
+rm -rf $RPM_BUILD_ROOT
+
+
+# install
+make DESTDIR=$RPM_BUILD_ROOT install
+
+
+# install necessary directories
+mkdir -p $RPM_BUILD_ROOT%&#123;_localstatedir&#125;/log/zabbix
+mkdir -p $RPM_BUILD_ROOT%&#123;_localstatedir&#125;/run/zabbix
+
+
+# install server and proxy binaries
+%if 0%&#123;?build_server&#125;
+rm src/zabbix_server/zabbix_server_sqlite3
+install -m 0755 -p src/zabbix_server/zabbix_server_* $RPM_BUILD_ROOT%&#123;_sbindir&#125;/
+rm $RPM_BUILD_ROOT%&#123;_sbindir&#125;/zabbix_server
+%endif
+install -m 0755 -p src/zabbix_proxy/zabbix_proxy_* $RPM_BUILD_ROOT%&#123;_sbindir&#125;/
+rm $RPM_BUILD_ROOT%&#123;_sbindir&#125;/zabbix_proxy
+
+
+# delete unnecessary files from java gateway
+rm $RPM_BUILD_ROOT%&#123;_sbindir&#125;/zabbix_java/settings.sh
+rm $RPM_BUILD_ROOT%&#123;_sbindir&#125;/zabbix_java/startup.sh
+rm $RPM_BUILD_ROOT%&#123;_sbindir&#125;/zabbix_java/shutdown.sh
+
+
+# install scripts and modules directories
+mkdir -p $RPM_BUILD_ROOT/usr/lib/zabbix
+%if 0%&#123;?build_server&#125;
+mv $RPM_BUILD_ROOT%&#123;_datadir&#125;/zabbix/alertscripts $RPM_BUILD_ROOT/usr/lib/zabbix
+%endif
+mv $RPM_BUILD_ROOT%&#123;_datadir&#125;/zabbix/externalscripts $RPM_BUILD_ROOT/usr/lib/zabbix
+#
+#
+#
+
+
+
+
+%if 0%&#123;?build_server&#125;
+# install frontend files
+find frontends/php -name &#39;*.orig&#39; | xargs rm -f
+cp -a frontends/php/* $RPM_BUILD_ROOT%&#123;_datadir&#125;/zabbix
+
+
+# install frontend configuration files
+mkdir -p $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/web
+touch $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/web/zabbix.conf.php
+mv $RPM_BUILD_ROOT%&#123;_datadir&#125;/zabbix/conf/maintenance.inc.php $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/web/
+
+
+# drop config files in place
+%if 0%&#123;?rhel&#125; &gt;= 7
+install -Dm 0644 -p %&#123;SOURCE2&#125; $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/httpd/conf.d/zabbix.conf
+%else
+install -Dm 0644 -p %&#123;SOURCE1&#125; conf/httpd22-example.conf
+install -Dm 0644 -p %&#123;SOURCE2&#125; conf/httpd24-example.conf
+%endif
+%endif
+
+
+# install configuration files
+mv $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.conf.d $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.d
+mv $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_proxy.conf.d $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_proxy.d
+%if 0%&#123;?build_server&#125;
+mv $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_server.conf.d $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_server.d
+%endif
+
+
+install -dm 755 $RPM_BUILD_ROOT%&#123;_docdir&#125;/zabbix-agent-%&#123;version&#125;
+
+
+install -m 0644 conf/zabbix_agentd/userparameter_mysql.conf $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.d
+install -m 0644 conf/zabbix_agentd/userparameter_examples.conf $RPM_BUILD_ROOT%&#123;_docdir&#125;/zabbix-agent-%&#123;version&#125;
+
+
+cat conf/zabbix_agentd.conf | sed \
+    -e &#39;/^# PidFile=/a \\nPidFile=%&#123;_localstatedir&#125;/run/zabbix/zabbix_agentd.pid&#39; \
+    -e &#39;s|^LogFile=.*|LogFile=%&#123;_localstatedir&#125;/log/zabbix/zabbix_agentd.log|g&#39; \
+    -e &#39;/^# LogFileSize=.*/a \\nLogFileSize=0&#39; \
+    -e &#39;/^# Include=$/a \\nInclude=%&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.d/&#39; \
+    &gt; $RPM_BUILD_ROOT%&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.conf
+
+
+#
+#
+#
+
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+
+
+%pre agent
+getent group zabbix &gt; /dev/null || groupadd -r zabbix
+getent passwd zabbix &gt; /dev/null || \
+    useradd -r -g zabbix -d %&#123;_localstatedir&#125;/lib/zabbix -s /sbin/nologin \
+    -c &quot;Zabbix Monitoring System&quot; zabbix
+:
+
+
+%post agent #rpm安装后执行的脚本
+%if 0%&#123;?rhel&#125; &gt;= 7
+%systemd_post zabbix-agent.service
+%else
+/sbin/chkconfig --add zabbix-agent || :
+%endif
+
+
+
+
+%preun agent # %preun,%postun  用脚本运行在包删除时
+if [ &quot;$1&quot; = 0 ]; then
+%if 0%&#123;?rhel&#125; &gt;= 7
+%systemd_preun zabbix-agent.service
+%else
+/sbin/service zabbix-agent stop &gt;/dev/null 2&gt;&amp;1
+/sbin/chkconfig --del zabbix-agent
+%endif
+fi
+:
+
+
+#####################################################################################################################
+※注意区分$RPM_BUILD_ROOT和$RPM_BUILD_DIR：
+$RPM_BUILD_ROOT是指开头定义的BuildRoot，而$RPM_BUILD_DIR通常就是指/usr/src/asianux/BUILD，其中，前面的才是%file需要的。 
+%pre rpm安装前执行的脚本
+%post rpm安装后执行的脚本
+%preun rpm卸载前执行的脚本
+%postun rpm卸载后执行的脚本
+
+
+%preun %postun 的区别是什么呢？
+前者在升级的时候会执行，后者在升级rpm包的时候不会执行
+#####################################################################################################################
+#
+#
+#
+
+
+%files agent #本段是文件
+%defattr(-,root,root,-)
+%doc AUTHORS ChangeLog COPYING NEWS README
+%config(noreplace) %&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.conf
+%config(noreplace) %&#123;_sysconfdir&#125;/logrotate.d/zabbix-agent
+%dir %&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.d
+%config(noreplace) %&#123;_sysconfdir&#125;/zabbix/zabbix_agentd.d/userparameter_mysql.conf
+%attr(0755,zabbix,zabbix) %dir %&#123;_localstatedir&#125;/log/zabbix
+%attr(0755,zabbix,zabbix) %dir %&#123;_localstatedir&#125;/run/zabbix
+%&#123;_sbindir&#125;/zabbix_agentd
+%&#123;_mandir&#125;/man8/zabbix_agentd.8*
+%if 0%&#123;?rhel&#125; &gt;= 7
+%&#123;_unitdir&#125;/zabbix-agent.service
+%&#123;_prefix&#125;/lib/tmpfiles.d/zabbix-agent.conf
+%else
+%&#123;_sysconfdir&#125;/init.d/zabbix-agent
+%endif
+#######################################################################################################################
+%files 定义那些文件或目录会放入rpm中
+这里会在虚拟根目录下进行，千万不要写绝对路径，而应用宏或变量表示相对路径。 如果描述为目录，表示目录中除%exclude外的所有文件。
+%defattr (-,root,root) 指定包装文件的属性，分别是(mode,owner,group)，-表示默认值，对文本文件是0644，可执行文件是0755
+
+
+%exclude 列出不想打包到rpm中的文件
+※小心，如果%exclude指定的文件不存在，也会出错的。 
+#######################################################################################################################
+
+
+%changelog
+#日志
+</code></pre>
+<p>4、<a target="_blank" rel="noopener" href="http://laoguang.blog.51cto.com/6013350/1103628">RPM包签名</a></p>
+<p>1.生成GPG签名密钥，我用的是root用户</p>
+<pre><code>gpg --gen-key 
+Your selection?1&lt;Enter&gt;  ##默认即可
+What keysize do you want? (2048) 1024&lt;Enter&gt;  ##密钥长度
+Key is valid for? (0) 1y&lt;Enter&gt;  ##有效期
+Is this correct? (y/N) y&lt;Enter&gt;  ##确认
+Real name: LaoGuang&lt;Enter&gt;  ##密钥名称
+Email address: ibuler@qq.com&lt;Enter&gt;  ##邮件
+Comment: GPG-RPM-KEY&lt;Enter&gt;  ##备注
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O&lt;ENTER&gt; 
+Enter passphrase  OK &lt;Enter&gt;  ##使用空密码，也可以输入                              
+&lt;Take this one anyway&gt; &lt;Enter&gt; 
+&lt;Take this one anyway&gt; &lt;Enter&gt; 
+</code></pre>
+<p>有时可能因为随机数不够导致卡在那里，这时候你就yum 安装几个包组，马上就够了。<br>2.查看成生的密钥</p>
+<pre><code>[root@ng1 dev]# gpg --list-keys 
+/root/.gnupg/pubring.gpg 
+------------------------ 
+pub   1024R/49C99488 2012-11-28 [expires: 2013-11-28] 
+uid                  LaoGuang (GPG-RPM-KEY) &lt;ibuler@qq.com&gt; 
+sub   1024R/69BA199D 2012-11-28 [expires: 2013-11-28] 
+</code></pre>
+<p>3.导出公钥以供大家使用验证</p>
+<pre><code>gpg --export -a &quot;LaoGuang&quot; &gt; RPM-GPG-KEY-LaoGuang 
+</code></pre>
+<p>4.编缉 .rpmmacros说明我们用哪一个密钥加密,我们用root加密的那就在/root下编辑</p>
+<pre><code>vi ~/.rpmmacros 
+%_gpg_name LaoGuang 
+</code></pre>
+<p>5.为rpm包加签名<br>    rpm –addsign tengine-1.4.2-1.el6.x86_64.rpm<br>    Enter pass phrase:   ##输入密钥<br>    Pass phrase is good.<br>    tengine-1.4.2-1.el6.x86_64.rpm:<br>    到此签名添加成功，下面来验证<br>6.讲刚才导出的公钥导入rpm中</p>
+<pre><code>rpm --import RPM-GPG-KEY-LaoGuang 
+</code></pre>
+<p>7.验证</p>
+<pre><code>rpm --checksig tengine-1.4.2-1.el6.x86_64.rpm  
+
+tengine-1.4.2-1.el6.x86_64.rpm: rsa sha1 (md5) pgp md5 OK 
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/05-Linux-Operation/">05. Linux Operation</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/打包/">打包</a>, <a href="/tags/Zabbix/">Zabbix</a>, <a href="/tags/SPEC/">SPEC</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

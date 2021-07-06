@@ -1,0 +1,489 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux POSIX 多线程 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1、POSIX 线程相关函数">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux POSIX 多线程"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-06-24T05:13:11.000Z"><a href="/2017/06/24/Linux-POSIX-多线程/">2017-06-24</a></time>
+        
+  
+    <h1 class="title">Linux POSIX 多线程</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1%E3%80%81POSIX-%E7%BA%BF%E7%A8%8B%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="toc-text">1、POSIX 线程相关函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1%E3%80%81%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B"><span class="toc-text">1.1、创建线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2%E3%80%81%E7%BB%88%E6%AD%A2%E7%BA%BF%E7%A8%8B"><span class="toc-text">1.2、终止线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3%E3%80%81%E9%98%BB%E5%A1%9E%E7%BA%BF%E7%A8%8B"><span class="toc-text">1.3、阻塞线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4%E3%80%81%E5%88%86%E7%A6%BB%E7%BA%BF%E7%A8%8B"><span class="toc-text">1.4、分离线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5%E3%80%81%E7%BA%BF%E7%A8%8B%E4%BA%92%E6%96%A5"><span class="toc-text">1.5、线程互斥</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E6%96%A5%E9%94%81%E5%88%9B%E5%BB%BA"><span class="toc-text">互斥锁创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E9%94%81%E5%B1%9E%E6%80%A7"><span class="toc-text">设置锁属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81"><span class="toc-text">读写锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-6%E3%80%81%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F"><span class="toc-text">1.6、条件变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-7%E3%80%81%E4%BD%BF%E7%94%A8%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">1.7、使用信号量</span></a></li></ol></li></ol>
+    </div>
+
+        <h1 id="1、POSIX-线程相关函数"><a href="#1、POSIX-线程相关函数" class="headerlink" title="1、POSIX 线程相关函数"></a>1、POSIX 线程相关函数</h1><span id="more"></span>
+<h2 id="1-1、创建线程"><a href="#1-1、创建线程" class="headerlink" title="1.1、创建线程"></a>1.1、创建线程</h2><pre><code>   #include &lt;pthread.h&gt;
+
+   int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+                      void *(*start_routine) (void *), void *arg);
+
+   编译时连接一下libpthread库 -pthread.
+</code></pre>
+<ul>
+<li>参数：<br><br>*thread:线程标识符的指针<br><br>*attr:设置线程属性(见后面详解)<br><br>*start_routine:线程运行函数的起始地址<br><br>*arg:线程运行函数的参数</li>
+</ul>
+<ul>
+<li>返回值：成功返回0，失败返回相应的错误代码<br><br>EAGAIN 描述: 超出了系统限制，如创建的线程太多。<br><br>EINVAL 描述: tattr 的值无效。</li>
+</ul>
+<p>eg:</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;pthread.h&gt;
+
+static void *pthread_start(void *arg)
+&#123;
+
+    printf(&quot;The Pthread arg is %d\n&quot;,*((int*)arg));
+    printf(&quot;Thre Pthread ID %u\n&quot;,pthread_self());
+    return 0;
+&#125;
+
+
+int main(int argc, const char *argv[])
+&#123;
+    pthread_t p;
+    int arg = 100;
+    pthread_create(&amp;p,NULL,pthread_start,&amp;arg);
+    pthread_join(p,NULL);
+    return 0;
+&#125;
+</code></pre>
+<h2 id="1-2、终止线程"><a href="#1-2、终止线程" class="headerlink" title="1.2、终止线程"></a>1.2、终止线程</h2><ul>
+<li><p>线程函数内执行return语句</p>
+</li>
+<li><p>调用pthread_exit()。</p>
+</li>
+<li><p>调用pthread_cancle()函数取消。</p>
+</li>
+<li><p>任意线程调用exit()或者主线程执行了return语句(在main函数内)。都会导致进程中所有的线程立即终止</p>
+<pre><code>  # include &lt;pthread.h&gt;
+  void pthread_exit(void *retval);
+  int pthread_cancel(pthread_t thread);
+</code></pre>
+</li>
+</ul>
+<h2 id="1-3、阻塞线程"><a href="#1-3、阻塞线程" class="headerlink" title="1.3、阻塞线程"></a>1.3、阻塞线程</h2><pre><code>   #include &lt;pthread.h&gt;
+
+   int pthread_join(pthread_t thread, void **retval);
+</code></pre>
+<p>pthread_join() 函数会一直阻塞调用线程，直到指定的线程终止。</p>
+<ul>
+<li>参数：<br><br>thread:被等待的线程标识符<br></li>
+</ul>
+<p>**retval:自定义的指针，存储被等待线程的返会值。</p>
+<ul>
+<li>返回值：<br><br>成功返回0，失败返回错误代码。<br><br><br>错误代码<br><br>ESRCH 描述: 没有找到与给定的线程ID 相对应的线程。<br><br>EDEADLK 描述: 将出现死锁，如一个线程等待其本身，或者线程A和线程B 互相等待。<br><br>EINVAL 描述: 与给定的线程ID 相对应的线程是分离线程。<br></li>
+</ul>
+<h2 id="1-4、分离线程"><a href="#1-4、分离线程" class="headerlink" title="1.4、分离线程"></a>1.4、分离线程</h2><pre><code>   #include &lt;pthread.h&gt;
+
+   int pthread_detach(pthread_t thread);
+</code></pre>
+<ul>
+<li>参数：被分离的线程标识符</li>
+<li>返回值<br><br>成功返回0。<br><br>失败返回错误码。<br><br>
+如果检测到以下任一情况，pthread_detach() 将失败并返回相应的值。<br>
+EINVAL 描述: tid 是分离线程。<br>
+ESRCH 描述: tid 不是当前进程中有效的未分离的线程。<br></li>
+</ul>
+<p>pthread_detach是pthread_join的替代函数，可回收创建时detachstate 属性设置为PTHREAD_CREATE_JOINABLE 的线程的存储空间。不可与pthread_join一起使用。</p>
+<h2 id="1-5、线程互斥"><a href="#1-5、线程互斥" class="headerlink" title="1.5、线程互斥"></a>1.5、线程互斥</h2><pre><code>   #include &lt;pthread.h&gt;
+   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+   int pthread_mutex_init(pthread_mutex_t *restrict mutex,
+       const pthread_mutexattr_t *restrict attr);
+   int pthread_mutex_lock(pthread_mutex_t *mutex);
+   int pthread_mutex_trylock(pthread_mutex_t *mutex);
+   int pthread_mutex_unlock(pthread_mutex_t *mutex);
+   int pthread_mutex_destroy(pthread_mutex_t *mutex);
+</code></pre>
+<h3 id="互斥锁创建"><a href="#互斥锁创建" class="headerlink" title="互斥锁创建"></a>互斥锁创建</h3><p>有静态方式和动态方式两种方式。<br>静态方式：<br>POXIX定义了一个PTHREAD_MUTEX_INITIALIZER来静态初始化互斥锁，锁属性为缺省状态。格式如下</p>
+<pre><code>phread_mutex_t mutex = PTHREAD_MUTEX_INITALIZER;
+</code></pre>
+<p>动态方式：</p>
+<p>动态方式是采用<code>pthread_mutex_init()</code>函数来初始化互斥锁。可以使用pthread_mutexattr_t设置线程的属性。</p>
+<h3 id="设置锁属性"><a href="#设置锁属性" class="headerlink" title="设置锁属性"></a>设置锁属性</h3><pre><code>   #include &lt;pthread.h&gt;
+
+   int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
+   int pthread_mutexattr_init(pthread_mutexattr_t *attr);
+</code></pre>
+<p>调用<code>pthread_mutexattr_init</code>时，attr 属性的缺省值为PTHREAD_PROCESS_PRIVATE。该值表示可以在进程内使用经过初始化的互斥锁。</p>
+<p>attr 范围可能的值为PTHREAD_PROCESS_PRIVATE 和PTHREAD_PROCESS_SHARED。PTHREAD_PROCESS_PRIVATE 是缺省值。</p>
+<p>可以设置的属性</p>
+<img src="/2017/06/24/Linux-POSIX-%E5%A4%9A%E7%BA%BF%E7%A8%8B/mutex_type.png" class="" title="锁属性">
+
+<h3 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h3><pre><code>    #include &lt;pthread.h&gt;
+    //销毁和初始化
+    int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+    int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock,
+          const pthread_rwlockattr_t *restrict attr);
+
+    //读加锁
+    int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+    int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+
+    //写加锁
+    int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
+    int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+
+    //解锁
+    int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
+</code></pre>
+<h2 id="1-6、条件变量"><a href="#1-6、条件变量" class="headerlink" title="1.6、条件变量"></a>1.6、条件变量</h2><pre><code>#include &lt;pthread.h&gt;
+//静态方式创建条件变量
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+//动态方式创建条件变量
+int pthread_cond_init(pthread_cond_t *cond, pthread_condattr_t *cond_attr);
+
+//发送一个信号给另外一个正在处于阻塞等待状态的线程,使其脱离阻塞状态,继续执行.
+//如果没有线程处在阻塞等待状态,pthread_cond_signal也会成功返回。
+int pthread_cond_signal(pthread_cond_t *cond);
+
+//将所有等待该条件变量的线程解锁
+int pthread_cond_broadcast(pthread_cond_t *cond);
+
+//等待条件变量
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+
+//等待条件变量超时设置
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime);
+
+//销毁条件变量
+int pthread_cond_destroy(pthread_cond_t *cond);
+</code></pre>
+<hr>
+<pre><code>/*************************************************************************
+    &gt; File Name: pthread.c
+    &gt; Author: 
+    &gt; Mail: 
+    &gt; Created Time: 2017年06月25日 星期日 14时34分38秒
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;pthread.h&gt;
+
+int index = 1;
+int flag = 1;
+pthread_mutex_t mutex;
+pthread_cond_t cond;
+void *pthread_func1(void *argc)
+&#123;
+
+    printf(&quot;Start pthread_func1\n&quot;);
+    for( ; index &lt; 11; index ++)
+    &#123;
+        pthread_mutex_lock(&amp;mutex);
+        if(index % 2 == 0)
+        &#123;
+            printf(&quot;before pthread_cond_signal index:----%d\n&quot;,index);
+            pthread_cond_signal(&amp;cond);
+            printf(&quot;after pthread_cond_signal index:----%d\n&quot;,index);
+        &#125;
+        else
+            printf(&quot;pthread_func1 index:----%d\n&quot;, index);
+        pthread_mutex_unlock(&amp;mutex);
+        sleep(1);
+    &#125;
+    printf(&quot;End of pthread_func1\n&quot;);
+    return 0;
+&#125;
+
+void *pthread_func2(void *argc)
+&#123;
+    printf(&quot;Start pthread_func2\n&quot;);
+    while(flag)
+    &#123;
+        if(index == 10)
+            break;
+        pthread_mutex_lock(&amp;mutex);
+        printf(&quot;pthread_func2 before pthread_cond_wait index:%d\n&quot;, index);
+        pthread_cond_wait(&amp;cond, &amp;mutex);
+        printf(&quot;pthread_func2 after pthread_cond_wait index:%d\n&quot;, index);
+        pthread_mutex_unlock(&amp;mutex);
+    &#125;
+    printf(&quot;End of pthread_func2\n&quot;);
+    return 0;
+&#125;
+
+int main(int argc, const char *argv[])
+&#123;
+    pthread_t p1 = 0, p2 = 0;
+
+    pthread_mutex_init(&amp;mutex, NULL);
+    pthread_cond_init(&amp;cond, NULL);
+
+    pthread_create(&amp;p1, NULL, pthread_func1, NULL);
+    pthread_create(&amp;p2, NULL, pthread_func2, NULL);
+
+
+    pthread_join(p1, NULL);
+    pthread_join(p2, NULL);
+    pthread_mutex_destroy(&amp;mutex);
+    pthread_cond_destroy(&amp;cond);
+    return 0;
+&#125;
+</code></pre>
+<hr>
+<pre><code># gcc pthread.c -o pthread -lpthread
+# ./pthread
+Start pthread_func1
+pthread_func1 index:----1
+Start pthread_func2
+pthread_func2 before pthread_cond_wait index:1
+before pthread_cond_signal index:----2
+after pthread_cond_signal index:----2
+pthread_func2 after pthread_cond_wait index:2
+pthread_func2 before pthread_cond_wait index:2
+pthread_func1 index:----3
+before pthread_cond_signal index:----4
+after pthread_cond_signal index:----4
+pthread_func2 after pthread_cond_wait index:4
+pthread_func2 before pthread_cond_wait index:4
+pthread_func1 index:----5
+before pthread_cond_signal index:----6
+after pthread_cond_signal index:----6
+pthread_func2 after pthread_cond_wait index:6
+pthread_func2 before pthread_cond_wait index:6
+pthread_func1 index:----7
+before pthread_cond_signal index:----8
+after pthread_cond_signal index:----8
+pthread_func2 after pthread_cond_wait index:8
+pthread_func2 before pthread_cond_wait index:8
+pthread_func1 index:----9
+before pthread_cond_signal index:----10
+after pthread_cond_signal index:----10
+pthread_func2 after pthread_cond_wait index:10
+End of pthread_func2
+End of pthread_func1
+</code></pre>
+<h2 id="1-7、使用信号量"><a href="#1-7、使用信号量" class="headerlink" title="1.7、使用信号量"></a>1.7、使用信号量</h2><p>信号量是个好东西，线程进程都使用。进程使用的是下面这样的</p>
+<hr>
+<p>别急混了。哈哈哈</p>
+<pre><code>#include&lt;sys/types.h&gt;
+#include&lt;sys/ipc.h&gt;
+#include&lt;sys/sem.h&gt;
+int semget(key_t  key,int nsems,int semflg);
+int semctl(int semid,int semnum,int cmd,union semun arg);
+int semop(int semid struct sembuf *sops,size_t nsops);
+</code></pre>
+<hr>
+<p>下面是线程。</p>
+<pre><code>#include &lt;semaphore.h&gt;
+int sem_init(sem_t *sem, int pshared, unsigned int value);
+Link with -pthread.
+</code></pre>
+<p>这个函数初始化一个信号量sem 的值为val，参数pshared 是共享属性控制，表明是否在进程间共享。</p>
+<pre><code>#include &lt;semaphore.h&gt;
+int sem_wait(sem_t *sem);
+int sem_trywait(sem_t *sem);
+int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
+Link with -pthread.
+</code></pre>
+<p>调用sem_wait函数时，若sem为无状态，调用线程阻塞，等待信号量sem值增加(post )成为有信号状态；若sem为有状态，调用线程顺序执行，但信号量的值减一。</p>
+<pre><code>#include &lt;semaphore.h&gt;
+int sem_post(sem_t *sem);
+Link with -pthread.
+</code></pre>
+<p>调用该函数，信号量sem的值增加，可以从无信号状态变为有信号状态。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: sem.c
+    &gt; Author: 
+    &gt; Mail: 
+    &gt; Created Time: 2017年06月25日 星期日 22时09分57秒
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;semaphore.h&gt;
+#include &lt;pthread.h&gt;
+sem_t sem;
+void *task1()
+&#123;
+  int sval = 0;
+  sem_wait(&amp;sem);
+  sleep(5); 
+  sem_getvalue(&amp;sem, &amp;sval);
+  printf(&quot;sem value = %d\n&quot;, sval);
+  sem_post(&amp;sem); 
+&#125;
+
+int main(void)
+&#123;
+ int ret=0;
+ pthread_t p1, p2;
+ sem_init(&amp;sem, 0, 1);
+ ret=pthread_create(&amp;p1, NULL, task1, NULL);
+ ret=pthread_create(&amp;p2, NULL, task1, NULL);
+ pthread_join(p1, NULL); 
+ pthread_join(p2, NULL);
+ return 0;
+&#125;
+</code></pre>
+<p>其实还有好多要说的。如何设置线程属性，如何向线程发送信号，如何设置线程栈大小，如何创建/删除线程特定数据键等问题，等有时间一点点补上。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/C/">C</a>, <a href="/tags/多线程/">多线程</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

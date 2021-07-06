@@ -1,0 +1,1285 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>PF_RING实现分析 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="作者独孤九贱">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="PF_RING实现分析"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-10T09:48:01.000Z"><a href="/2017/08/10/PF_RING实现分析/">2017-08-10</a></time>
+        
+  
+    <h1 class="title">PF_RING实现分析</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E7%BC%96%E8%AF%91%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="toc-text">1、编译和使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%E5%88%9D%E6%AD%A5"><span class="toc-text">2、实现分析初步</span></a></li></ol>
+    </div>
+
+        <p>作者<a target="_blank" rel="noopener" href="http://bbs.chinaunix.net/thread-1943951-1-1.html">独孤九贱</a></p>
+<span id="more"></span>
+<p>内核版本：Linux 2.6.30.9</p>
+<p>PF_RING版本：4.1.0</p>
+<h3 id="1、编译和使用"><a href="#1、编译和使用" class="headerlink" title="1、编译和使用"></a>1、编译和使用</h3><p>接口分为两部份，一个是内核模块，一个是用户态的库</p>
+<pre><code>cd my_pf_ring_goes_here
+cd kernel
+make
+sudo insmod ./pf_ring.ko
+cd ../userland
+make
+</code></pre>
+<p>在源码目录中，关于用户态的库有使用的现成的例子，很容易依葫芦画瓢。后文也会提到用户态库的实现的简单分析，可以两相比照，很容易上手。而且源码目录中有一个PDF文档，有详细的API介绍，建议使用前阅读。</p>
+<h3 id="2、实现分析初步"><a href="#2、实现分析初步" class="headerlink" title="2、实现分析初步"></a>2、实现分析初步</h3><p>1、核心思路</p>
+<ul>
+<li>A、在内核队列层注册Hook，获取数据帧。</li>
+<li>B、在内核创建一个环形队列(这也是叫RING的原因)，用于存储数据，并使用mmap映射到用户空间。这样，避免用户态的系统调用，也是提高性能的关键所在。</li>
+<li>C、创建了一个新的套接字类型PF_RING，用户态通过它与内核通信。</li>
+</ul>
+<p>2、模块初始化<br>模块源码只有一个文件，在目录树kernel/pf_ring.c，嗯，还有一个头文件，在kernel/linux下</p>
+<pre><code>static int __init ring_init(void)
+&#123;
+  int i, rc;
+
+  printk(&quot;[PF_RING] Welcome to PF_RING %s ($Revision: 4012 $)\n&quot;
+         &quot;(C) 2004-09 L.Deri &lt;[email]deri@ntop.org[/email]&gt;\n&quot;, RING_VERSION);
+       
+        //注册名为PF_RING的新协议
+  if((rc = proto_register(&amp;ring_proto, 0)) != 0)
+    return(rc);
+    
+    
+</code></pre>
+<p>ring_proto的定义为</p>
+<pre><code>#if(LINUX_VERSION_CODE &gt; KERNEL_VERSION(2,6,11))
+static struct proto ring_proto = &#123;
+  .name = &quot;PF_RING&quot;,
+  .owner = THIS_MODULE,
+  .obj_size = sizeof(struct ring_sock),
+&#125;;
+#endif
+</code></pre>
+<p>初始化四个链表，它们的作用，后文会分析到：</p>
+<pre><code>//初始化四个链表
+INIT_LIST_HEAD(&amp;ring_table);                                        /* List of all ring sockets. */
+INIT_LIST_HEAD(&amp;ring_cluster_list);                        /* List of all clusters */
+INIT_LIST_HEAD(&amp;ring_aware_device_list);                /* List of all devices on which PF_RING has been registered */
+INIT_LIST_HEAD(&amp;ring_dna_devices_list);                /* List of all dna (direct nic access) devices */
+</code></pre>
+<p>device_ring_list是一个指针数组，它的每一个元素对应一个网络设备，后文也会分析它的使用：</p>
+<pre><code>/*
+For each device, pf_ring keeps a list of the number of
+available ring socket slots. So that a caller knows in advance whether
+there are slots available (for rings bound to such device)
+that can potentially host the packet
+*/
+for (i = 0; i &lt; MAX_NUM_DEVICES; i++)
+    INIT_LIST_HEAD(&amp;device_ring_list[i]);
+    
+//为新协议注册sock
+sock_register(&amp;ring_family_ops);
+</code></pre>
+<p>ring_family_ops定义为</p>
+<pre><code>static struct net_proto_family ring_family_ops = &#123;
+  .family = PF_RING,
+  .create = ring_create,
+  .owner = THIS_MODULE,
+&#125;;
+</code></pre>
+<p>这样，当用户空间创建PF_RING时，例如，</p>
+<pre><code>fd = socket(PF_RING, SOCK_RAW, htons(ETH_P_ALL));
+</code></pre>
+<p>ring_create将会被调用</p>
+<pre><code>//注册通知链表  
+register_netdevice_notifier(&amp;ring_netdev_notifier);
+
+/* 工作模式语法检查 */
+if(transparent_mode &gt; driver2pf_ring_non_transparent)
+    transparent_mode = standard_linux_path;    
+    
+    
+</code></pre>
+<p>PF_RING一共有三种工作模式：</p>
+<pre><code>typedef enum &#123;
+    standard_linux_path = 0, /* Business as usual */
+    driver2pf_ring_transparent = 1, /* Packets are still delivered to the kernel */
+    driver2pf_ring_non_transparent = 2 /* Packets not delivered to the kernel */
+&#125; direct2pf_ring;
+</code></pre>
+<p>第一种最简单，这里仅分析第一种</p>
+<pre><code>//输出工作信息参数
+printk(&quot;[PF_RING] Ring slots       %d\n&quot;, num_slots);
+printk(&quot;[PF_RING] Slot version     %d\n&quot;,
+        RING_FLOWSLOT_VERSION);
+printk(&quot;[PF_RING] Capture TX       %s\n&quot;,
+        enable_tx_capture ? &quot;Yes [RX+TX]&quot; : &quot;No [RX only]&quot;);
+printk(&quot;[PF_RING] Transparent Mode %d\n&quot;,
+        transparent_mode);
+printk(&quot;[PF_RING] IP Defragment    %s\n&quot;,
+        enable_ip_defrag ? &quot;Yes&quot; : &quot;No&quot;);
+printk(&quot;[PF_RING] Initialized correctly\n&quot;);
+</code></pre>
+<p>num_slots为槽位总数，系统采用数组来实现双向环形队列，它也就代表数组的最大元素。<br>版本信息：不用多说了。不过我的版本在2.6.18及以下都没有编译成功，后来使用2.6.30.9搞定之。<br>enable_tx_capture：是否启用发送时的数据捕获，对于大多数应用而言，都是在接收时处理。<br>enable_ip_defrag：为用户提供一个接口，是否在捕获最重组IP分片。</p>
+<pre><code>    //创建/proc目录
+    ring_proc_init();
+
+    //注册设备句柄
+    register_device_handler();
+
+    pfring_enabled = 1;                //工作标志
+    return 0;
+&#125;
+</code></pre>
+<p>register_device_handler注册了一个协议，用于数据包的获取：</p>
+<pre><code>/* Protocol hook */
+static struct packet_type prot_hook;
+
+void register_device_handler(void) &#123;
+        //只有在第一种模式下，才用这种方式接收数据
+  if(transparent_mode != standard_linux_path) return;
+
+  prot_hook.func = packet_rcv;
+  prot_hook.type = htons(ETH_P_ALL);
+  dev_add_pack(&amp;prot_hook);
+&#125;
+
+void register_device_handler(void) &#123;
+  if(transparent_mode != standard_linux_path) return;
+
+  prot_hook.func = packet_rcv;
+  prot_hook.type = htons(ETH_P_ALL);
+  dev_add_pack(&amp;prot_hook);
+&#125;
+</code></pre>
+<p>2、创建套接字<br>Linux的套按字的内核接口，使用了两个重要的数据结构：<br>struct socket和struct sock，这本来并没有什么，不过令人常常迷惑的是，前者常常被缩写为sock，即：<br>struct socket *sock;<br>这样，“sock”就容易造成混淆了。还好，后者常常被缩写为sk……<br>我这里写sock指前者，sk指后者，如果不小心写混了，请参考上下文区分 。</p>
+<p>关于这两个结构的含义，使用等等，可以参考相关资料以获取详细信息，如《Linux情景分析》。我的个人网站<a target="_blank" rel="noopener" href="http://www.skynet.org.cn上也分析了linux/">www.skynet.org.cn上也分析了Linux</a> socket的实现。可以参考。这里关于socket的进一步信息，就不详细分析了。</p>
+<p>这里的创建套接字，内核已经在系统调用过程中，准备好了sock，主要就是分析sk，并为sk指定一系列的操作函数，如bind、mmap、poll等等。<br>如前所述，套接字的创建，是通过调用ring_create函数来完成的：</p>
+<pre><code>static int ring_create(
+#if(LINUX_VERSION_CODE &gt;= KERNEL_VERSION(2,6,24))
+                       struct net *net,
+#endif
+                       struct socket *sock, int protocol)
+&#123;
+  struct sock *sk;
+  struct ring_opt *pfr;
+  int err;
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] ring_create()\n&quot;);
+#endif
+
+  /* 权限验证 ? */
+  if(!capable(CAP_NET_ADMIN))
+    return -EPERM;
+
+  //协议簇验证
+  if(sock-&gt;type != SOCK_RAW)
+    return -ESOCKTNOSUPPORT;
+
+  //协议验证
+  if(protocol != htons(ETH_P_ALL))
+    return -EPROTONOSUPPORT;
+
+  err = -ENOMEM;
+
+  // 分配sk
+  // options are.
+#if(LINUX_VERSION_CODE &lt;= KERNEL_VERSION(2,6,11))
+  sk = sk_alloc(PF_RING, GFP_KERNEL, 1, NULL);
+#else
+#if(LINUX_VERSION_CODE &lt; KERNEL_VERSION(2,6,24))
+    // BD: API changed in 2.6.12, ref:
+    // [url]http://svn.clkao.org/svnweb/linux/revision/?rev=28201[/url]
+    sk = sk_alloc(PF_RING, GFP_ATOMIC, &amp;ring_proto, 1);
+#else
+    sk = sk_alloc(net, PF_INET, GFP_KERNEL, &amp;ring_proto);
+#endif
+#endif
+
+  //分配失败
+  if(sk == NULL)
+    goto out;
+  
+  //这里很重要，设定sock的ops，即对应用户态的bind、connect诸如此类操作的动作
+  sock-&gt;ops = &amp;ring_ops;
+
+  //初始化sock结构(即sk)各成员，并设定与套接字socket(即sock)的关联
+  sock_init_data(sock, sk);
+#if(LINUX_VERSION_CODE &lt;= KERNEL_VERSION(2,6,11))
+  sk_set_owner(sk, THIS_MODULE);
+#endif
+
+  err = -ENOMEM;
+
+#define ring_sk_datatype(__sk) ((struct ring_opt *)__sk)
+#define ring_sk(__sk) ((__sk)-&gt;sk_protinfo)
+
+//作者喜欢用小写的宏
+//这里分配一个struct ring_opt结构，这个结构比较重要，其记录了ring的选项信息。
+在sk中，使用sk_protinfo成员指向之，这样就建立了sock-&gt;sk-&gt;ring_opt的关联。可以通过套接字很容易获取Ring的信息。
+  ring_sk(sk) = ring_sk_datatype(kmalloc(sizeof(*pfr), GFP_KERNEL));
+  //分配失败
+  if(!(pfr = ring_sk(sk))) &#123;
+    sk_free(sk);
+    goto out;
+  &#125;
+
+  //初始化各成员
+  memset(pfr, 0, sizeof(*pfr));
+//激活标志
+  pfr-&gt;ring_active = 0;        /* We activate as soon as somebody waits for packets */
+  //通道ID
+  pfr-&gt;channel_id = RING_ANY_CHANNEL;
+  //RING的每个槽位的桶的大小，其用来存储捕获的数据帧，这个值，用户态也可以使用setsocketopt来调整
+  pfr-&gt;bucket_len = DEFAULT_BUCKET_LEN;
+//过滤器hash桶
+  pfr-&gt;handle_hash_rule = handle_filtering_hash_bucket;
+  //初始化等待队列
+  init_waitqueue_head(&amp;pfr-&gt;ring_slots_waitqueue);
+  //初始化RING的锁
+  rwlock_init(&amp;pfr-&gt;ring_index_lock);
+  rwlock_init(&amp;pfr-&gt;ring_rules_lock);
+  //初始化使用计数器
+  atomic_set(&amp;pfr-&gt;num_ring_users, 0);
+  INIT_LIST_HEAD(&amp;pfr-&gt;rules);
+  //设定协议簇
+  sk-&gt;sk_family = PF_RING;
+//设定sk的destuct函数
+  sk-&gt;sk_destruct = ring_sock_destruct;
+
+  //sk入队
+  ring_insert(sk);
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] ring_create() - created\n&quot;);
+#endif
+
+  return(0);
+out:
+  return err;
+  
+  
+</code></pre>
+<p>在模块初始化中，初始化过四个链表。其中一个是ring_table，ring_insert将刚刚创建的套接字插入其中。其封装引进了一个struct ring_element 结构：</p>
+<pre><code>/*
+* ring_insert()
+*
+* store the sk in a new element and add it
+* to the head of the list.
+*/
+static inline void ring_insert(struct sock *sk)
+&#123;
+  struct ring_element *next;
+  struct ring_opt *pfr;
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] ring_insert()\n&quot;);
+#endif
+
+//分配element
+  next = kmalloc(sizeof(struct ring_element), GFP_ATOMIC);
+  if(next != NULL) &#123;
+    //记录sk
+    next-&gt;sk = sk;
+    write_lock_bh(&amp;ring_mgmt_lock);
+    //入队
+    list_add(&amp;next-&gt;list, &amp;ring_table);
+    write_unlock_bh(&amp;ring_mgmt_lock);
+  &#125; else &#123;
+    if(net_ratelimit())
+      printk(&quot;[PF_RING] net_ratelimit() failure\n&quot;);
+  &#125;
+
+  //累计使用计数器
+  ring_table_size++;
+  //ring_proc_add(ring_sk(sk));
+  //记录进程PID
+  pfr = (struct ring_opt *)ring_sk(sk);
+  pfr-&gt;ring_pid = current-&gt;pid;
+&#125;
+</code></pre>
+<p>3 、分配队列空间<br>用户态在创建了套接字后，接下来就调用bind函数，绑定套接字，而PF_RING实际做的就是为RING分配相应的空间。也就是说，一个套接字，都有一个与之对应的RING。这样，有多个进程同时使用PF_RING，也没有问题:</p>
+<pre><code>            sa.sa_family   = PF_RING;
+            snprintf(sa.sa_data, sizeof(sa.sa_data), &quot;%s&quot;, device_name);
+            rc = bind(ring-&gt;fd, (struct sockaddr *)&amp;sa, sizeof(sa));
+            
+            
+</code></pre>
+<p>因为前一步创建套接字时，为sk指定了其ops：</p>
+<pre><code>static struct proto_ops ring_ops = &#123;
+  .family = PF_RING,
+  .owner = THIS_MODULE,
+
+  /* Operations that make no sense on ring sockets. */
+  .connect = sock_no_connect,
+  .socketpair = sock_no_socketpair,
+  .accept = sock_no_accept,
+  .getname = sock_no_getname,
+  .listen = sock_no_listen,
+  .shutdown = sock_no_shutdown,
+  .sendpage = sock_no_sendpage,
+  .sendmsg = sock_no_sendmsg,
+
+  /* Now the operations that really occur. */
+  .release = ring_release,
+  .bind = ring_bind,
+  .mmap = ring_mmap,
+  .poll = ring_poll,
+  .setsockopt = ring_setsockopt,
+  .getsockopt = ring_getsockopt,
+  .ioctl = ring_ioctl,
+  .recvmsg = ring_recvmsg,
+&#125;;
+</code></pre>
+<p>这样，当bing系统调用触发时，ring_bind函数将被调用：</p>
+<pre><code>* Bind to a device */
+static int ring_bind(struct socket *sock, struct sockaddr *sa, int addr_len)
+&#123;
+  struct sock *sk = sock-&gt;sk;
+  struct net_device *dev = NULL;
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] ring_bind() called\n&quot;);
+#endif
+
+  /*
+   *      Check legality
+   */
+  if(addr_len != sizeof(struct sockaddr))
+    return -EINVAL;
+  if(sa-&gt;sa_family != PF_RING)
+    return -EINVAL;
+  if(sa-&gt;sa_data == NULL)
+    return -EINVAL;
+
+  /* Safety check: add trailing zero if missing */
+  sa-&gt;sa_data[sizeof(sa-&gt;sa_data) - 1] = &#39;\0&#39;;
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] searching device %s\n&quot;, sa-&gt;sa_data);
+#endif
+
+  if((dev = __dev_get_by_name(
+#if(LINUX_VERSION_CODE &gt;= KERNEL_VERSION(2,6,24))
+                               &amp;init_net,
+#endif
+                               sa-&gt;sa_data)) == NULL) &#123;
+#if defined(RING_DEBUG)
+    printk(&quot;[PF_RING] search failed\n&quot;);
+#endif
+    return(-EINVAL);
+  &#125; else
+    return(packet_ring_bind(sk, dev));
+&#125;
+</code></pre>
+<p>在做了一些必要的语法检查后，函数转向packet_ring_bind：</p>
+<pre><code>/*
+* We create a ring for this socket and bind it to the specified device
+*/
+static int packet_ring_bind(struct sock *sk, struct net_device *dev)
+&#123;
+  u_int the_slot_len;
+  u_int32_t tot_mem;
+  struct ring_opt *pfr = ring_sk(sk);
+  // struct page *page, *page_end;
+
+  if(!dev)
+    return(-1);
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] packet_ring_bind(%s) called\n&quot;, dev-&gt;name);
+#endif
+
+  /* **********************************************
+
+   * *************************************
+   * *                                   *
+   * *        FlowSlotInfo               *
+   * *                                   *
+   * ************************************* &lt;-+
+   * *        FlowSlot                   *   |
+   * *************************************   |
+   * *        FlowSlot                   *   |
+   * *************************************   +- num_slots
+   * *        FlowSlot                   *   |
+   * *************************************   |
+   * *        FlowSlot                   *   |
+   * ************************************* &lt;-+
+   *
+   * ********************************************** */
+
+        //计算每一个槽位所需的内存空间
+  the_slot_len = sizeof(u_char)        /* flowSlot.slot_state */
+#ifdef RING_MAGIC
+    + sizeof(u_char)
+#endif
+    + sizeof(struct pfring_pkthdr)
+    + pfr-&gt;bucket_len /* flowSlot.bucket */ ;
+/*   
+        对于槽位空间的计算，有意思的是
+typedef struct flowSlot &#123;
+#ifdef RING_MAGIC
+  u_char     magic;      /* It must alwasy be zero */
+#endif
+  u_char     slot_state; /* 0=empty, 1=full   */
+  u_char     bucket;     /* bucket[bucketLen] */
+&#125; FlowSlot;
+对照结构定义和上面的计算公式：
+1、作者好像把magic和slog_state的顺序给搞反了，不过还好，它们都是u_char，对结果不影响
+2、bucket，桶的大小，这个桶就是拿来装要捕获的数据包了，虽然它在结构中定义是一个成员，事实上，
+它由两个部份组成，一个是包的首部信息，这个结构的定义同libpcap很接近。另一个才是包的空间。
+*/
+
+        //总共的环形队列内存所需空间，包含一个队列控制信息FlowSlotInfo和若干个(由变量num_slots决定)槽位空间
+  tot_mem = sizeof(FlowSlotInfo) + num_slots * the_slot_len;
+  
+  //确保按整数页分配，mmap也要求这样
+  if(tot_mem % PAGE_SIZE)
+    tot_mem += PAGE_SIZE - (tot_mem % PAGE_SIZE);
+
+        //分配内存空间
+  pfr-&gt;ring_memory = rvmalloc(tot_mem);
+
+  if(pfr-&gt;ring_memory != NULL) &#123;
+    printk(&quot;[PF_RING] successfully allocated %lu bytes at 0x%08lx\n&quot;,
+           (unsigned long)tot_mem, (unsigned long)pfr-&gt;ring_memory);
+  &#125; else &#123;
+    printk(&quot;[PF_RING] ERROR: not enough memory for ring\n&quot;);
+    return(-1);
+  &#125;
+
+  // memset(pfr-&gt;ring_memory, 0, tot_mem); // rvmalloc does the memset already
+  //初始化各成员
+        //内存指定，因为分配的内存开始部份是sizeof(FlowSlotInfo)，所以可以做这样的强制转换，很容易互相取值
+  pfr-&gt;slots_info = (FlowSlotInfo *) pfr-&gt;ring_memory;
+  //跳过控制信息，指向槽位指针.事实上，它就是一个一维数组了，可以计算出合适的索引值，取到数组(RING)中的任意槽位值
+  pfr-&gt;ring_slots = (char *)(pfr-&gt;ring_memory + sizeof(FlowSlotInfo));
+
+  //版本信息
+  pfr-&gt;slots_info-&gt;version = RING_FLOWSLOT_VERSION;
+  //登记单个槽的大小
+  pfr-&gt;slots_info-&gt;slot_len = the_slot_len;
+  //登记bucket大小，从前面特别注释的bucket的分配看，bucket_len这个大小并不代表bucket成员的实际大小——它不包含struct pfring_pkthdr
+  pfr-&gt;slots_info-&gt;data_len = pfr-&gt;bucket_len;
+  //登记实际分配到的槽位数量，这里不用num_slots，难道是怕rvmalloc偷吃？
+  pfr-&gt;slots_info-&gt;tot_slots =
+    (tot_mem - sizeof(FlowSlotInfo)) / the_slot_len;
+  //登记实际分配的内存总数  
+  pfr-&gt;slots_info-&gt;tot_mem = tot_mem;
+  //采样速率？？
+  pfr-&gt;slots_info-&gt;sample_rate = 1;
+
+  printk(&quot;[PF_RING] allocated %d slots [slot_len=%d][tot_mem=%u]\n&quot;,
+         pfr-&gt;slots_info-&gt;tot_slots, pfr-&gt;slots_info-&gt;slot_len,
+         pfr-&gt;slots_info-&gt;tot_mem);
+
+#ifdef RING_MAGIC
+  &#123;
+    int i;
+
+    for (i = 0; i &lt; pfr-&gt;slots_info-&gt;tot_slots; i++) &#123;
+      unsigned long idx = i * pfr-&gt;slots_info-&gt;slot_len;
+      FlowSlot *slot = (FlowSlot *) &amp; pfr-&gt;ring_slots[idx];
+      slot-&gt;magic = RING_MAGIC_VALUE;
+      slot-&gt;slot_state = 0;
+    &#125;
+  &#125;
+#endif
+  //这些控制变量可以在环的入队操作中看到它们的作用
+  pfr-&gt;sample_rate = 1;        /* No sampling */
+  pfr-&gt;insert_page_id = 1, pfr-&gt;insert_slot_id = 0;
+  pfr-&gt;rules_default_accept_policy = 1, pfr-&gt;num_filtering_rules = 0;
+  ring_proc_add(ring_sk(sk), dev);
+
+  //记录与之相应的设备信息，例如，如果在eth0上打开了5 个PF_RING, bind
+  //被调用5次，分配了5个环形队列空间。eth0上随之分配5个elem，它们指向与
+  //之对应的ring，然后根据设备索引号民全部加入至了device_ring_list
+  //当有数据报文从指定接口进入时，可以很容易地在device_ring_list中找到相应的设备
+  //然后再遍历链表，再找到与之相应的ring
+  if(dev-&gt;ifindex &lt; MAX_NUM_DEVICES) &#123;
+    device_ring_list_element *elem;
+
+    /* printk(&quot;[PF_RING] Adding ring to device index %d\n&quot;, dev-&gt;ifindex); */
+
+    elem = kmalloc(sizeof(device_ring_list_element), GFP_ATOMIC);
+    if(elem != NULL) &#123;
+      elem-&gt;the_ring = pfr;
+      INIT_LIST_HEAD(&amp;elem-&gt;list);
+      write_lock(&amp;ring_list_lock);
+      list_add(&amp;elem-&gt;list, &amp;device_ring_list[dev-&gt;ifindex]);
+      write_unlock(&amp;ring_list_lock);
+      /* printk(&quot;[PF_RING] Added ring to device index %d\n&quot;, dev-&gt;ifindex); */
+    &#125;
+  &#125;
+
+  /*
+    IMPORTANT
+    Leave this statement here as last one. In fact when
+    the ring_netdev != NULL the socket is ready to be used.
+  */
+  pfr-&gt;ring_netdev = dev;
+
+  return(0);
+&#125;
+</code></pre>
+<p>这个函数中，最重要的三点：<br>1、整个空间的详细构成，作者画了一个简单的草图，清晰明了。<br>2、如果取得某个槽位。<br>3、device_ring_list链表的使用。</p>
+<p>一些作者有详细注释的地方，我就不再重重了。</p>
+<p>这一步进行完了后，就有一块内存了（系统将其看成一个数组），用来存储捕获的数据帧。接下来要做的事情。就是把它映射到用户态。</p>
+<p>4、mmap操作</p>
+<p>用户态的接下来调用：</p>
+<pre><code>                    ring-&gt;buffer = (char *)mmap(NULL, PAGE_SIZE, PROT_READ|PROT_WRITE,
+                            MAP_SHARED, ring-&gt;fd, 0);
+                            
+</code></pre>
+<p>进行内存映射。<br>同样地，内核调用相应的ring_mmap进行处理。<br>Ring选项结构通过ring_sk宏与sk 建立关联</p>
+<pre><code>struct ring_opt *pfr = ring_sk(sk);
+</code></pre>
+<p>pfr-&gt;ring_memory 即为分配的环形队列空间。所以，要mmap操作，实际上就是调用remap_pfn_range函数把pfr-&gt;ring_memory 映射到用户空间即可。这个函数的原型为：</p>
+<pre><code>    /**
+    * remap_pfn_range - remap kernel memory to userspace
+    * @vma: user vma to map to
+    * @addr: target user address to start at
+    * @pfn: physical address of kernel memory
+    * @size: size of map area
+    * @prot: page protection flags for this mapping
+    *
+    *  Note: this is only safe if the mm semaphore is held when called.
+    */
+    int remap_pfn_range(struct vm_area_struct *vma, unsigned long addr,
+                        unsigned long pfn, unsigned long size, pgprot_t prot)
+    &#123;
+    
+关于remap_pfn_range函数的进一步说明，可以参考LDD3，上面有详细说明和现成的例子。
+
+
+
+
+static int ring_mmap(struct file *file,
+                     struct socket *sock, struct vm_area_struct *vma)
+&#123;
+  struct sock *sk = sock-&gt;sk;
+  struct ring_opt *pfr = ring_sk(sk);                //取得pfr指针，也就是相应取得环形队列的内存空间地址指针
+  int rc;
+  unsigned long size = (unsigned long)(vma-&gt;vm_end - vma-&gt;vm_start);
+
+  if(size % PAGE_SIZE) &#123;
+#if defined(RING_DEBUG)
+    printk(&quot;[PF_RING] ring_mmap() failed: &quot;
+           &quot;len is not multiple of PAGE_SIZE\n&quot;);
+#endif
+    return(-EINVAL);
+  &#125;
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] ring_mmap() called, size: %ld bytes\n&quot;, size);
+#endif
+
+  if((pfr-&gt;dna_device == NULL) &amp;&amp; (pfr-&gt;ring_memory == NULL)) &#123;
+#if defined(RING_DEBUG)
+    printk(&quot;[PF_RING] ring_mmap() failed: &quot;
+           &quot;mapping area to an unbound socket\n&quot;);
+#endif
+    return -EINVAL;
+  &#125;
+
+  //dns设备为空，即没有使用dns技术
+  if(pfr-&gt;dna_device == NULL) &#123;
+    /* if userspace tries to mmap beyond end of our buffer, fail */
+    //映射空间超限
+    if(size &gt; pfr-&gt;slots_info-&gt;tot_mem) &#123;
+#if defined(RING_DEBUG)
+      printk(&quot;[PF_RING] ring_mmap() failed: &quot;
+             &quot;area too large [%ld &gt; %d]\n&quot;,
+             size, pfr-&gt;slots_info-&gt;tot_mem);
+#endif
+      return(-EINVAL);
+    &#125;
+#if defined(RING_DEBUG)
+    printk(&quot;[PF_RING] mmap [slot_len=%d]&quot;
+           &quot;[tot_slots=%d] for ring on device %s\n&quot;,
+           pfr-&gt;slots_info-&gt;slot_len, pfr-&gt;slots_info-&gt;tot_slots,
+           pfr-&gt;ring_netdev-&gt;name);
+#endif
+        //进行内存映射
+    if((rc =
+         do_memory_mmap(vma, size, pfr-&gt;ring_memory, VM_LOCKED,
+                        0)) &lt; 0)
+      return(rc);
+  &#125; else &#123;
+    /* DNA Device */
+    if(pfr-&gt;dna_device == NULL)
+      return(-EAGAIN);
+
+    switch (pfr-&gt;mmap_count) &#123;
+    case 0:
+      if((rc = do_memory_mmap(vma, size,
+                               (void *)pfr-&gt;dna_device-&gt;
+                               packet_memory, VM_LOCKED,
+                               1)) &lt; 0)
+        return(rc);
+      break;
+
+    case 1:
+      if((rc = do_memory_mmap(vma, size,
+                               (void *)pfr-&gt;dna_device-&gt;
+                               descr_packet_memory, VM_LOCKED,
+                               1)) &lt; 0)
+        return(rc);
+      break;
+
+    case 2:
+      if((rc = do_memory_mmap(vma, size,
+                               (void *)pfr-&gt;dna_device-&gt;
+                               phys_card_memory,
+                               (VM_RESERVED | VM_IO), 2)) &lt; 0)
+        return(rc);
+      break;
+
+    default:
+      return(-EAGAIN);
+    &#125;
+
+    pfr-&gt;mmap_count++;
+  &#125;
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] ring_mmap succeeded\n&quot;);
+#endif
+
+  return 0;
+&#125;
+</code></pre>
+<p>实际上的内存映射工作，是由do_memory_mmap来完成的，这个函数实际上基本就是remap_pfn_range的包裹函数。<br>不过因为系统支持dna等技术，相应的mode参数有些变化，这里只分析了最基本的方法：mode == 0</p>
+<pre><code>static int do_memory_mmap(struct vm_area_struct *vma,
+                          unsigned long size, char *ptr, u_int flags, int mode)
+&#123;
+  unsigned long start;
+  unsigned long page;
+
+  /* we do not want to have this area swapped out, lock it */
+  vma-&gt;vm_flags |= flags;
+  start = vma-&gt;vm_start;
+
+  while (size &gt; 0) &#123;
+    int rc;
+
+    if(mode == 0) &#123;
+#if(LINUX_VERSION_CODE &gt;= KERNEL_VERSION(2,6,11))
+          //根据地址，计算要映射的页帧
+      page = vmalloc_to_pfn(ptr);
+      //进行内存映射
+      rc = remap_pfn_range(vma, start, page, PAGE_SIZE,
+                           PAGE_SHARED);
+#else
+      page = vmalloc_to_page(ptr);
+      page = kvirt_to_pa(ptr);
+      rc = remap_page_range(vma, start, page, PAGE_SIZE,
+                            PAGE_SHARED);
+#endif
+    &#125; else if(mode == 1) &#123;
+      rc = remap_pfn_range(vma, start,
+                           __pa(ptr) &gt;&gt; PAGE_SHIFT,
+                           PAGE_SIZE, PAGE_SHARED);
+    &#125; else &#123;
+      rc = remap_pfn_range(vma, start,
+                           ((unsigned long)ptr) &gt;&gt; PAGE_SHIFT,
+                           PAGE_SIZE, PAGE_SHARED);
+    &#125;
+
+    if(rc) &#123;
+#if defined(RING_DEBUG)
+      printk(&quot;[PF_RING] remap_pfn_range() failed\n&quot;);
+#endif
+      return(-EAGAIN);
+    &#125;
+
+    start += PAGE_SIZE;
+    ptr += PAGE_SIZE;
+    if(size &gt; PAGE_SIZE) &#123;
+      size -= PAGE_SIZE;
+    &#125; else &#123;
+      size = 0;
+    &#125;
+  &#125;
+
+  return(0);
+&#125;
+</code></pre>
+<p>嗯，跳过了太多的细节，不过其mmap最核心的东东已经呈现出来。<br>如果要共享内核与用户空间内存，这倒是个现成的可借鉴的例子。</p>
+<p>5、数据包的入队操作</p>
+<p>做到这一步，准备工作基本上就完成了。因为PF_RING在初始化中，注册了prot_hook。其func指针指向packet_rcv函数：<br>当数据报文进入Linux网络协议栈队列时，netif_receive_skb会遍历这些注册的Hook：</p>
+<pre><code>int netif_receive_skb(struct sk_buff *skb)
+&#123;
+        list_for_each_entry_rcu(ptype, &amp;ptype_all, list) &#123;
+                if (ptype-&gt;dev == null_or_orig || ptype-&gt;dev == skb-&gt;dev ||
+                    ptype-&gt;dev == orig_dev) &#123;
+                        if (pt_prev)
+                                ret = deliver_skb(skb, pt_prev, orig_dev);
+                        pt_prev = ptype;
+                &#125;
+        &#125;
+&#125;    
+</code></pre>
+<p>相应的Hook函数得到调用：</p>
+<pre><code>static inline int deliver_skb(struct sk_buff *skb,
+                              struct packet_type *pt_prev,
+                              struct net_device *orig_dev)
+&#123;
+        atomic_inc(&amp;skb-&gt;users);        //注意，这里引用计数器被增加了
+        return pt_prev-&gt;func(skb, skb-&gt;dev, pt_prev, orig_dev);
+&#125;
+</code></pre>
+<p>packet_rcv随之执行环形队列的入队操作：</p>
+<pre><code>static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
+                      struct packet_type *pt, struct net_device *orig_dev)
+&#123;
+  int rc;
+
+  //忽略本地环回报文
+  if(skb-&gt;pkt_type != PACKET_LOOPBACK) &#123;
+          //进一步转向，最后一个参数直接使用-1，从上下文来看，写为RING_ANY_CHANNEL(其实也是-1)似乎可读性更强，
+          //这里表示，如果从packet_rcv进入队列，由通道ID是“未指定的”，由skb_ring_handler来处理
+    rc = skb_ring_handler(skb,
+                          (skb-&gt;pkt_type == PACKET_OUTGOING) ? 0 : 1,
+                          1, -1 /* unknown channel */);
+
+  &#125; else
+    rc = 0;
+
+  kfree_skb(skb);                                //所以，这里要做相应的减少
+  return(rc);
+&#125;
+
+
+
+static int skb_ring_handler(struct sk_buff *skb,                                //要捕获的数据包
+                            u_char recv_packet,                                                                //数据流方向，&gt;0表示是进入(接收)方向
+                            u_char real_skb /* 1=real skb, 0=faked skb */ ,
+                            short channel_id)                                                                //通道ID
+&#123;
+  struct sock *skElement;
+  int rc = 0, is_ip_pkt;
+  struct list_head *ptr;
+  struct pfring_pkthdr hdr;
+  int displ;
+  struct sk_buff *skk = NULL;
+  struct sk_buff *orig_skb = skb;
+
+#ifdef PROFILING
+  uint64_t rdt = _rdtsc(), rdt1, rdt2;
+#endif
+
+  //skb合法检查，包括数据流的方向
+  if((!skb)                /* Invalid skb */
+      ||((!enable_tx_capture) &amp;&amp; (!recv_packet))) &#123;
+    /*
+      An outgoing packet is about to be sent out
+      but we decided not to handle transmitted
+      packets.
+    */
+    return(0);
+  &#125;
+#if defined(RING_DEBUG)
+  if(1) &#123;
+    struct timeval tv;
+
+    skb_get_timestamp(skb, &amp;tv);
+    printk
+      (&quot;[PF_RING] skb_ring_handler() [skb=%p][%u.%u][len=%d][dev=%s][csum=%u]\n&quot;,
+       skb, (unsigned int)tv.tv_sec, (unsigned int)tv.tv_usec,
+       skb-&gt;len,
+       skb-&gt;dev-&gt;name == NULL ? &quot;&lt;NULL&gt;&quot; : skb-&gt;dev-&gt;name,
+       skb-&gt;csum);
+  &#125;
+#endif
+
+        //如果通道ID未指定，根据进入的报文设备索引，设定之
+#if(LINUX_VERSION_CODE &gt;= KERNEL_VERSION(2,6,21))
+  if(channel_id == RING_ANY_CHANNEL /* Unknown channel */ )
+    channel_id = skb-&gt;iif;        /* Might have been set by the driver */
+#endif
+
+#if defined (RING_DEBUG)
+  /* printk(&quot;[PF_RING] channel_id=%d\n&quot;, channel_id); */
+#endif
+
+#ifdef PROFILING
+  rdt1 = _rdtsc();
+#endif
+
+  if(recv_packet) &#123;
+    /* Hack for identifying a packet received by the e1000 */
+    if(real_skb)
+      displ = SKB_DISPLACEMENT;
+    else
+      displ = 0;        /* Received by the e1000 wrapper */
+  &#125; else
+    displ = 0;
+       
+  //解析数据报文，并判断是否为IP报文
+  is_ip_pkt = parse_pkt(skb, displ, &amp;hdr);
+
+  //分片处理,是一个可选的功能项，事实上，对大多数包捕获工具而言，它们好像都不使用底层库来完成这一功能
+  /* (de)Fragmentation &lt;fusco@ntop.org&gt; */
+  if(enable_ip_defrag
+      &amp;&amp; real_skb &amp;&amp; is_ip_pkt &amp;&amp; recv_packet &amp;&amp; (ring_table_size &gt; 0)) &#123;
+    &#125; else &#123;
+#if defined (RING_DEBUG)
+        printk(&quot;[PF_RING] Do not seems to be a fragmented ip_pkt[iphdr=%p]\n&quot;,
+               iphdr);
+#endif
+      &#125;
+    &#125;
+  &#125;
+
+  //按惯例，在报文的捕获首部信息中记录捕获的时间戳
+  /* BD - API changed for time keeping */
+#if(LINUX_VERSION_CODE &lt; KERNEL_VERSION(2,6,14))
+  if(skb-&gt;stamp.tv_sec == 0)
+    do_gettimeofday(&amp;skb-&gt;stamp);
+  hdr.ts.tv_sec = skb-&gt;stamp.tv_sec, hdr.ts.tv_usec = skb-&gt;stamp.tv_usec;
+#elif(LINUX_VERSION_CODE &lt; KERNEL_VERSION(2,6,22))
+  if(skb-&gt;tstamp.off_sec == 0)
+    __net_timestamp(skb);
+  hdr.ts.tv_sec = skb-&gt;tstamp.off_sec, hdr.ts.tv_usec =
+    skb-&gt;tstamp.off_usec;
+#else /* 2.6.22 and above */
+  if(skb-&gt;tstamp.tv64 == 0)
+    __net_timestamp(skb);
+  hdr.ts = ktime_to_timeval(skb-&gt;tstamp);
+#endif
+
+  //除了时间，还有长度，熟悉libpcap的话，这些操作应该很眼熟
+  hdr.len = hdr.caplen = skb-&gt;len + displ;
+
+  /* Avoid the ring to be manipulated while playing with it */
+  read_lock_bh(&amp;ring_mgmt_lock);
+
+  /* 前面在创建sk时，已经看过ring_insert的入队操作了，现在要检查它的成员
+  * 它们的关系是，通过ring_table的成员，获取到element，它里面封装了sk，
+  *通过ring_sk宏，就可以得到ring_opt指针
+   */
+  list_for_each(ptr, &amp;ring_table) &#123;
+    struct ring_opt *pfr;
+    struct ring_element *entry;
+
+    entry = list_entry(ptr, struct ring_element, list);
+
+    skElement = entry-&gt;sk;
+    pfr = ring_sk(skElement);
+       
+        //看来要加入社团，条件还是满多的,pfr不能为空，未指定集群cluster_id，槽位不能为空，方向要正确，绑定的网络设备
+        //得对上号
+        //另一种可能就是对bonding的支持，如果设备是从属设备，则应校验其主设备
+    if((pfr != NULL)
+        &amp;&amp; (pfr-&gt;cluster_id == 0 /* No cluster */ )
+        &amp;&amp; (pfr-&gt;ring_slots != NULL)
+        &amp;&amp; is_valid_skb_direction(pfr-&gt;direction, recv_packet)
+        &amp;&amp; ((pfr-&gt;ring_netdev == skb-&gt;dev)
+            || ((skb-&gt;dev-&gt;flags &amp; IFF_SLAVE)
+                &amp;&amp; (pfr-&gt;ring_netdev == skb-&gt;dev-&gt;master)))) &#123;
+      /* We&#39;ve found the ring where the packet can be stored */
+      /* 从新计算捕获帧长度，是因为可能因为巨型帧的出现——超过了桶能容纳的长度 */
+      int old_caplen = hdr.caplen;        /* Keep old lenght */
+      hdr.caplen = min(hdr.caplen, pfr-&gt;bucket_len);
+      /* 入队操作 */
+      add_skb_to_ring(skb, pfr, &amp;hdr, is_ip_pkt, displ, channel_id);
+      hdr.caplen = old_caplen;
+      rc = 1;        /* Ring found: we&#39;ve done our job */
+    &#125;
+  &#125;
+
+  /* [2] Check socket clusters */
+  list_for_each(ptr, &amp;ring_cluster_list) &#123;
+    ring_cluster_element *cluster_ptr;
+    struct ring_opt *pfr;
+
+    cluster_ptr = list_entry(ptr, ring_cluster_element, list);
+
+    if(cluster_ptr-&gt;cluster.num_cluster_elements &gt; 0) &#123;
+      u_int skb_hash = hash_pkt_cluster(cluster_ptr, &amp;hdr);
+
+      skElement = cluster_ptr-&gt;cluster.sk[skb_hash];
+
+      if(skElement != NULL) &#123;
+        pfr = ring_sk(skElement);
+
+        if((pfr != NULL)
+            &amp;&amp; (pfr-&gt;ring_slots != NULL)
+            &amp;&amp; ((pfr-&gt;ring_netdev == skb-&gt;dev)
+                || ((skb-&gt;dev-&gt;flags &amp; IFF_SLAVE)
+                    &amp;&amp; (pfr-&gt;ring_netdev ==
+                        skb-&gt;dev-&gt;master)))
+            &amp;&amp; is_valid_skb_direction(pfr-&gt;direction, recv_packet)
+            ) &#123;
+          /* We&#39;ve found the ring where the packet can be stored */
+          add_skb_to_ring(skb, pfr, &amp;hdr,
+                          is_ip_pkt, displ,
+                          channel_id);
+          rc = 1;        /* Ring found: we&#39;ve done our job */
+        &#125;
+      &#125;
+    &#125;
+  &#125;
+
+  read_unlock_bh(&amp;ring_mgmt_lock);
+
+#ifdef PROFILING
+  rdt1 = _rdtsc() - rdt1;
+#endif
+
+#ifdef PROFILING
+  rdt2 = _rdtsc();
+#endif
+
+  /* Fragment handling */
+  if(skk != NULL)
+    kfree_skb(skk);
+
+  if(rc == 1) &#123;
+    if(transparent_mode != driver2pf_ring_non_transparent) &#123;
+      rc = 0;
+    &#125; else &#123;
+      if(recv_packet &amp;&amp; real_skb) &#123;
+#if defined(RING_DEBUG)
+        printk(&quot;[PF_RING] kfree_skb()\n&quot;);
+#endif
+
+        kfree_skb(orig_skb);
+      &#125;
+    &#125;
+  &#125;
+#ifdef PROFILING
+  rdt2 = _rdtsc() - rdt2;
+  rdt = _rdtsc() - rdt;
+
+#if defined(RING_DEBUG)
+  printk
+    (&quot;[PF_RING] # cycles: %d [lock costed %d %d%%][free costed %d %d%%]\n&quot;,
+     (int)rdt, rdt - rdt1,
+     (int)((float)((rdt - rdt1) * 100) / (float)rdt), rdt2,
+     (int)((float)(rdt2 * 100) / (float)rdt));
+#endif
+#endif
+
+  //printk(&quot;[PF_RING] Returned %d\n&quot;, rc);
+  return(rc);                /*  0 = packet not handled */
+&#125;
+</code></pre>
+<p>上面跳过了对cluster(集群)的分析，PF_RING允许同时对多个接口捕获报文，而并不是一个。这就是集群。看一下它用户态的注释就一目了然了：</p>
+<pre><code>                    /* Syntax
+                    ethX@1,5       channel 1 and 5
+                    ethX@1-5       channel 1,2...5
+                    ethX@1-3,5-7   channel 1,2,3,5,6,7
+                    */
+                    
+</code></pre>
+<p>进一步的入队操作，是通过add_skb_to_ring来完成的：</p>
+<pre><code>static int add_skb_to_ring(struct sk_buff *skb,
+                           struct ring_opt *pfr,
+                           struct pfring_pkthdr *hdr,
+                           int is_ip_pkt, int displ, short channel_id)
+&#123;
+      //add_skb_to_ring函数比较复杂，因为它要处理过滤器方面的问题。
+      //关于PF_RING的过滤器，可以参考[url]http://luca.ntop.org/Blooms.pdf[/url]
+      //获取更多内容。这里不做详细讨论了。或者留到下回分解吧。
+      
+      //最终入队操作，是通过调用dd_pkt_to_ring来实现的。
+      add_pkt_to_ring(skb, pfr, hdr, displ, channel_id,
+                      offset, mem);       
+&#125;
+
+
+
+
+static void add_pkt_to_ring(struct sk_buff *skb,
+                            struct ring_opt *pfr,
+                            struct pfring_pkthdr *hdr,
+                            int displ, short channel_id,
+                            int offset, void *plugin_mem)
+&#123;
+  char *ring_bucket;
+  int idx;
+  FlowSlot *theSlot;
+  int32_t the_bit = 1 &lt;&lt; channel_id;
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] --&gt; add_pkt_to_ring(len=%d) [pfr-&gt;channel_id=%d][channel_id=%d]\n&quot;,
+         hdr-&gt;len, pfr-&gt;channel_id, channel_id);
+#endif
+
+  //检查激活标志
+  if(!pfr-&gt;ring_active)
+    return;
+
+  if((pfr-&gt;channel_id != RING_ANY_CHANNEL)
+      &amp;&amp; (channel_id != RING_ANY_CHANNEL)
+      &amp;&amp; ((pfr-&gt;channel_id &amp; the_bit) != the_bit))
+    return; /* Wrong channel */
+
+  //写锁
+  write_lock_bh(&amp;pfr-&gt;ring_index_lock);
+  //获取前一次插入的位置索引
+  idx = pfr-&gt;slots_info-&gt;insert_idx;
+  //调用get_insert_slot获取当前要捕获数据报文的合适的槽位
+  //这里idx++后，指向了下一次插入的位置索引
+  idx++, theSlot = get_insert_slot(pfr);
+  //累计计数器
+  pfr-&gt;slots_info-&gt;tot_pkts++;
+
+  //没位子了，累计丢包计数器，返回之
+  if((theSlot == NULL) || (theSlot-&gt;slot_state != 0)) &#123;
+    /* No room left */
+    pfr-&gt;slots_info-&gt;tot_lost++;
+    write_unlock_bh(&amp;pfr-&gt;ring_index_lock);
+    return;
+  &#125;
+
+  //获取当前槽位的桶
+  ring_bucket = &amp;theSlot-&gt;bucket;
+
+  //支持插件？？在最开始处记录插件信息？？
+  if((plugin_mem != NULL) &amp;&amp; (offset &gt; 0))
+    memcpy(&amp;ring_bucket[sizeof(struct pfring_pkthdr)], plugin_mem, offset);  
+
+  if(skb != NULL) &#123;
+          //重新计算捕获帧长度
+    hdr-&gt;caplen = min(pfr-&gt;bucket_len - offset, hdr-&gt;caplen);
+
+    if(hdr-&gt;caplen &gt; 0) &#123;
+#if defined(RING_DEBUG)
+      printk(&quot;[PF_RING] --&gt; [caplen=%d][len=%d][displ=%d][parsed_header_len=%d][bucket_len=%d][sizeof=%d]\n&quot;,
+         hdr-&gt;caplen, hdr-&gt;len, displ,
+             hdr-&gt;parsed_header_len, pfr-&gt;bucket_len,
+             sizeof(struct pfring_pkthdr));
+#endif
+      //拷贝捕获的数据报文，前面空了两个栏位：一个是pkthdr首部，一个是插件offset长度
+      //这里经过了一次数据拷贝，对于完美主义者，这并不是一个好的方法。但是PF_RING定位于一个
+      //通用的接口库，似乎只有这么做了。否则，追求“零拷贝”，为了避免这一次拷贝，只有逐个修改网卡驱动了。
+      skb_copy_bits(skb, -displ,
+                    &amp;ring_bucket[sizeof(struct pfring_pkthdr) + offset], hdr-&gt;caplen);
+    &#125; else &#123;
+      if(hdr-&gt;parsed_header_len &gt;= pfr-&gt;bucket_len) &#123;
+        static u_char print_once = 0;
+
+        if(!print_once) &#123;
+          printk(&quot;[PF_RING] WARNING: the bucket len is [%d] shorter than the plugin parsed header [%d]\n&quot;,
+             pfr-&gt;bucket_len, hdr-&gt;parsed_header_len);
+          print_once = 1;
+        &#125;
+      &#125;
+    &#125;
+  &#125;
+
+  //记录首部
+  memcpy(ring_bucket, hdr, sizeof(struct pfring_pkthdr)); /* Copy extended packet header */
+
+  //前面idx已经自加过了，判断是否队列已满，若满，归零，否则更新插入索引
+  if(idx == pfr-&gt;slots_info-&gt;tot_slots)
+    pfr-&gt;slots_info-&gt;insert_idx = 0;
+  else
+    pfr-&gt;slots_info-&gt;insert_idx = idx;
+
+#if defined(RING_DEBUG)
+  printk(&quot;[PF_RING] ==&gt; insert_idx=%d\n&quot;, pfr-&gt;slots_info-&gt;insert_idx);
+#endif
+
+  //累计插入计数器
+  pfr-&gt;slots_info-&gt;tot_insert++;
+  //槽位就绪标记，用户空间可以来取了
+  theSlot-&gt;slot_state = 1;
+  write_unlock_bh(&amp;pfr-&gt;ring_index_lock);
+
+  //有的时候会出现，用户空间取不到的情况，如队列为空。这样，用户空间调用poll等待数据。这里做相应的唤醒处理
+  /* wakeup in case of poll() */
+  if(waitqueue_active(&amp;pfr-&gt;ring_slots_waitqueue))
+    wake_up_interruptible(&amp;pfr-&gt;ring_slots_waitqueue);
+&#125;
+</code></pre>
+<p>槽位的计算:</p>
+<pre><code>在ring_bind函数中，分配空间后，使用ring_slots做为槽位指针。事实上，这里要计算槽位，就是通过索引号 * 槽位长度来得到：
+static inline FlowSlot *get_insert_slot(struct ring_opt *pfr)
+&#123;
+  if(pfr-&gt;ring_slots != NULL) &#123;
+    FlowSlot *slot =
+      (FlowSlot *) &amp; (pfr-&gt;
+                      ring_slots[pfr-&gt;slots_info-&gt;insert_idx *
+                                 pfr-&gt;slots_info-&gt;slot_len]);
+#if defined(RING_DEBUG)
+    printk
+      (&quot;[PF_RING] get_insert_slot(%d): returned slot [slot_state=%d]\n&quot;,
+       pfr-&gt;slots_info-&gt;insert_idx, slot-&gt;slot_state);
+#endif
+    return(slot);
+  &#125; else &#123;
+#if defined(RING_DEBUG)
+    printk(&quot;[PF_RING] get_insert_slot(%d): NULL slot\n&quot;,
+           pfr-&gt;slots_info-&gt;insert_idx);
+#endif
+    return(NULL);
+  &#125;
+&#125;
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

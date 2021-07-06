@@ -1,0 +1,409 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java-Web开发笔记03-Javascript | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1、用法">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Java-Web开发笔记03-Javascript"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-11-10T10:15:51.000Z"><a href="/2017/11/10/Java-Web开发笔记03-Javascript/">2017-11-10</a></time>
+        
+  
+    <h1 class="title">Java-Web开发笔记03-Javascript</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E7%94%A8%E6%B3%95"><span class="toc-text">1、用法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1%E3%80%81Javascript%E7%BB%93%E5%90%88%E6%96%B9%E5%BC%8F"><span class="toc-text">1.1、Javascript结合方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81JavaScript-%E8%AF%AD%E6%B3%95"><span class="toc-text">2、JavaScript 语法</span></a></li></ol></li></ol>
+    </div>
+
+        <h3 id="1、用法"><a href="#1、用法" class="headerlink" title="1、用法"></a>1、用法</h3><span id="more"></span>
+<h4 id="1-1、Javascript结合方式"><a href="#1-1、Javascript结合方式" class="headerlink" title="1.1、Javascript结合方式"></a>1.1、Javascript结合方式</h4><p>1、在页面使用scrip标签，在标签中写JS代码；</p>
+<p>HTML 中的脚本必须位于 <script> 与 </script> 标签之间。脚本可被放置在 HTML 页面的 <body> 和 <head> 部分中。</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;学习&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+    alert(&quot;结合方式一!&quot;)
+&lt;/script&gt;
+
+&lt;/head&gt;
+
+&lt;body&gt;
+
+    &lt;p&gt;Hello World!&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;    
+</code></pre>
+<p>2、使用src属性引入外部js文件</p>
+<p>JS文件</p>
+<pre><code>function JS_Function(str)
+&#123;
+    alert(str);
+&#125;
+</code></pre>
+<p>HTML文件</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;学习&lt;/title&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;../js/Fun.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; &gt;
+
+window.onload = function()
+&#123;
+
+    var fun = JS_Function;//引入JS_Function函数
+    JS_Function(&quot;外部引入函数&quot;);
+&#125;
+
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h4 id="2、JavaScript-语法"><a href="#2、JavaScript-语法" class="headerlink" title="2、JavaScript 语法"></a>2、JavaScript 语法</h4><p>JavaScript 是一个程序语言。语法规则定义了语言结构。JavaScript 是一个脚本语言。它是一个轻量级，但功能强大的编程语言。</p>
+<p><strong>JavaScript 字面量</strong></p>
+<p>在编程语言中，一般固定值称为字面量，如 3.14。</p>
+<ul>
+<li>数字（Number）字面量 可以是整数或者是小数，或者是科学计数(e)。</li>
+</ul>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;菜鸟教程(runoob.com)&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    
+&lt;p id=&quot;demo&quot;&gt;&lt;/p&gt;
+&lt;script&gt;
+document.getElementById(&quot;demo&quot;).innerHTML = 123e5;
+&lt;/script&gt;
+    
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<ul>
+<li>字符串（String）字面量 可以使用单引号或双引号:</li>
+</ul>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt; 
+&lt;meta charset=&quot;utf-8&quot;&gt; 
+&lt;title&gt;菜鸟教程(runoob.com)&lt;/title&gt; 
+&lt;/head&gt;
+&lt;body&gt;
+    
+&lt;p id=&quot;demo&quot;&gt;&lt;/p&gt;
+&lt;script&gt;
+document.getElementById(&quot;demo&quot;).innerHTML = &#39;John Doe&#39;;
+&lt;/script&gt;
+    
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<ul>
+<li>表达式字面量 用于计算：</li>
+</ul>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt; 
+&lt;meta charset=&quot;utf-8&quot;&gt; 
+&lt;title&gt;菜鸟教程(runoob.com)&lt;/title&gt; 
+&lt;/head&gt;
+&lt;body&gt;
+    
+&lt;p id=&quot;demo&quot;&gt;&lt;/p&gt;
+&lt;script&gt;
+document.getElementById(&quot;demo&quot;).innerHTML = 5 * 10;
+&lt;/script&gt;
+    
+&lt;/body&gt;
+&lt;/html&gt;    
+</code></pre>
+<ul>
+<li>数组（Array）字面量 定义一个数组：</li>
+</ul>
+<pre><code>[40, 100, 1, 5, 25, 10]
+</code></pre>
+<ul>
+<li>对象（Object）字面量 定义一个对象：</li>
+</ul>
+<pre><code>&#123;firstName:&quot;John&quot;, lastName:&quot;Doe&quot;, age:50, eyeColor:&quot;blue&quot;&#125;
+</code></pre>
+<ul>
+<li>函数（Function）字面量 定义一个函数：</li>
+</ul>
+<pre><code>function myFunction(a, b) &#123; return a * b;&#125;
+</code></pre>
+<p><strong>JavaScript 变量</strong></p>
+<p>在编程语言中，变量用于存储数据值。<br>JavaScript 使用关键字 var 来定义变量， 使用等号来为变量赋值：</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt; 
+&lt;meta charset=&quot;utf-8&quot;&gt; 
+&lt;title&gt;菜鸟教程(runoob.com)&lt;/title&gt; 
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p id=&quot;demo&quot;&gt;&lt;/p&gt;
+&lt;script&gt;
+var length;
+length = 6;
+document.getElementById(&quot;demo&quot;).innerHTML = length;
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>变量可以通过变量名访问。在指令式语言中，变量通常是可变的。字面量是一个恒定的值。</p>
+<blockquote>
+<p>变量是一个名称。字面量是一个值。</p>
+</blockquote>
+<p><strong>JavaScript 操作符</strong></p>
+<p>JavaScript使用 算术运算符 来计算值:</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt; 
+&lt;meta charset=&quot;utf-8&quot;&gt; 
+&lt;title&gt;菜鸟教程(runoob.com)&lt;/title&gt; 
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p id=&quot;demo&quot;&gt;&lt;/p&gt;
+&lt;script&gt;
+document.getElementById(&quot;demo&quot;).innerHTML = (5 + 6) * 10;
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>JavaScript使用赋值运算符给变量赋值：</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt; 
+&lt;meta charset=&quot;utf-8&quot;&gt; 
+&lt;title&gt;菜鸟教程(runoob.com)&lt;/title&gt; 
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;p id=&quot;demo&quot;&gt;&lt;/p&gt;
+&lt;script&gt;
+var x, y, z;
+x = 5;
+y = 6;
+z = (x + y) * 10;
+document.getElementById(&quot;demo&quot;).innerHTML = z;
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>JavaScript语言有多种类型的运算符：</p>
+<p>类型                                实例                    描述<br>赋值，算术和位运算符                =  +  -  *  /            在 JS 运算符中描述<br>条件，比较及逻辑运算符                ==  != &lt;  &gt;             在 JS 比较运算符中描述</p>
+<p><strong>JavaScript 语句</strong><br>在 HTML 中，JavaScript 语句向浏览器发出的命令。<br>语句是用分号分隔：<br>x = 5 + 6;<br>y = x * 10;</p>
+<p><strong>JavaScript 关键字</strong><br>JavaScript 关键字用于标识要执行的操作。<br>和其他任何编程语言一样，JavaScript 保留了一些关键字为自己所用。<br>var 关键字告诉浏览器创建一个新的变量：<br>var x = 5 + 6;<br>var y = x * 10;<br>JavaScript 同样保留了一些关键字，这些关键字在当前的语言版本中并没有使用，但在以后 JavaScript 扩展中会用到。<br>JavaScript 关键字必须以字母、下划线（_）或美元符（$）开始。<br>后续的字符可以是字母、数字、下划线或美元符（数字是不允许作为首字符出现的，以便 JavaScript 可以轻易区分开关键字和数字）。<br>以下是 JavaScript 中最​​重要的保留字（按字母顺序）：</p>
+<img src="/2017/11/10/Java-Web%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B003-Javascript/1.png" class="" title="图片">
+
+
+<p><strong>JavaScript 注释</strong><br>不是所有的 JavaScript 语句都是”命令”。双斜杠 // 后的内容将会被浏览器忽略：</p>
+<pre><code>// 我不会执行
+JavaScript 数据类型
+JavaScript 有多种数据类型：数字，字符串，数组，对象等等：
+var length = 16;                                  // Number 通过数字字面量赋值 
+var points = x * 10;                              // Number 通过表达式字面量赋值
+var lastName = &quot;Johnson&quot;;                         // String 通过字符串字面量赋值
+var cars = [&quot;Saab&quot;, &quot;Volvo&quot;, &quot;BMW&quot;];              // Array  通过数组字面量赋值
+var person = &#123;firstName:&quot;John&quot;, lastName:&quot;Doe&quot;&#125;;  // Object 通过对象字面量赋值
+</code></pre>
+<p><strong>数据类型的概念</strong><br>编程语言中，数据类型是一个非常重要的内容。<br>为了可以操作变量，了解数据类型的概念非常重要。<br>如果没有使用数据类型，以下实例将无法执行：</p>
+<pre><code>16 + &quot;Volvo&quot;
+</code></pre>
+<p>16 加上 “Volvo” 是如何计算呢? 以上会产生一个错误还是输出以下结果呢？</p>
+<pre><code>&quot;16Volvo&quot;
+</code></pre>
+<p>你可以在浏览器尝试执行以上代码查看效果。<br>在接下来的章节中你将学到更多关于数据类型的知识。</p>
+<ul>
+<li>JavaScript 函数</li>
+</ul>
+<p>JavaScript 语句可以写在函数内，函数可以重复引用：</p>
+<p>引用一个函数 = 调用函数(执行函数内的语句)。</p>
+<pre><code>function myFunction(a, b) &#123;
+       return a * b;                                // 返回 a 乘于 b 的结果
+&#125;
+</code></pre>
+<p><strong>JavaScript 字母大小写</strong></p>
+<p>JavaScript 对大小写是敏感的。<br>当编写 JavaScript 语句时，请留意是否关闭大小写切换键。<br>函数 getElementById 与 getElementbyID 是不同的。<br>同样，变量 myVariable 与 MyVariable 也是不同的。</p>
+<p><strong>JavaScript 字符集</strong><br>JavaScript 使用 Unicode 字符集。<br>Unicode 覆盖了所有的字符，包含标点等字符。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/10-Web/">10. Web</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Java-Web/">Java Web</a>, <a href="/tags/Eclipse/">Eclipse</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

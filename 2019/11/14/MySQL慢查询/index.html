@@ -1,0 +1,321 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>MySQL慢查询 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="隐藏正文">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="MySQL慢查询"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2019-11-14T07:34:39.000Z"><a href="/2019/11/14/MySQL慢查询/">2019-11-14</a></time>
+        
+  
+    <h1 class="title">MySQL慢查询</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%85%A2%E6%97%A5%E5%BF%97%E6%9F%A5%E8%AF%A2%E4%BD%9C%E7%94%A8"><span class="toc-text">1. 慢日志查询作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%BC%80%E5%90%AF%E6%97%A5%E5%BF%97%E6%85%A2%E6%9F%A5%E8%AF%A2"><span class="toc-text">2. 开启日志慢查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%9F%A5%E7%9C%8B%E6%85%A2%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95"><span class="toc-text">3. 查看慢日志记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BD%BF%E7%94%A8explain-%E5%88%86%E6%9E%90SQL"><span class="toc-text">4. 使用explain 分析SQL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E4%BC%98%E5%8C%96SQL"><span class="toc-text">5. 优化SQL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E6%85%A2%E6%97%A5%E5%BF%97%E7%9A%84%E6%B8%85%E7%90%86%E5%92%8C%E5%A4%87%E4%BB%BD"><span class="toc-text">6. 慢日志的清理和备份</span></a></li></ol>
+    </div>
+
+        <p>隐藏正文</p>
+<span id="more"></span>
+
+<h3 id="1-慢日志查询作用"><a href="#1-慢日志查询作用" class="headerlink" title="1. 慢日志查询作用"></a>1. 慢日志查询作用</h3><p>慢日志查询的主要功能就是，记录执行sql语句超过设定的时间阈值的语句写入日志文件（日志可以写入文件或者数据库表，如果对性能要求高的话，建议写文件）。慢查询主要是为了我们做sql语句的优化功能.</p>
+<p>当某些sql语句执行完毕所花费的时间特别长，我们将这种响应比较慢的语句记录在慢查询日志中，不要被<code>慢查询日志</code>的名字误导，不要错误的以为慢查询日志<code>只会记录执行比较慢的SELECT语句</code>，INSERT、DELETE、UPDATE、CALL等操作，只要是超过了指定的时间，都可以称为慢查询，被记录在慢查询日志中。默认情况下，慢查询日志是关闭状态，需手动开启。</p>
+<p>例如，一条查询sql语句，我们设置的阈值为5s，当这条语句的执行时间超过了5s，则将被写入到慢查询配置的日志中.</p>
+<h3 id="2-开启日志慢查询"><a href="#2-开启日志慢查询" class="headerlink" title="2. 开启日志慢查询"></a>2. 开启日志慢查询</h3><p>开启慢查询功能的方式有两种，一种是在my.cnf配置文件中配置,另外一种是在mysql命令终端中使用命令配置.</p>
+<p>如果版本低于5.5的，参数名称会不一样。</p>
+<pre><code>mysql&gt; show variables like &#39;%version%&#39;;
++-------------------------+------------------------------+
+| Variable_name           | Value                        |
++-------------------------+------------------------------+
+| innodb_version          | 5.7.25                       |
+| protocol_version        | 10                           |
+| slave_type_conversions  |                              |
+| tls_version             | TLSv1,TLSv1.1                |
+| version                 | 5.7.25                       |
+| version_comment         | MySQL Community Server (GPL) |
+| version_compile_machine | x86_64                       |
+| version_compile_os      | Linux                        |
++-------------------------+------------------------------+
+8 rows in set (0.00 sec)
+</code></pre>
+<p>2.1 my.cnf配置文件</p>
+<pre><code># 找到[mysqld],在其下面添加如下代码即可.
+
+
+# ON为开启慢查询日志，OFF则为关闭慢查询日志
+slow_query_log=ON
+
+# 指定了慢查询的阈值，即如果执行语句的时间超过该阈值则为慢查询语句，默认值为10秒。0秒表示记录所有执行的SQL语句
+long_query_time=0
+
+# 记录的慢查询日志到文件中（注意：默认名为主机名.log，慢查询日志是否写入指定文件中，需要指定慢查询的输出日志格式为文件，相关命令为：show variables like ‘%log_output%’；去查看输出的格式）
+slow_query_log_file=/var/lib/mysql/msd-slow.log
+
+# 这个参数设置为ON，可以捕获到所有未使用索引的SQL语句（注意：如果只是将log_queries_not_using_indexes设置为ON，而将slow_query_log设置为OFF，此时该设置也不会生效，即该设置生效的前提是slow_query_log的值设置为ON）
+log_queries_not_using_indexes=ON
+
+
+# 配置好后，重启mysql服务
+</code></pre>
+<p>2.2 登录mysql服务，使用mysql终端命令配置</p>
+<pre><code>mysql&gt; show variables like &#39;%query%&#39;;
++------------------------------+-----------------------------+
+| Variable_name                | Value                       |
++------------------------------+-----------------------------+
+| binlog_rows_query_log_events | OFF                         |
+| ft_query_expansion_limit     | 20                          |
+| have_query_cache             | YES                         |
+| long_query_time              | 10.000000                   |
+| query_alloc_block_size       | 8192                        |
+| query_cache_limit            | 1048576                     |
+| query_cache_min_res_unit     | 4096                        |
+| query_cache_size             | 1048576                     |
+| query_cache_type             | OFF                         |
+| query_cache_wlock_invalidate | OFF                         |
+| query_prealloc_size          | 8192                        |
+| slow_query_log               | OFF                         |
+| slow_query_log_file          | /var/lib/mysql/msd-slow.log |
++------------------------------+-----------------------------+
+13 rows in set (0.00 sec)
+mysql&gt; SET GLOBAL slow_query_log=ON;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql&gt; SET GLOBAL long_query_time=0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; SET GLOBAL log_queries_not_using_indexes=ON;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; exit #需要重新连接mysql，设置的long_query_time 才会生效
+
+mysql&gt; show variables like &#39;%query%&#39;;
++------------------------------+-----------------------------+
+| Variable_name                | Value                       |
++------------------------------+-----------------------------+
+| binlog_rows_query_log_events | OFF                         |
+| ft_query_expansion_limit     | 20                          |
+| have_query_cache             | YES                         |
+| long_query_time              | 0.000000                    |
+| query_alloc_block_size       | 8192                        |
+| query_cache_limit            | 1048576                     |
+| query_cache_min_res_unit     | 4096                        |
+| query_cache_size             | 1048576                     |
+| query_cache_type             | OFF                         |
+| query_cache_wlock_invalidate | OFF                         |
+| query_prealloc_size          | 8192                        |
+| slow_query_log               | ON                          |
+| slow_query_log_file          | /var/lib/mysql/msd-slow.log |
++------------------------------+-----------------------------+
+13 rows in set (0.01 sec)
+</code></pre>
+<p>当出现下面问题，请使用如下命令修复。</p>
+<pre><code>mysql&gt; show variables like &#39;%query%&#39;;
+ERROR 1146 (42S02): Table &#39;performance_schema.session_variables&#39; doesn&#39;t exist
+mysql&gt; exit
+
+# mysql_upgrade -uroot -p --force
+# systemctl restart mysqld
+</code></pre>
+<p>慢查询日志具体记录了：导致慢查询的语句（sql_text），该语句的查询时间（query_time），锁表时间（Lock_time），以及扫描过的行数（rows_examined）等信息</p>
+<h3 id="3-查看慢日志记录"><a href="#3-查看慢日志记录" class="headerlink" title="3. 查看慢日志记录"></a>3. 查看慢日志记录</h3><pre><code>/usr/sbin/mysqld, Version: 5.7.25 (MySQL Community Server (GPL)). started with:
+Tcp port: 3306  Unix socket: /var/lib/mysql/mysql.sock
+Time                 Id Command    Argument
+# Time: 2019-11-14T06:52:49.640069Z
+# User@Host: skip-grants user[root] @ localhost []  Id:     5
+# Query_time: 0.000435  Lock_time: 0.000130 Rows_sent: 2  Rows_examined: 195
+SET timestamp=1573714369;
+select * from comments where likedCount &gt; 50;
+</code></pre>
+<p> 上面文件配置内容说明</p>
+<ol>
+<li>Mysql的相关信息，版本</li>
+<li>Mysql的端口号以及socket文件路径</li>
+<li>字段说明</li>
+<li>Time：该日志记录的时间</li>
+<li>User@Host：Mysql登录的用户和登录的主机地址,Id表示的是服务器线程ID</li>
+<li>Query_time：第一个时间是查询的时间、第二个是锁表持续的时间、第三个是返回的行数、第四个是扫描的行数</li>
+<li>SET timestamp：Mysql查询的时间</li>
+<li>执行的sql语句</li>
+</ol>
+<h3 id="4-使用explain-分析SQL"><a href="#4-使用explain-分析SQL" class="headerlink" title="4. 使用explain 分析SQL"></a>4. 使用explain 分析SQL</h3><p>Mysql提供了EXPLAIN关键字。可以与SELECT、DELETE、INSERT、REPLACE、UPDATE语句一起使用。只需要如下一样添加到查询开始处：<code> explain select * from comments where likedCount &gt; 50;</code></p>
+<pre><code>mysql&gt; explain select * from comments where likedCount &gt; 50;
++----+-------------+----------+------------+------+---------------+------+---------+------+------+----------+-------------+
+| id | select_type | table    | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
++----+-------------+----------+------------+------+---------------+------+---------+------+------+----------+-------------+
+|  1 | SIMPLE      | comments | NULL       | ALL  | NULL          | NULL | NULL    | NULL |  195 |    33.33 | Using where |
++----+-------------+----------+------------+------+---------------+------+---------+------+------+----------+-------------+
+1 row in set, 1 warning (0.00 sec)
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html">EXPLAIN Output Format</a></p>
+<h3 id="5-优化SQL"><a href="#5-优化SQL" class="headerlink" title="5. 优化SQL"></a>5. 优化SQL</h3><p>剩下的就是该加索引的加索引，该分区的分区，该分表的分表，该设置中间表的设置中间表，该优化连表查询的优化连表查询（拆分SQL）等等，如果这些方式还解决不了，则需要第三方工具了。<br>首先使用的是官方自带的工具mysqldumpslow<br>开源工具mysqlsla </p>
+<p>其他工具pt-query-digest,mysqltop,mysqldumpslow,mysqlsla,myprofi,mysql-explain-slow-log,mysqllogfilter</p>
+<h3 id="6-慢日志的清理和备份"><a href="#6-慢日志的清理和备份" class="headerlink" title="6. 慢日志的清理和备份"></a>6. 慢日志的清理和备份</h3><p>删除：直接删除慢日志文件，执行flush logs（必须的）。</p>
+<p>备份：先用mv重命名文件（不要跨分区），然后执行flush logs（必须的）。</p>
+<p>另外修改系统变量slow_query_log_file也可以立即生效；</p>
+<p>执行flush logs，系统会先close当前的句柄，然后重新open；mv , rm日志文件系统并不会报错，具体的原因可以Google下linux  i_count   i_nlink ；</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/08-DataBase/">08.DataBase</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/MYSQL/">MYSQL</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,898 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux Shell命令总结 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="$ 表示在命令行中，# 表示注释说明也可能是代表该脚本需要root权限，pwd表示路径，除非特别标明是其他意思。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux Shell命令总结"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2018-07-19T09:15:58.000Z"><a href="/2018/07/19/Linux-Shell命令总结/">2018-07-19</a></time>
+        
+  
+    <h1 class="title">Linux Shell命令总结</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%B8%AE%E5%8A%A9%E6%89%8B%E5%86%8C"><span class="toc-text">1 帮助手册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C"><span class="toc-text">2 文件操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E6%8D%A2%E8%A1%8C%E7%AC%A6%E8%BD%AC%E6%8D%A2"><span class="toc-text">2.1 换行符转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E6%96%87%E4%BB%B6%EF%BC%88%E6%96%87%E4%BB%B6%E5%A4%B9%EF%BC%89%E5%88%9B%E5%BB%BA"><span class="toc-text">2.2 文件（文件夹）创建</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-1%E6%96%87%E4%BB%B6%E5%88%9B%E5%BB%BA"><span class="toc-text">2.2.1文件创建</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-2%E7%9B%AE%E5%BD%95%E5%88%9B%E5%BB%BA"><span class="toc-text">2.2.2目录创建</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E6%96%87%E4%BB%B6%EF%BC%88%E6%96%87%E4%BB%B6%E5%A4%B9%EF%BC%89%E5%88%A0%E9%99%A4"><span class="toc-text">2.3 文件（文件夹）删除</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-1-%E6%96%87%E4%BB%B6%E5%88%A0%E9%99%A4"><span class="toc-text">2.3.1 文件删除</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-2-%E7%9B%AE%E5%BD%95%E5%88%A0%E9%99%A4"><span class="toc-text">2.3.2 目录删除</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E6%96%87%E4%BB%B6%EF%BC%88%E6%96%87%E4%BB%B6%E5%A4%B9%EF%BC%89%E6%98%BE%E7%A4%BA"><span class="toc-text">2.4 文件（文件夹）显示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E8%BF%9C%E7%A8%8B-%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6-%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-text">2.5 (远程)复制文件(文件夹)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-%E6%96%87%E4%BB%B6%EF%BC%88%E6%96%87%E4%BB%B6%E5%A4%B9%EF%BC%89%E7%A7%BB%E5%8A%A8"><span class="toc-text">2.6 文件（文件夹）移动</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-6-1-%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E5%8E%8B%E7%BC%A9"><span class="toc-text">2.6.1 文件解压压缩</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-%E6%9F%A5%E6%89%BE-%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%E6%9F%A5%E6%89%BE%E3%80%81%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE"><span class="toc-text">2.7 查找(文件内容查找、文件查找)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-%E6%96%87%E4%BB%B6%EF%BC%88%E6%96%87%E4%BB%B6%E5%A4%B9%EF%BC%89%E5%B1%9E%E6%80%A7-%E6%9D%83%E9%99%90"><span class="toc-text">2.8 文件（文件夹）属性(权限)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-%E6%96%87%E4%BB%B6%EF%BC%88%E8%BD%AF%E3%80%81%E7%A1%AC%EF%BC%89%E8%BF%9E%E6%8E%A5"><span class="toc-text">2.9 文件（软、硬）连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-10%E6%96%87%E4%BB%B6%E6%B8%85%E7%A9%BA"><span class="toc-text">2.10文件清空</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-11-%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD"><span class="toc-text">2.11 文件下载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-12-%E6%96%87%E4%BB%B6%E6%AF%94%E8%BE%83"><span class="toc-text">2.12 文件比较</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%BD%AF%E4%BB%B6"><span class="toc-text">2 软件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85"><span class="toc-text">2.1 软件安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E8%BD%AF%E4%BB%B6%E6%9F%A5%E8%AF%A2"><span class="toc-text">2.2 软件查询</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E7%A8%8B%E5%BA%8F"><span class="toc-text">3 程序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%9F%A5%E8%AF%A2%E8%BF%9B%E7%A8%8B"><span class="toc-text">3.1 查询进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%90%8E%E5%8F%B0%E8%BF%9B%E7%A8%8B"><span class="toc-text">3.2 后台进程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%BD%91%E7%BB%9C-amp-%E9%98%B2%E7%81%AB%E5%A2%99"><span class="toc-text">4 网络&amp;防火墙</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E9%98%B2%E7%81%AB%E5%A2%99"><span class="toc-text">4.1 防火墙</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%BD%91%E7%BB%9C"><span class="toc-text">4.2 网络</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%B4%A6%E6%88%B7"><span class="toc-text">5 账户</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C"><span class="toc-text">6 系统操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E6%B3%A8%E9%94%80%E5%85%B3%E6%9C%BA%E9%87%8D%E5%90%AF%E6%93%8D%E4%BD%9C"><span class="toc-text">6.1 注销关机重启操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%86%85%E5%AD%98"><span class="toc-text">6.2 内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E5%88%9B%E5%BB%BAswap%E7%A9%BA%E9%97%B4"><span class="toc-text">6.3 创建swap空间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-%E7%A3%81%E7%9B%98"><span class="toc-text">6.4 磁盘</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%A1%AC%E4%BB%B6%E4%BF%A1%E6%81%AF"><span class="toc-text">7 硬件信息</span></a></li></ol>
+    </div>
+
+        <p><code>$</code> 表示在命令行中，<code>#</code> 表示注释说明也可能是代表该脚本需要root权限，<code>pwd</code>表示路径，除非特别标明是其他意思。</p>
+<span id="more"></span>
+
+<h2 id="1-帮助手册"><a href="#1-帮助手册" class="headerlink" title="1 帮助手册"></a>1 帮助手册</h2><p>Linux 系统的帮助手册，详细解释了Shell命令的使用，系统函数的使用以及库函数的帮助说明（man is the system’s manual pager.）</p>
+<pre><code>$ man man # 详细解释了如何使用man命令
+$ man 1 ls   # Executable programs or shell commands
+$ man 2 open # System calls (functions provided by the kernel)
+$ man 3 print # Library calls (functions within program libraries)
+
+$ man  ascii    # 查看ascii码    
+</code></pre>
+<h2 id="2-文件操作"><a href="#2-文件操作" class="headerlink" title="2 文件操作"></a>2 文件操作</h2><p>在Linux系统中一切皆文件，这里的文件范围很大。</p>
+<h3 id="2-1-换行符转换"><a href="#2-1-换行符转换" class="headerlink" title="2.1 换行符转换"></a>2.1 换行符转换</h3><p>因为windows的换行符和Unix的换行符不一样，可能有时候需要转换一下。</p>
+<p>dos2unix把”\r\n”转化成”\n” <br><br>unixtodos把”\n”转化成”\r\n”。<br></p>
+<p>format:</p>
+<pre><code>$ dos2unix file_name
+</code></pre>
+<h3 id="2-2-文件（文件夹）创建"><a href="#2-2-文件（文件夹）创建" class="headerlink" title="2.2 文件（文件夹）创建"></a>2.2 文件（文件夹）创建</h3><h4 id="2-2-1文件创建"><a href="#2-2-1文件创建" class="headerlink" title="2.2.1文件创建"></a>2.2.1文件创建</h4><pre><code>$ touch file_name
+</code></pre>
+<p>touch 命令创建文件的时候，如果该文件存在，则只会更新该文件的时间戳（文件的访问时间和修改时间），如果该文件不存在，则创建文件。</p>
+<p><code>touch   touch [OPTION]... FILE...</code></p>
+<p>参数说明</p>
+<pre><code>   -a     change only the access time
+
+   -c, --no-create
+          do not create any files
+
+   -d, --date=STRING
+          parse STRING and use it instead of current time
+
+   -f     (ignored)
+
+   -h, --no-dereference
+          会影响符号链接本身，而非符号链接所指示的目的地(当系统支持更改符号链接的所有者时，此选项才有用)
+          affect each symbolic link instead of any referenced file (useful
+          only on systems that can change the timestamps of a symlink)
+
+   -m     change only the modification time
+
+   -r, --reference=FILE
+          use this file&#39;s times instead of current time
+
+   -t STAMP
+          use [[CC]YY]MMDDhhmm[.ss] instead of current time
+
+   --time=WORD
+          change the specified time: WORD is access, atime, or use: equiv‐
+          alent to -a WORD is modify or mtime: equivalent to -m
+
+   --help display this help and exit
+
+   --version
+          output version information and exit    
+</code></pre>
+<h4 id="2-2-2目录创建"><a href="#2-2-2目录创建" class="headerlink" title="2.2.2目录创建"></a>2.2.2目录创建</h4><pre><code>$ mkdir Dir_Name # 在当前目录下创建Dir_Name
+$ mkdir -p dirctory1/dirctory2/dirctory3/dirctory4 # 在当前路径下递归创建多级目录（一次性创建）
+</code></pre>
+<h3 id="2-3-文件（文件夹）删除"><a href="#2-3-文件（文件夹）删除" class="headerlink" title="2.3 文件（文件夹）删除"></a>2.3 文件（文件夹）删除</h3><h4 id="2-3-1-文件删除"><a href="#2-3-1-文件删除" class="headerlink" title="2.3.1 文件删除"></a>2.3.1 文件删除</h4><pre><code>$ rm file_name            #根据文件名，删除指定文件
+$ rm pwd/file_name        #根据文件名，删除指定路径下文件
+$ rm directory -rf         # 递归强制删除目录及目录下所有内容
+$ rm pwd/directory -rf    # 递归强制删除指定路径下的目录及此目录下所有内容
+$ rm -r file_name         # 强制删除某一文件（目录）
+</code></pre>
+<h4 id="2-3-2-目录删除"><a href="#2-3-2-目录删除" class="headerlink" title="2.3.2 目录删除"></a>2.3.2 目录删除</h4><pre><code>$ rmdir dir_empty        # 只能删除空目录
+$ rmdir -p dir_empty    # 只删除空的子目录
+</code></pre>
+<h3 id="2-4-文件（文件夹）显示"><a href="#2-4-文件（文件夹）显示" class="headerlink" title="2.4 文件（文件夹）显示"></a>2.4 文件（文件夹）显示</h3><p>less/more：分屏显示文件</p>
+<p><strong>more - file perusal filter for crt viewing/一页一页的显示档案内容</strong></p>
+<pre><code>$ more -n file_name                # 分屏显示前n行
+$ more file_name
+空格键 (space)：代表向下翻一页； 
+Enter：代表向下翻『一行』； 
+/字符串：代表在这个显示的内容当中，向下搜索『字符串』这个关键词； 
+:f ：立刻显示出文件名以及目前显示的行数； 
+h 帮助
+b 或 [ctrl]-b ：代表往回翻页 
+q：退出 
+</code></pre>
+<p><strong>less - opposite of more</strong></p>
+<pre><code>$ less file_name
+往前翻页！ ：
+空格键：向下翻一页； 
+[pagedown]：向下翻一页； 
+[pageup]：向上翻一页； 
+/字符串：向下搜索『字符串』； 
+?字符串 ：向上搜索『字符串』； 
+n：重复前一个搜索 
+N：反向的重复前一个搜索
+h：帮助
+q：退出
+</code></pre>
+<p><strong>head - output the first part of files</strong></p>
+<pre><code>$ head -n filename         # 不打开文件，在终端上显示filename的前n行
+</code></pre>
+<p><strong>tail - output the last part of files</strong></p>
+<pre><code>$ tail -n file_name     # 不打开文件，在终端上显示file——name的后n行
+$ tail -f file_name        # 动态监控文件内容，并输入到终端上
+</code></pre>
+<p><strong>sort - sort lines of text files</strong></p>
+<pre><code>$ sort filename         # 不打开文件，在终端上按照次序（默认升序）显示filename的内容
+</code></pre>
+<p><strong>uniq - report or omit repeated lines</strong></p>
+<pre><code>$ uniq file_name        # 去掉文件中相邻重复的行
+</code></pre>
+<p><strong>ls - list directory contents</strong></p>
+<pre><code>$ ls -lrt    # sort by modification time, newest first
+$ ls -l     # 列出文件的详细信息，可以查看某一文件的类型
+$ ls -a     # 列出所有文件，包括隐藏文件（开头是“.”文件）
+$ ls -la    # 列出所有文件，包括隐藏文件（开头是“.”文件）的详细信息
+$ ls -sh     # 列出文件的大小，以K为单位
+</code></pre>
+<p><strong>cat - concatenate files and print on the standard output</strong></p>
+<pre><code>$ cat file_name         # 不打开文件，查看当前路径下的文件的内容
+$ cat pwd/file_name     # 不打开文件，查看某一路径下的文件的内容
+
+-n 或 --number 由 1 开始对所有输出的行数编号
+-b 或 --number-nonblank 和 -n 相似，只不过对于空白行不编号
+-s 或 --squeeze-blank 当遇到有连续两行以上的空白行，就代换为一行的空白行
+-v 或 --show-nonprinting 
+</code></pre>
+<p><strong>echo - display a line of text</strong></p>
+<pre><code>$ echo &quot;string&quot;             # 显示字符串string到标准输出上
+$ echo &quot;string&quot; &gt; file1     # 把要显示到标准输出上的字符串string重定向到文件file1中
+$ echo &quot;string&quot; &gt;&gt; file1     # 把要显示到标准输出上的字符串string追加到文件file1中
+$ echo $HISTSIZE            # 在终端上打印环境变量
+$ echo &quot;hello world&quot;         # 原样打印
+$ echo hello world             # 当成一个空格打印
+$ echo -n &quot;hello world&quot;     # 打印完后不会自动换行
+</code></pre>
+<p><strong>tac - concatenate and print files in reverse</strong></p>
+<pre><code>$ tac file_name                # 从最后一行开始显示 (倒着显示文件内容)
+</code></pre>
+<p><strong>tree - list contents of directories in a tree-like format.</strong></p>
+<pre><code>$ man tree
+$ tree -L 1        # 显示一级目录
+</code></pre>
+<h3 id="2-5-远程-复制文件-文件夹"><a href="#2-5-远程-复制文件-文件夹" class="headerlink" title="2.5 (远程)复制文件(文件夹)"></a>2.5 (远程)复制文件(文件夹)</h3><p><strong>cp - copy files and directories</strong></p>
+<pre><code>$ cp file_name1 pwd        # 将文件复制到pwd路径下
+$ cp -r Dir_Name pwd    # 将路径Dir_Name复制到pwd路径下
+$ cp file_name1 file_name2 # 复制file_name1，并重命名为file_name2
+</code></pre>
+<hr>
+<pre><code>-f  强制覆盖，不询问yes/no（-i的默认的，即默认为交互模式，询问是否覆盖）
+-r  递归复制，包含目录
+-p  保持新文件的属性不变
+</code></pre>
+<p><strong>scp — secure copy (remote file copy program)</strong></p>
+<p>scp命令用在两个Linux主机直接复制。类似于cp，无非是将远程服务器的文件当成普通文件来使用。<br>条件：openssh-server和openssh-client.<br>命令基本格式：</p>
+<p>scp [可选参数] file_source file_target</p>
+<p>从本地传输到远程主机</p>
+<pre><code>$ scp local_file remote_username@remote_ip:remote_folder         # 文件
+$ scp local_file remote_username@remote_ip:remote_file          # 文件
+$ scp local_file remote_ip:remote_folder                          # 文件
+$ scp local_file remote_ip:remote_file                            # 文件
+$ scp -r local_folder remote_username@remote_ip:remote_folder    # 目录
+$ scp -r local_folder remote_ip:remote_folder                    # 目录
+</code></pre>
+<p>第1,2个指定了用户名，命令执行后需要再输入密码，第1个仅指定了远程的目录，文件名字不变，第2个指定了文件名；<br>第3,4个没有指定用户名，执行后需输入用户名和密码，第3个仅指定了远程的目录，文件名字不变，第4个指定了文件名；</p>
+<p>从远程复制到本地。从远程复制到本地，只要将从本地复制到远程的命令的后2个参数调换顺序即可；</p>
+<pre><code>$ scp remote_username@remote_ip:pwd/file_name file_name1
+$ scp -r remote_username@remote_ip:pwd/Dir_Name Dir_Name1
+</code></pre>
+<p><strong>rsync - a fast, versatile, remote (and local) file-copying tool</strong></p>
+<p>条件：主机和宿机都要安装rsync</p>
+<p>当时有scp传输文件的时候，会出现文件中断。使用rsync会恢复部分传输的文件</p>
+<p>1.</p>
+<pre><code>$ scp big_file_name example@192.168.1.100:~
+</code></pre>
+<p>将big_file_name传输到IP为192.168.1.100用户为example的home目录下，当传输到一半的时候，断开了，可以使用如下命令恢复，继续传输</p>
+<p>2-0.</p>
+<pre><code>$ rsync -P -rsh=ssh big_file_name example@192.168.1.100:~
+</code></pre>
+<p>也可以像下面那样使用 -partial 而不是 -P 参数。</p>
+<p>2-1.</p>
+<pre><code>$ rsync --partial -rsh=ssh big_file_name example@192.168.1.100:~
+# 这里，参数 -partial 或 -P 告诉 rsync 命令保留部分下载的文件并恢复进度。
+</code></pre>
+<p>2-2. 或者，我们也可以使用以下命令通过 SSH 恢复部分传输的文件。</p>
+<pre><code>$ rsync -avP big_file_name example@192.168.1.100:~
+</code></pre>
+<p>2-3. 或者，</p>
+<pre><code>$ rsync -av --partial big_file_name example@192.168.1.100:~
+</code></pre>
+<h3 id="2-6-文件（文件夹）移动"><a href="#2-6-文件（文件夹）移动" class="headerlink" title="2.6 文件（文件夹）移动"></a>2.6 文件（文件夹）移动</h3><pre><code>$ mv file_name file_name1        # 将file_name 重命名为file_name1
+$ mv pwd/file_name pwd1            # 将pwd目录下的file_name移动到pwd1目录下
+$ mv pwd/Dir_Name pwd1            # 将pwd目录下的Dir_Name复制到pwd1目录下
+</code></pre>
+<h4 id="2-6-1-文件解压压缩"><a href="#2-6-1-文件解压压缩" class="headerlink" title="2.6.1 文件解压压缩"></a>2.6.1 文件解压压缩</h4><p><strong>归档并压缩</strong></p>
+<pre><code>tar  -cjvf  file_name.tar.bz2(压缩文件名)  filelist 采用bzip2的方式归档并压缩 -&gt; 释放归档文件命令: tar -xjvf  tar.bz2 或者  tar  -xvf    tar.bz2
+tar  -czvf  file_name.tar.gz（压缩文件名） filelist 采用gzip的方式归档并压缩 -&gt; 释放归档文件命令: tar -xzvf  tar.gz 或者 tar  -xvf    tar.gz        
+</code></pre>
+<p><strong>gz文件</strong></p>
+<pre><code>$ tar -xvf xxxxxx.tar.gz            # 解压文件
+$ tar -xvf xxxxxx.tar.gz -C pwd        # 将xxxxxx.tar.gz文件解压到pwd目录下
+$ tar -czvf xxxxxx.tar.gz xxxxxx    # 将xxxxxx目录或者文件压缩为xxxxxx.tar.gz
+</code></pre>
+<p><strong>tar文件</strong></p>
+<pre><code>$ tar -cvf xxxxxx.tar xxxxxx        # 将xxxxxx压缩为xxxxxx.tar
+$ tar -xvf xxxxxx.tar                # 解压文件
+</code></pre>
+<p><strong>XZ文件（ 语法类似于gzip and bzip2.）</strong></p>
+<pre><code>$ tar -xvf  xxxxxx.xz     # 解压，但是会删除xxxxxx.xz,我记得是
+$ xz -z xxxxxx.tar        # 压缩文件
+$ xz -d xxxxxx.xz        # 解压文件
+
+使用 -k 参数来保留被解压缩的文件。如果要设置压缩率加入参数 -0 到 -9调节压缩率。如果不设置，默认压缩等级是6.
+
+
+习惯了 tar czvf 或 tar xzvf 的人可能碰到 tar.xz也会想用单一命令搞定解压或压缩。其实不行 tar里面没有征对xz格式的参数比如 z是针对 gzip，j是针对 bzip2。
+创建tar.xz文件：只要先 tar cvf xxx.tar xxx/ 这样创建xxx.tar文件先，然后使用 xz -z xxx.tar 来将 xxx.tar压缩成为 xxx.tar.xz
+解压tar.xz文件：先 xz -d xxx.tar.xz 将 xxx.tar.xz解压成 xxx.tar 然后，再用 tar xvf xxx.tar来解包。
+</code></pre>
+<p><strong>.a 文件解压</strong></p>
+<pre><code>$ tar xv file.a
+</code></pre>
+<p><strong>.z文件解压</strong></p>
+<pre><code>$ uncompress file.Z
+</code></pre>
+<p><strong>.gz文件解压</strong></p>
+<pre><code>$ gunzip file.gz
+</code></pre>
+<p><strong>.bz2文件解压</strong></p>
+<pre><code>$ bunzip2 file.bz2
+</code></pre>
+<p><strong>.tar.Z文件解压</strong></p>
+<pre><code>$ tar xvZf file.tar.Z  #第一种
+$ compress -dc file.tar.Z | tar xvf  #第二种
+</code></pre>
+<p><strong>.tar.gz/.tgz文件解压</strong></p>
+<pre><code>$ tar xvzf file.tar.gz
+$ gzip -dc file.tar.gz | tar xvf -
+</code></pre>
+<p><strong>.tar.bz2文件解压</strong></p>
+<pre><code>$ tar xvIf file.tar.bz2
+$ bzip2 -dc file.tar.bz2 | xvf –
+</code></pre>
+<p><strong>.cpio.gz/.cgz文件解压</strong></p>
+<pre><code>$ gzip -dc file.cgz | cpio -div
+</code></pre>
+<p><strong>.cpio/cpio文件解压</strong></p>
+<pre><code>$ cpio -div file.cpio
+$ cpio -divc file.cpio
+</code></pre>
+<p><strong>.rpm文件解压</strong></p>
+<pre><code>$ rpm2cpio file.rpm | cpio -div
+</code></pre>
+<p><strong>.zip文件解压</strong></p>
+<pre><code>$ unzip file.zip
+</code></pre>
+<p><strong>.deb文件解压</strong></p>
+<pre><code>$ dpkg-deb --fsys-tarfile file.deb | tar xvf - 
+</code></pre>
+<h3 id="2-7-查找-文件内容查找、文件查找"><a href="#2-7-查找-文件内容查找、文件查找" class="headerlink" title="2.7 查找(文件内容查找、文件查找)"></a>2.7 查找(文件内容查找、文件查找)</h3><p><strong>grep</strong></p>
+<p>OPTIONS:</p>
+<pre><code>-r  在目录中递归
+-i  不区分大小写
+-n  显示查询字符串的行数
+-v  过滤指定字符串
+-w  精确匹配字符串
+</code></pre>
+<p><strong>查找文件中所包含的字符串</strong></p>
+<p>eg:<br>找找在本地路径下含有’zabbix_log_cutout’字符串的文件</p>
+<pre><code>$ grep -nr &#39;zabbix_log_cutout&#39;  .
+</code></pre>
+<p>查询结果</p>
+<pre><code>./source/_posts/Zabbix开启调试模式.md:72:         &gt; File Name: zabbix_log_cutout.c
+./source/_posts/Zabbix开启调试模式.md:129:      # gcc zabbix_log_cutout.c -o zabbix_log_cutout
+./source/_posts/Zabbix开启调试模式.md:131:      # zabbix_log_cutout zabbix_server.log 进程号
+</code></pre>
+<p>忽略字符大小写差别</p>
+<pre><code>$ grep -inr &#39;ZABBIX_LOG_CUTOUT&#39; .
+查询结果
+
+
+./source/_posts/Zabbix开启调试模式.md:72:         &gt; File Name: zabbix_log_cutout.c
+./source/_posts/Zabbix开启调试模式.md:129:      # gcc zabbix_log_cutout.c -o zabbix_log_cutout
+./source/_posts/Zabbix开启调试模式.md:131:      # zabbix_log_cutout zabbix_server.log 进程号
+</code></pre>
+<p><strong>过滤字符串</strong></p>
+<p>查询进程中’11111111111’的属性</p>
+<pre><code>$ ps -ef | grep &#39;11111111111&#39;
+lxl       9553  8256  0 14:06 pts/3    00:00:00 grep --color=auto 11111111111
+</code></pre>
+<p>过滤含有grep的字符串</p>
+<pre><code>$ ps -ef | grep &#39;11111111111&#39; | grep -v &#39;grep&#39;
+</code></pre>
+<p>未查询到结果</p>
+<p><strong>查询指定文件的行数</strong></p>
+<p>eg: 查询package.json文件中’hexo-site’的行数</p>
+<pre><code>$ grep -n &#39;hexo-site&#39; package.json
+2:  &quot;name&quot;: &quot;hexo-site&quot;,
+</code></pre>
+<p><strong>支持正则表达式搜索</strong></p>
+<p>输出hexo-a或者hexo-b的字符串</p>
+<pre><code>$ grep -E &#39;hexo-[a,b]&#39; package.json
+</code></pre>
+<p>NOTE:</p>
+<pre><code>&#39;egrep&#39; means &#39;grep -E&#39;
+&#39;fgrep&#39; means &#39;grep -F&#39;
+</code></pre>
+<p><strong>find 主要是用于查找文件</strong></p>
+<p><strong>根据文件名称查找</strong></p>
+<p>查找/目录下以.jpg为后缀的文件</p>
+<pre><code>$ find / -name &#39;*.jpg&#39;
+</code></pre>
+<p>查找/目录下以.jpg和.png为后缀的文件</p>
+<pre><code>$ find / -name &#39;*.jpg&#39; -o -name &#39;*.jpg&#39;
+</code></pre>
+<p>查找当前目录不以.jpg结尾的文件</p>
+<pre><code>$ find . ! -name &#39;*.jpg&#39;
+</code></pre>
+<p><strong>根据正则表达式查找</strong></p>
+<p>复杂的正则表达式直接从网上查即可，没必要花时间自己写</p>
+<pre><code>$ touch 123123123.jpg
+$ find . -regex &#39;./[1-9]+.jpg&#39;
+./123123123.jpg
+</code></pre>
+<p><strong>根据路径查找</strong></p>
+<p>路径的风格如下<code>/home/lxl/lxl/blog/source/_posts/</code></p>
+<p>find 使用路径查找的时候，把路径当成字符串来处理，所以查询的时候要通用查询。即字符串两边都加上’*’。</p>
+<p>查找当前路径下含有_posts的路径或文件</p>
+<pre><code>$ find . -path &#39;*_posts*&#39;
+</code></pre>
+<p><strong>根据文件类型查找</strong></p>
+<p>文件类型有::bcdsp-。普通文件用f来区分。使用type来区分。</p>
+<p>查询当前路径下含有_posts的文件夹</p>
+<pre><code>$ find . -type &#39;d&#39; -path &#39;*_posts*&#39;
+
+根据文件大小查找
+
+-size 支持的文件大小单元如下:
+b block 块 512字节
+c character 字节 字节
+w word 字 2字节
+k
+M
+G
+</code></pre>
+<p>查询当前目录下文件大小超过1k的文件</p>
+<pre><code>$ find . type &#39;f&#39; -size +1k
+</code></pre>
+<p><strong>根据文件访问/修改/变化时间查找</strong></p>
+<p>支持下面的时间类型。</p>
+<p>访问时间（-atime/天，-amin/分钟）：用户最近一次访问时间。<br>修改时间（-mtime/天，-mmin/分钟）：文件最后一次修改时间。<br>变化时间（-ctime/天，-cmin/分钟）：文件数据元（例如权限等）最后一次修改时间。</p>
+<pre><code># 找出1天内被修改过的文件
+$ find . -type f -mtime -1
+
+
+# 找出最近1周内被访问过的文件
+$ find . -type f -atime -7
+
+# 根据文件权限查找.通过-perm来实现。
+# 找出当前目录下权限为777的文件
+$ find . -type f -perm 777
+
+
+
+# 找出当前目录下权限不是644的jpg文件
+$ find . -type f -name &quot;*.jpg&quot; ! -perm 644
+</code></pre>
+<p><strong>根据文件拥有者查找</strong></p>
+<pre><code># 找出文件拥有者为root的文件
+$ find . -type f -user root
+
+# 找出文件所在群组为root的文件
+$ find . -type f -group root
+</code></pre>
+<p><strong>找出空文件</strong></p>
+<pre><code>$ touch &#123;1..9&#125;.txt
+$ echo “hello” &gt; 1.txt
+$ find . -empty
+</code></pre>
+<p><strong>限制搜索深度</strong></p>
+<pre><code># 找出当前目录下所有的jpg，不包括子目录。
+$ find . -maxdepth 1 -name “*.jpg”
+# 相对应的，也是mindepth选项。
+
+$ find . -mindepth 2 -maxdepth 2 -name “*.png”
+</code></pre>
+<p><strong>找到文件后执行相应的操作</strong></p>
+<p>通过-ok、和-exec来实现。区别在于，-ok在执行命令前，会进行二次确认，-exec不会。</p>
+<pre><code># 删除当前目录下以数字命名的jpg文件。用-ok的效果如下，删除前有二次确认
+$ find . -type f -regex &#39;./[1-9]+.jpg&#39; -ok rm &#123;&#125; \;
+&lt; rm ... ./123123123.jpg &gt; ?
+
+
+# 试下-exec。直接就删除了
+$ find . -type f -regex &#39;./[1-9]+.jpg&#39; -exec rm &#123;&#125; \;
+
+
+
+
+# 将日志目录里超过一个礼拜的日志文件，移动到/tmp/old_logs里。
+$ find . -type f -mtime +7 -name &quot;*.log&quot; -exec mv &#123;&#125; /tmp/old_logs \;
+</code></pre>
+<p>注意：{} 用于与-exec选项结合使用来匹配所有文件，然后会被替换为相应的文件名。另外，;用来表示命令结束，如果没有加，则会有如下提示</p>
+<p>find: -exec: no terminating “;” or “+”</p>
+<pre><code># 拷贝指定目录下的某种类型文件到另一个目录
+$ find pwd -name *.jar|xargs -I &#123;&#125; cp -r &#123;&#125; /pwd1
+
+
+# 删除一个目录下指定文件夹
+$ find ./ -name .svn | xargs rm -rf
+</code></pre>
+<p>** 管道”|”：前面的标准输出当作后面的标准输入 **<br>** xargs：将标准输入作为命令的参数 **</p>
+<h3 id="2-8-文件（文件夹）属性-权限"><a href="#2-8-文件（文件夹）属性-权限" class="headerlink" title="2.8 文件（文件夹）属性(权限)"></a>2.8 文件（文件夹）属性(权限)</h3><p><strong>chmod - change file mode bits</strong></p>
+<p>(1)使用<code>uao</code>表示所属于的用户权限，使用<code>xwr</code>表示执行写读权限</p>
+<pre><code>u     user
+a     all
+o     other
+（rwx rwx rwx）
+文件所有者 同组者 其他组用户
+r：可读
+w：可写
+x:可执行
+
+
+$ chmod u+x file_name # 为文件所有者添加可执行权限
+$ chmod u-x file_name # 为文件所有者删去可执行权限
+$ chmod u-w file_name # 去掉所有者对文件的写权限
+$ chmod g-w file_name # 去掉同组者对文件的写权限
+$ chmod o-w file_name # 去掉其他组对文件的写权限
+</code></pre>
+<p>（2）八进制方式 （r=4，w=2，x=1 ）<br>更改某一文件权限为<code>rwxr-xrw-</code>对应命令为 <code>$ chmod 0756 file_name</code><br>如果想要去除某一用户的权限，只需要更改相应用户的权限，其他用户不变！ 比如说：去除文件a.out（rwxr-xrw-）所有者的可写权限，使用 <code>$ chmod 0556 a.out</code><br>chmod 修改某一个文件的权限</p>
+<pre><code>$ chmod 777 file_name    #将文件权限修改为777
+</code></pre>
+<p><strong>chown - change file owner and group</strong></p>
+<pre><code>$ chown -R user_name:group_name pwd    # 将pwd目录及子目录文件赋给user_name用户，group_name组
+</code></pre>
+<p><strong>chgrp - change group ownership</strong></p>
+<pre><code>$ chgrp -R group_name pwd        # 将pwd目录的组赋给group_name
+</code></pre>
+<h3 id="2-9-文件（软、硬）连接"><a href="#2-9-文件（软、硬）连接" class="headerlink" title="2.9 文件（软、硬）连接"></a>2.9 文件（软、硬）连接</h3><p>硬链接是利用Linux中为每个文件分配的物理编号——inode建立链接。因此，硬链接不能跨越文件系统。硬连接跟源文件的文件节点号相同，不占空间，只是另外一个标示。</p>
+<p>软链接（符号链接）是利用文件的路径名建立链接。通常建立软链接使用绝对路径而不是相对路径，以最大限度增加可移植性。软连接占空间，保存源文件存在的路径。如果指定的是绝对路径，那么软链接文件移动其他 目录下，照常可以通过连接找到源文件。</p>
+<p>** ln - make links between files**</p>
+<pre><code>$ ln -s soft_link_name source_name    # 创建软链接
+$ ln hard_link_name source_name         #创建硬链接
+</code></pre>
+<h3 id="2-10文件清空"><a href="#2-10文件清空" class="headerlink" title="2.10文件清空"></a>2.10文件清空</h3><pre><code>$ echo &quot;&quot; &gt; file_name    #清空文件内容
+</code></pre>
+<h3 id="2-11-文件下载"><a href="#2-11-文件下载" class="headerlink" title="2.11 文件下载"></a>2.11 文件下载</h3><p><strong>单个文件下载</strong></p>
+<pre><code>$ wget link
+</code></pre>
+<p><strong>后台文件下载</strong></p>
+<pre><code>$ wget -b link
+</code></pre>
+<p><strong>批量下载文件index.html</strong></p>
+<p>1.下载index.html</p>
+<pre><code>$ wget http://mirrors.163.com/centos/6/os/x86_64/Packages/        # or
+$ wget -vE -rLnp -nH --tries=20 --timeout=40 --wait=5 http://mirrors.163.com/centos/6/os/x86_64/Packages/ # or
+$ wget -m  http://mirrors.163.com/centos/6/os/x86_64/Packages/
+</code></pre>
+<p>2.解析index.html文件，批量下载</p>
+<pre><code>$ wget -nc -B http://mirrors.163.com/centos/6/os/x86_64/Packages/ -F -nH --cut-dirs=3 -i index.html
+</code></pre>
+<p>该方法是用来搭建本地源。</p>
+<h3 id="2-12-文件比较"><a href="#2-12-文件比较" class="headerlink" title="2.12 文件比较"></a>2.12 文件比较</h3><p><strong>diff - compare files line by line</strong></p>
+<pre><code>$ diff file_name1 file_name2 # 比较两个文件，若文件内用相同，没有输出；若不同，打印出不同
+</code></pre>
+<h2 id="2-软件"><a href="#2-软件" class="headerlink" title="2 软件"></a>2 软件</h2><h3 id="2-1-软件安装"><a href="#2-1-软件安装" class="headerlink" title="2.1 软件安装"></a>2.1 软件安装</h3><p>rpm包管理</p>
+<pre><code># yum install soft_name
+# rpm -ivh soft_name.rpm
+</code></pre>
+<p>Deb包管理</p>
+<pre><code># apt-get install soft_name
+# dpkg -i soft_name
+</code></pre>
+<p>源码编译安装</p>
+<pre><code># ./configure --配置条件 &amp;&amp; make install
+# mkdir build &amp;&amp; cd build &amp;&amp; cmake .. &amp;&amp; make install
+</code></pre>
+<h3 id="2-2-软件查询"><a href="#2-2-软件查询" class="headerlink" title="2.2 软件查询"></a>2.2 软件查询</h3><p><strong>命令查询</strong></p>
+<pre><code>$ whereis command_name
+</code></pre>
+<p><strong>安装包查询</strong></p>
+<pre><code>$ rpm -qa | grep soft_name
+</code></pre>
+<h2 id="3-程序"><a href="#3-程序" class="headerlink" title="3 程序"></a>3 程序</h2><h3 id="3-1-查询进程"><a href="#3-1-查询进程" class="headerlink" title="3.1 查询进程"></a>3.1 查询进程</h3><pre><code>$ ps -ef         #  查询所有进程
+$ top            # 实时显示进程信息，CPU使用率等信息
+</code></pre>
+<h3 id="3-2-后台进程"><a href="#3-2-后台进程" class="headerlink" title="3.2 后台进程"></a>3.2 后台进程</h3><p><strong>crontab - maintains crontab files for individual users</strong></p>
+<pre><code>$ crontab
+</code></pre>
+<p><strong>screen - screen manager with VT100/ANSI terminal emulation</strong></p>
+<p>screen会实现稳定的后台运行，这个会话只有在手动输入exit的时候才会退出，在这个会话里执行的命令不用担心HUP信号会对我们的进程 造成影响，因此也不用给每个命令前都加上“nohup”或“setsid”了，非常适合我们有规划的执行大量的后台任务，可以非常方便的让我们对这些后台任务进行管理。</p>
+<p>使用方法：</p>
+<pre><code>$ screen                 # 立即创建并进入一个会话。
+$ screen -list            # 列出所有会话。
+$ screen -r &#123;name&#125;        # 以独占方式进入指定会话。
+$ screen -x &#123;name&#125;        #以并行方式进入指定会话。
+$ screen -dmS &#123;name&#125;    # 建立一个处于断开模式下的会话，并根据我们的需要指定其会话名称。
+$ exit                    # 进入指定会话后执行exit即可关闭该会话。
+</code></pre>
+<p>ctrl +ad //输入快捷键ctrl +a和d，可暂时退出当前会话。</p>
+<h2 id="4-网络-amp-防火墙"><a href="#4-网络-amp-防火墙" class="headerlink" title="4 网络&amp;防火墙"></a>4 网络&amp;防火墙</h2><h3 id="4-1-防火墙"><a href="#4-1-防火墙" class="headerlink" title="4.1 防火墙"></a>4.1 防火墙</h3><p>在Centos 7之后不再使用iptables防火墙了，以下只适合防火墙是iptables。</p>
+<pre><code>$ ifconfig                  # 查看所有网络接口的属性
+$ iptables -L                # 查看防火墙设置
+# service iptables stop        # 关闭防火墙服务 
+# chkconfig iptables off    # 关闭防火墙自启服务
+</code></pre>
+<p>在Linux服务器被攻击的时候，有的时候会有几个主力IP。如果能拒绝掉这几个IP的攻击的话，会大大减轻服务器的压力，说不定服务器就能恢复正常了。</p>
+<p>在Linux下封停IP，有封杀网段和封杀单个IP两种形式。一般来说，现在的攻击者不会使用一个网段的IP来攻击，IP一般都是散列的。于是下面就详细说明一下封杀单个IP的命令，和解封单个IP的命令。</p>
+<p>在Linux下，使用ipteables来维护IP规则表。要封停或者是解封IP，其实就是在IP规则表中对入站部分的规则进行添加操作。</p>
+<p>要封停一个IP，使用下面这条命令：</p>
+<pre><code># iptables -I INPUT -s ***.***.***.*** -j DROP
+</code></pre>
+<p>要解封一个IP，使用下面这条命令：</p>
+<pre><code># iptables -D INPUT -s ***.***.***.*** -j DROP
+</code></pre>
+<p>参数-I是表示Insert（添加），-D表示Delete（删除）。后面跟的是规则，INPUT表示入站，***.<em><strong>.</strong></em>.***表示要封停的IP，DROP表示放弃连接。</p>
+<p>此外，还可以使用下面的命令来查看当前的IP规则表：</p>
+<pre><code>$ iptables --list
+</code></pre>
+<p>比如现在要将111.22.33.44这个IP封杀，就输入：</p>
+<pre><code># iptables -I INPUT -s 111.22.33.44 -j DROP
+</code></pre>
+<p>要解封则将-I换成-D即可，前提是iptables已经有这条记录。如果要想清空封掉的IP地址，可以输入：</p>
+<pre><code># iptables --flush
+</code></pre>
+<p>要添加IP段到封停列表中，使用下面的命令：</p>
+<pre><code># iptables -I INPUT -s 121.0.0.0/8 -j DROP
+</code></pre>
+<p>其实也就是将单个IP封停的IP部分换成了Linux的IP段表达式。<br><a target="_blank" rel="noopener" href="https://www.cmhello.com/linux-ipteables-ban-unban-ip.html">https://www.cmhello.com/linux-ipteables-ban-unban-ip.html</a></p>
+<p>CentOS 7.0默认使用的是firewall作为防火墙</p>
+<pre><code>$ systemctl list-unit-files            # 查询所有的服务
+$ systemctl stop firewalld.service    # 关闭firewall服务
+$ systemctl disable firewalld.service #禁止firewall开机启动
+</code></pre>
+<h3 id="4-2-网络"><a href="#4-2-网络" class="headerlink" title="4.2 网络"></a>4.2 网络</h3><pre><code>$ route -n               # 查看路由表
+$ netstat -lntp          # 查看所有监听端口 
+$ netstat -antp          # 查看所有已经建立的连接 
+$ netstat -s             # 查看网络统计信息进程
+$ ifconfig eth0 192.168.1.100    # 配置eth0 网卡的IP地址，重启后失效
+
+centos 6的eth0配置文件在
+`/etc/sysconfig/network-scripts/ifcfg-eth0`
+
+
+$ lsof -w -n -i tcp:80    # 查询80端口
+
+$ sestatus # 查看selinux情况
+</code></pre>
+<p><strong>关闭selinux步骤</strong></p>
+<pre><code># vi /etc/selinux/config
+# 将底下的设定值改成这样：
+SELINUX=disabled
+
+# 修改开机时 grub 的设定档
+# vi /boot/grub/menu.lst
+
+.....省略.....
+kernel /boot/vmlinuz-2.6.9 ro root=/dev/hda1 rhgb selinux=0
+.....省略.....
+
+# 重新开机
+# sync; reboot
+</code></pre>
+<h2 id="5-账户"><a href="#5-账户" class="headerlink" title="5 账户"></a>5 账户</h2><p><strong>创建账户</strong></p>
+<pre><code>$ sudo adduser user_name         # 创建用户完成
+</code></pre>
+<p><strong>删除用户</strong></p>
+<pre><code>$ sudo deluser user_name        # 删除某一个用户
+</code></pre>
+<p><strong>删除用户工作目录</strong></p>
+<pre><code>$ sudo deluser --remove-home user_name
+$ sudo passwd user_name                # 设置user_name 密码
+</code></pre>
+<p><strong>删除用户及其主目录</strong><br>    $ userdel –r user_name</p>
+<p><strong>添加组</strong></p>
+<pre><code>$ sudo groupadd group_name
+</code></pre>
+<p><strong>添加用户到组内</strong></p>
+<pre><code>$ sudo gpasswd -a user_name group_name # 正在将用户&quot;user_name&quot;加入到&quot;group_name&quot;组中
+</code></pre>
+<p>**账户信息</p>
+<pre><code>$ w                 # 查看活动用户
+$ id &lt;用户名&gt;        # 查看指定用户信息
+$ id root
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel) context=root:system_r:unconfined_t:SystemLow-SystemHigh
+$ last              # 查看用户登录日志
+</code></pre>
+<h2 id="6-系统操作"><a href="#6-系统操作" class="headerlink" title="6 系统操作"></a>6 系统操作</h2><p><strong>列出加载的内核模块</strong></p>
+<pre><code>$ lsmod
+</code></pre>
+<p><strong>查看环境变量资源</strong></p>
+<pre><code>$ env    
+</code></pre>
+<hr>
+<pre><code>$ man ulimit
+$ ulimit -a
+$ dmesg    # 系统启动日志  Linux命令dmesg用来显示开机信息，kernel会将开机信息存储在ring buffer中。您若是开机时来不及查看信息，可利用dmesg来查看。开机信息亦保存在/var/log目录中，名称为dmesg的文件里。    
+</code></pre>
+<h3 id="6-1-注销关机重启操作"><a href="#6-1-注销关机重启操作" class="headerlink" title="6.1 注销关机重启操作"></a>6.1 注销关机重启操作</h3><pre><code># logout                 # 注销
+# shutdown –h now        # 立即关机
+# shutdown +5            # 5分钟后关机
+# shutdown 10:30        # 在10:30关机
+# shutdown –r now        # 立即关闭系统并重启
+# shutdown –r 23:59        # 指定在23:59重启
+# reboot            # 独使用就可以重启系统，也可以加上参数
+# poweroff            # 关机
+# shutdown -h now         # 现在立即关机
+# shutdown -r now         # 现在立即重启
+# shutdown -r +3         # 三分钟后重启
+# shutdown -h +3         # 提示使用者将在三分钟后关机
+&quot;The System will shutdown after 3 minutes&quot; 
+# shutdown -r 20:23     # 在20：23时将重启计算机
+# shutdown -r 20:23 &amp;     # 可以将在20：23时重启的任务放到后台去，用户可以继续操作终端
+</code></pre>
+<h3 id="6-2-内存"><a href="#6-2-内存" class="headerlink" title="6.2 内存"></a>6.2 内存</h3><p>常用内存查看命令</p>
+<pre><code># grep MemTotal /proc/meminfo   # 查看内存总量
+# grep MemFree /proc/meminfo    # 查看空闲内存量
+# grep MemTotal /proc/meminfo | cut -f2 -d:
+
+# free -m | grep &quot;Mem&quot; | awk &#39;&#123;print $2&#125;&#39;
+# free -m                # 查看内存使用量和交换区使用量
+# awk &#39;/MemTotal/ &#123;printf( &quot;%.2f\n&quot;, $2 / 1024 )&#125;&#39; /proc/meminfo
+</code></pre>
+<p>我们通过free命令查看机器空闲内存时，会发现free的值很小。这主要是因为，在linux中有这么一种思想，内存不用白不用，因此它尽可能的cache和buffer一些数据，以方便下次使用。但实际上这些内存也是可以立刻拿来使用的。<br>所以空闲内存=free+buffers+cached=total-used。</p>
+<pre><code># cat /proc/meminfo
+</code></pre>
+<h3 id="6-3-创建swap空间"><a href="#6-3-创建swap空间" class="headerlink" title="6.3 创建swap空间"></a>6.3 创建swap空间</h3><p>有些软件需要swap空间比较大。</p>
+<p>需要root权限</p>
+<p>1.查看现有memory及swap</p>
+<pre><code>$ free -m
+             total       used       free     shared    buffers     cached
+Mem:          2026       1931         95          0         15       1789
+-/+ buffers/cache:        127       1899
+Swap:         3074          2       3071
+</code></pre>
+<p>2.用dd命令创建一个2G的文件（2G=1024<em>1024</em>2=2097152）</p>
+<pre><code># dd if=/dev/zero of=/var/swapfile1 bs=1024 count=2097152 
+</code></pre>
+<p>3.将它创建为Linux Swap虚拟交换文件</p>
+<pre><code># mkswap /var/swapfile1
+</code></pre>
+<p>4.激活并使用/var/swapfile1交换文件</p>
+<pre><code># swapon /var/swapfile1
+</code></pre>
+<p>5.可以使用free -m查看swap大小，使用swapon -s查看swap状态：</p>
+<pre><code># free -m
+...略过
+</code></pre>
+<p>6.设置系统启动后自动激活虚拟交换文件。</p>
+<pre><code># vi /etc/fstab  # 添加下面一行
+
+/var/swapfile1 swap swap defaults 0 0 
+</code></pre>
+<p>7.查看所有交换分区</p>
+<pre><code># swapon -s
+</code></pre>
+<h3 id="6-4-磁盘"><a href="#6-4-磁盘" class="headerlink" title="6.4 磁盘"></a>6.4 磁盘</h3><p><strong>du - estimate file space usage</strong></p>
+<p>查找文件和目录的磁盘使用情况</p>
+<pre><code>-h  以Kb，Mb显示文件和目录的大小
+-s  目录总磁盘的大小
+
+
+$ du -sh /home/lxl
+1.1G /home/lxl
+</code></pre>
+<p><strong>df - report file system disk space usage</strong>    </p>
+<pre><code>$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1        40G  9.2G   29G  25% /
+devtmpfs        909M     0  909M   0% /dev
+tmpfs           920M     0  920M   0% /dev/shm
+tmpfs           920M  532K  920M   1% /run
+tmpfs           920M     0  920M   0% /sys/fs/cgroup
+tmpfs           184M     0  184M   0% /run/user/1000
+</code></pre>
+<p><strong>mount - mount a filesystem</strong><br><strong>umount - unmount file systems</strong><br><strong>fdisk - manipulate disk partition table</strong></p>
+<pre><code># mount -t filetype 设备名(例如 /dev/sdb1) 挂载点(可以为任意目录)
+
+# mount -o loop *.iso ~/iso # 挂载iso镜像文件 
+# 也可以更改/etc/fstab，实现自动挂载,但是需要注意容易造成系统无法正常启动。
+
+# umount -av  # 卸载所有挂载
+# mount | column -t      # 查看挂接的分区状态
+# hdparm -i /dev/hda     # 查看磁盘参数(仅适用于IDE设备)
+# cat /proc/loadavg      # 查看系统负载磁盘和分区
+# fdisk -l               # 查看所有分区
+</code></pre>
+<p><strong>装载U盘的步骤</strong></p>
+<p>1.</p>
+<pre><code># cat /proc/partitions # 先查询系统中存在哪些分区
+</code></pre>
+<p>2.插入U盘后，查询多出来哪个分区。</p>
+<pre><code># 例如我查询到的结果是/dev/sda4,需要将U盘挂载到/mnt/usb目录下，没有该目录需创建。
+# 现在开始查询U盘的存储格式
+# fdisk -l /dev/sda4
+</code></pre>
+<p>如果是fat16就使用下面的命令</p>
+<pre><code># mount -t msdos /dev/sdb1 /mnt/usb
+</code></pre>
+<p>如果是fat32，我们现在用的U盘默认都是这个格式的</p>
+<pre><code># mount -t vfat /dev/sdb1 /mnt/usb
+</code></pre>
+<p>如果是ext2格式，就用命令：</p>
+<pre><code># mount -t ext2 /dev/sda1 /mnt/usb
+</code></pre>
+<p>3.打开/mnt/usb 就可以看到你的U盘里的东西了！</p>
+<pre><code># cd  /mnt/usb
+</code></pre>
+<p>4.卸载命令</p>
+<pre><code># umount  /mnt/usb 
+</code></pre>
+<h2 id="7-硬件信息"><a href="#7-硬件信息" class="headerlink" title="7 硬件信息"></a>7 硬件信息</h2><pre><code># echo $LANG $LANGUAGE #查看系统默认语言
+# uptime                 # 查看系统运行时间、用户数、负载
+# cat /proc/cpuinfo            # 查看CPU信息
+# lspci -tv                    # 列出所有PCI设备
+# lsusb -tv                  # 列出所有USB设备
+# hostname #查看主机名
+# cat /etc/redhat-release # 查看当前linux的版本
+# uname -a               # 查看内核/操作系统/CPU信息
+# getconf LONG_BIT         #查看CPU位数(32 or 64)
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Shell/">Shell</a>, <a href="/tags/Shell脚本/">Shell脚本</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

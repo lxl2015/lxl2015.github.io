@@ -1,0 +1,427 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>HTTP协议详解及Socket发送HTTP | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="看网络协议直接看rfc文档即可，还有一本书挺好的《图解HTTP》。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="HTTP协议详解及Socket发送HTTP"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-09-05T11:08:50.000Z"><a href="/2017/09/05/HTTP协议详解及Socket发送HTTP/">2017-09-05</a></time>
+        
+  
+    <h1 class="title">HTTP协议详解及Socket发送HTTP</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81HTTP-1-1%E5%8D%8F%E8%AE%AE%E6%9B%B4%E6%96%B0"><span class="toc-text">一、HTTP&#x2F;1.1协议更新</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81HTTP-HTTPS%E7%AE%80%E4%BB%8B"><span class="toc-text">二、HTTP&#x2F;HTTPS简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81HTTP%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-text">三、HTTP工作原理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E3%80%81HTTP%E6%B6%88%E6%81%AF%E7%BB%93%E6%9E%84"><span class="toc-text">四、HTTP消息结构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81HTTP%E6%B6%88%E6%81%AF%E7%BB%93%E6%9E%84%E6%A6%82%E8%BF%B0"><span class="toc-text">1、HTTP消息结构概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81URL%E8%AF%A6%E8%A7%A3"><span class="toc-text">2、URL详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E3%80%81URL%E7%9A%84%E6%A0%BC%E5%BC%8F"><span class="toc-text">2.1、URL的格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E3%80%81URL%E7%9A%84%E4%B8%80%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="toc-text">2.2、URL的一个例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81HTTP%E6%8A%A5%E6%96%87"><span class="toc-text">3、HTTP报文</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82%E6%8A%A5%E6%96%87"><span class="toc-text">请求报文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E6%8A%A5%E6%96%87"><span class="toc-text">响应报文</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP%E6%8A%A5%E6%96%87%E4%BE%8B%E5%AD%90"><span class="toc-text">HTTP报文例子</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94%E3%80%81HTTP%E8%AF%B7%E6%B1%82%E6%96%B9%E6%B3%95"><span class="toc-text">五、HTTP请求方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AD%E3%80%81HTTP%E5%93%8D%E5%BA%94%E5%A4%B4%E4%BF%A1%E6%81%AF"><span class="toc-text">六、HTTP响应头信息</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%83%E3%80%81HTTP%E7%8A%B6%E6%80%81%E7%A0%81"><span class="toc-text">七、HTTP状态码</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%AB%E3%80%81HTTP-content-type"><span class="toc-text">八、HTTP content-type</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E5%90%8E%E8%AE%B0"><span class="toc-text">九、后记</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%81%E3%80%81Linux-C%E5%B0%81%E8%A3%85HTTP%E8%AE%BF%E9%97%AEWeb-Server"><span class="toc-text">十、Linux C封装HTTP访问Web Server</span></a></li></ol>
+    </div>
+
+        <p>看网络协议直接看rfc文档即可，还有一本书挺好的《图解HTTP》。</p>
+<span id="more"></span>
+
+
+<h1 id="一、HTTP-1-1协议更新"><a href="#一、HTTP-1-1协议更新" class="headerlink" title="一、HTTP/1.1协议更新"></a>一、HTTP/1.1协议更新</h1><p>1999年RFC2616定义了现在普遍使用的HTTP1.1，但是到了2014年，RFC2616被拆分为六个单独的协议说明，并且对原来语句模糊的部分进行了解释，新的协议说明更易懂，易读。</p>
+<p><a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7230#appendix-A.2">Changes from RFC 2616</a></p>
+<p>新的协议说明包括一下六部分：</p>
+<p><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7230.txt">RFC7230</a> - HTTP/1.1:<br>消息语法和路由——该文档对HTTP结构和相关术语进行了概括。定义了http和https统一资源描述符格式。定义了HTTP 1.1的消息语法和解析要求，并描述实现的相关安全问题。</p>
+<p><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7231.txt">RFC7231</a> - HTTP/1.1:<br>Semantics and Content ——-这个文档定义了HTTP / 1.1消息的语义，如请求方法、请求头字段、响应状态代码和响应头字段，以及消息(元数据和正文内容)和内容协商机制。</p>
+<p><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7232.txt">RFC7232</a> - HTTP/1.1:<br>Conditional Requests(条件请求)——这个文档定义了HTTP / 1.1条件请求，包括用于指示状态更改的元数据头字段，请求在此状态下制定先决条件的请求头字段，以及在一个或多个先决条件评估为false时构造对条件请求的响应的规则。</p>
+<p><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7233.txt">RFC7233</a> - HTTP/1.1:<br>Range Requests ——本文档定义请求范围以及用于构建和组合对这些请求的响应的规则。</p>
+<p><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7234.txt">RFC7234</a> - HTTP/1.1:<br>Caching(缓存)——本文档定义HTTP缓存和控制缓存行为或指示可缓存响应消息的相关联的头域。</p>
+<p><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7235.txt">RFC7235</a> - HTTP/1.1:<br>Authentication ——- 该文档定义了HTTP身份验证框架</p>
+<p>如果想要详细了解HTTP 1.1，看这六份rfc文档即可。</p>
+<h1 id="二、HTTP-HTTPS简介"><a href="#二、HTTP-HTTPS简介" class="headerlink" title="二、HTTP/HTTPS简介"></a>二、HTTP/HTTPS简介</h1><p>HTTP 协议是以 ASCII 码传输，建立在 TCP/IP 协议之上的应用层规范。如果HTTP加上加密处理和认证以及完整性保护后即是HTTPS。HTTPS并非是应用层的一种新协议。只是HTTP通信接口部分用SSL和TLS协议代替而已。</p>
+<p>通常，HTTP直接和TCP通信。当使用SSL时，则演变成显赫SSL通信，再由SSL和TCP通信了。简而言之，所谓的HTTPS就是加了一层SSL协议。</p>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/https.png" class="">
+
+<p>至于HTTPS里面的对称加密，非对称加密等一些概念不做解释。</p>
+<h1 id="三、HTTP工作原理"><a href="#三、HTTP工作原理" class="headerlink" title="三、HTTP工作原理"></a>三、HTTP工作原理</h1><p>HTTP协议工作于客户端-服务端架构为上。浏览器作为HTTP客户端通过URL向HTTP服务端即WEB服务器发送所有请求。</p>
+<p>Web服务器有：Apache服务器，IIS服务器（Internet Information Services）等。</p>
+<p>Web服务器根据接收到的请求后，向客户端发送响应信息。</p>
+<p>HTTP默认端口号为80，也可以改为8080或者其他端口。</p>
+<p>HTTP三点注意事项：</p>
+<ul>
+<li><p>HTTP是无连接：无连接的含义是限制每次连接只处理一个请求。服务器处理完客户的请求，并收到客户的应答后，即断开连接。采用这种方式可以节省传输时间。</p>
+</li>
+<li><p>HTTP是媒体独立的：这意味着，只要客户端和服务器知道如何处理的数据内容，任何类型的数据都可以通过HTTP发送。客户端以及服务器指定使用适合的MIME-type内容类型。</p>
+</li>
+<li><p>HTTP是无状态：HTTP协议是无状态协议。无状态是指协议对于事务处理没有记忆能力。缺少状态意味着如果后续处理需要前面的信息，则它必须重传，这样可能导致每次连接传送的数据量增大。另一方面，在服务器不需要先前信息时它的应答就较快。</p>
+</li>
+</ul>
+<h1 id="四、HTTP消息结构"><a href="#四、HTTP消息结构" class="headerlink" title="四、HTTP消息结构"></a>四、HTTP消息结构</h1><h2 id="1、HTTP消息结构概述"><a href="#1、HTTP消息结构概述" class="headerlink" title="1、HTTP消息结构概述"></a>1、HTTP消息结构概述</h2><p>HTTP是基于客户端/服务端（C/S）的架构模型，通过一个可靠的链接来交换信息，是一个无状态的请求/响应协议。</p>
+<p>一个HTTP”客户端”是一个应用程序（Web浏览器或其他任何客户端），通过连接到服务器达到向服务器发送一个或多个HTTP的请求的目的。</p>
+<p>一个HTTP”服务器”同样也是一个应用程序（通常是一个Web服务，如Apache Web服务器或IIS服务器等），通过接收客户端的请求并向客户端发送HTTP响应数据。</p>
+<p>HTTP使用统一资源标识符（Uniform Resource Identifiers, URI）来传输数据和建立连接。<br>一旦建立连接后，数据消息就通过类似Internet邮件所使用的格式[RFC5322]和多用途Internet邮件扩展（MIME）[RFC2045]来传送。</p>
+<h2 id="2、URL详解"><a href="#2、URL详解" class="headerlink" title="2、URL详解"></a>2、URL详解</h2><p>URL是一种特殊类型的URI，首先，URI，是Uniform Resource  Identifier，统一资源标识符，用来唯一的标识一个资源。而URL是Uniform Resource Locator，统一资源定位器，它是一种具体的URI，即URL可以用来标识一个资源，而且还指明了如何locate这个资源。也就是说，URI是以一种抽象的，高层次概念定义统一资源标识，而URL和URN则是具体的资源标识的方式。</p>
+<h3 id="2-1、URL的格式"><a href="#2-1、URL的格式" class="headerlink" title="2.1、URL的格式"></a>2.1、URL的格式</h3><p>格式如下：</p>
+<pre><code>schema://host[:port]/path/.../[;url-params][?query-string][#anchor]
+</code></pre>
+<p>scheme        ：指定低层使用的协议(例如：http,https,ftp)</p>
+<p>host        ：HTTP服务器的IP地址或者域名</p>
+<p>port        ：HTTP服务器的默认端口是80，这种情况下端口号可以省略。如果使用了别的端口，必须指明，例如 <a target="_blank" rel="noopener" href="http://www.cnblogs.com:8080/">http://www.cnblogs.com:8080/</a></p>
+<p>path        ：访问资源的路径</p>
+<p>url-params    ：请求参数</p>
+<p>query-string：发送给http服务器的数据</p>
+<p>anchor        ：锚</p>
+<h3 id="2-2、URL的一个例子"><a href="#2-2、URL的一个例子" class="headerlink" title="2.2、URL的一个例子"></a>2.2、URL的一个例子</h3><pre><code>http://www.test1.com:8080/test2/twst3/test4;id=1234?name=test5&amp;x=true#stuff
+
+Schema        :http
+host        :www.test1.com
+port        :8080
+path        :test2/twst3/test4
+URL params    :id=1234
+Query String:ame=test5&amp;x=true
+Anchor        :stuff
+</code></pre>
+<h2 id="3、HTTP报文"><a href="#3、HTTP报文" class="headerlink" title="3、HTTP报文"></a>3、HTTP报文</h2><p>所有HTTP报文都可以分为两类：请求报文(request message)和响应报文(response message)</p>
+<h3 id="请求报文"><a href="#请求报文" class="headerlink" title="请求报文"></a>请求报文</h3><p>请求报文包括请求行（request line）、请求头部（header）、空行和请求数据四个部分组成。</p>
+<p>请求报文的格式：</p>
+<pre><code>&lt;method&gt; &lt;request-URL&gt; &lt;version&gt;
+&lt;headers&gt;
+&lt;entity-body&gt;
+</code></pre>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/client.png" class="">
+
+
+<h3 id="响应报文"><a href="#响应报文" class="headerlink" title="响应报文"></a>响应报文</h3><p>HTTP响应报文也由四个部分组成，分别是：状态行、消息报头、空行和响应正文。<br>响应报文的格式：</p>
+<pre><code>&lt;version&gt; &lt;status&gt; &lt;reason-phrase&gt;
+&lt;headers&gt;
+&lt;entity-body&gt;
+</code></pre>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/httpmessage.jpg" class="">
+
+
+<h3 id="HTTP报文例子"><a href="#HTTP报文例子" class="headerlink" title="HTTP报文例子"></a>HTTP报文例子</h3><p>请求报文</p>
+<pre><code>POST /fcgi-bin/a_player_stat.fcg?pcachetime=1504589297 HTTP/1.1\r\nAccept: */*\r\nAccept-Language: zh-CN\r\nHost: stat.pc.music.qq.com\r\nUser-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)\r\nContent-Length: 480\r\n
+</code></pre>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/post.png" class="">
+
+<p>响应报文</p>
+<pre><code>HTTP/1.1 200 OK\r\nConnection: close\r\nServer: QZHTTP-2.38.23\r\nDate: Tue, 05 Sep 2017 05:29:24 GMT\r\nContent-Encoding: gzip\r\nContent-Type: text/html;charset=gb2312\r\nTransfer-Encoding: chunked\r\n\r\n
+</code></pre>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/rep.png" class="">
+
+
+
+<h1 id="五、HTTP请求方法"><a href="#五、HTTP请求方法" class="headerlink" title="五、HTTP请求方法"></a>五、HTTP请求方法</h1><p>根据HTTP标准，HTTP请求可以使用多种请求方法。<br>HTTP1.0定义了三种请求方法： GET, POST 和 HEAD方法。<br>HTTP1.1新增了五种请求方法：OPTIONS, PUT, DELETE, TRACE 和 CONNECT 方法。</p>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/requesthttp.png" class="">
+
+
+<p>GET请求方法的一些属性</p>
+<ul>
+<li>GET 请求可被缓存</li>
+<li>GET 请求保留在浏览器历史记录中</li>
+<li>GET 请求可被收藏为书签</li>
+<li>GET 请求不应在处理敏感数据时使用</li>
+<li>GET 请求有长度限制</li>
+<li>GET 请求只应当用于取回数据</li>
+</ul>
+<p>POST请求方法的一些属性</p>
+<ul>
+<li>POST 请求不会被缓存</li>
+<li>POST 请求不会保留在浏览器历史记录中</li>
+<li>POST 不能被收藏为书签</li>
+<li>POST 请求对数据长度没有要求</li>
+</ul>
+<p>POST和GET方法的比较</p>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/getpost.png" class="" title="比较 GET 与 POST">
+
+<h1 id="六、HTTP响应头信息"><a href="#六、HTTP响应头信息" class="headerlink" title="六、HTTP响应头信息"></a>六、HTTP响应头信息</h1><p>HTTP请求头提供了关于请求，响应或者其他的发送实体的信息。</p>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/httpresponse.png" class="">
+
+<h1 id="七、HTTP状态码"><a href="#七、HTTP状态码" class="headerlink" title="七、HTTP状态码"></a>七、HTTP状态码</h1><p>响应报文中的第一行叫做状态行，由HTTP协议版本号， 状态码， 状态消息 三部分组成。状态码用来告诉HTTP客户端，HTTP服务器是否产生了预期的Response.</p>
+<p>HTTP/1.1中定义了5类状态码， 状态码由三位数字组成，第一个数字定义了响应的类别</p>
+<pre><code>1XX        提示信息        -表示请求已被成功接收，继续处理
+2XX        成功            -表示请求已被成功接收，理解，接受
+3XX        重定向        -要完成请求必须进行更进一步的处理
+4XX        客户端错误    -请求有语法错误或请求无法实现
+5XX        服务器端错误    -服务器未能实现合法的请求
+</code></pre>
+<p>常见的HTTP状态码：</p>
+<ul>
+<li>200 OK</li>
+</ul>
+<p>客户端请求成功</p>
+<ul>
+<li>400 Bad Request</li>
+</ul>
+<p>客户端请求有语法错误，不能被服务器所理解</p>
+<ul>
+<li>401 Unauthorized</li>
+</ul>
+<p>请求未经授权，这个状态代码必须和WWW-Authenticate报头域一起使用 </p>
+<ul>
+<li>403 Forbidden</li>
+</ul>
+<p>服务器收到请求，但是拒绝提供服务</p>
+<ul>
+<li>404 Not Found</li>
+</ul>
+<p>请求资源不存在，eg：输入了错误的URL</p>
+<ul>
+<li>500 Internal Server Error</li>
+</ul>
+<p>服务器发生不可预期的错误</p>
+<ul>
+<li>503 Server Unavailable</li>
+</ul>
+<p>服务器当前不能处理客户端的请求，一段时间后,可能恢复正常</p>
+<h1 id="八、HTTP-content-type"><a href="#八、HTTP-content-type" class="headerlink" title="八、HTTP content-type"></a>八、HTTP content-type</h1><p>Content-Type，内容类型，一般是指网页中存在的Content-Type，用于定义网络文件的类型和网页的编码，决定浏览器将以什么形式、什么编码读取这个文件，这就是经常看到一些Asp网页点击的结果却是下载到的一个文件或一张图片的原因。</p>
+<img src="/2017/09/05/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3%E5%8F%8ASocket%E5%8F%91%E9%80%81HTTP/content-type.png" class="" title="HTTP content-type 对照表">
+
+<h1 id="九、后记"><a href="#九、后记" class="headerlink" title="九、后记"></a>九、后记</h1><p>HTTP协议里面的cache域等等其他都没有讲述。因为我现在不需要知道。</p>
+<h1 id="十、Linux-C封装HTTP访问Web-Server"><a href="#十、Linux-C封装HTTP访问Web-Server" class="headerlink" title="十、Linux C封装HTTP访问Web Server"></a>十、Linux C封装HTTP访问Web Server</h1><p>简单的说就是在发送缓冲区添加请求报文。</p>
+<pre><code>/*************************************************************************
+  &gt; File Name: http.c
+  &gt; Author: Lin
+  &gt; Mail: 不想写邮箱
+  &gt; Created Time: Wed 06 Sep 2017 04:29:59 PM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;arpa/inet.h&gt;
+
+#define OTHER
+
+int main(int argc, const char *argv[])
+&#123;
+    int sockfd = -1, len = -1, result = -1;
+    struct sockaddr_in addr;
+
+
+#ifdef OTHER
+    char url[] = &quot;GET / HTTP/1.1\r\nHost: 192.168.1.86\r\n\r\n&quot;;
+#else
+    char url[1024] = &#123;0&#125;;
+
+    strcat(url,&quot;POST / HTTP/1.1\r\n&quot;);
+    strcat(url,&quot;HOST: 192.168.1.86\r\n&quot;);
+    strcat(url,&quot;\r\n&quot;);
+#endif
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd  &lt; 0)
+    &#123;
+        perror(&quot;socket&quot;);
+        return -1;
+    &#125;
+
+
+
+    memset(&amp;addr,0,sizeof(addr));
+
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(&quot;192.168.1.86&quot;);
+    addr.sin_port = htons(80);
+
+    len = sizeof(addr);
+
+    result = connect(sockfd, (struct sockaddr *)&amp;addr, len);
+
+    if(result &lt; 0)
+    &#123;
+        perror(&quot;connect&quot;);
+        return -1;
+    &#125;
+
+    write(sockfd,url,strlen(url));
+
+    char ch;
+    while(read(sockfd,&amp;ch,1))
+        printf(&quot;%c&quot;,ch);
+
+
+    return 0;
+&#125;
+</code></pre>
+<p>编译：</p>
+<pre><code># gcc http.c -o http
+</code></pre>
+<p>运行:</p>
+<pre><code># ./http
+</code></pre>
+<p>结果：</p>
+<pre><code>HTTP/1.1 200 OK
+Date: Wed, 06 Sep 2017 09:02:02 GMT
+Server: Apache/2.2.15 (CentOS)
+X-Powered-By: PHP/5.6.30
+Set-Cookie: sessionid=e9bc30cb15ab0c13859edf1ea043b39f
+Set-Cookie: sessionid=e9bc30cb15ab0c13859edf1ea043b39f
+Set-Cookie: PHPSESSID=4ha80mcas85oe4grdsfbg1s9s0; path=/
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+Content-Length: 2686
+Connection: close
+Content-Type: text/html; charset=UTF-8
+</code></pre>
+<p>剩下就是解析里面的你要获取的数据了。strstr还是很好用的。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/HTTP/">HTTP</a>, <a href="/tags/socket/">socket</a>, <a href="/tags/RFC/">RFC</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C &amp; C++混合编程 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="本文翻译的链接在这里">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C &amp; C++混合编程"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-16T09:48:01.000Z"><a href="/2017/08/16/16-C-CPP混合编程-翻译/">2017-08-16</a></time>
+        
+  
+    <h1 class="title">C &amp; C++混合编程</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#C-C-%E6%B7%B7%E5%90%88%E7%BC%96%E7%A8%8B%EF%BC%8C%E9%9C%80%E8%A6%81%E5%81%9A%E4%BA%9B%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">C&#x2F;C++混合编程，需要做些什么？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%9C%A8C-%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%B0%83%E7%94%A8C%E5%87%BD%E6%95%B0"><span class="toc-text">如何在C++代码中调用C函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BB%8EC%E8%B0%83%E7%94%A8C-%E5%87%BD%E6%95%B0"><span class="toc-text">如何从C调用C++函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%9C%A8C-%E4%BB%A3%E7%A0%81%E4%B8%AD%E5%8A%A0%E5%85%A5%E4%B8%80%E4%B8%AA%E6%A0%87%E5%87%86%E7%9A%84C%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="toc-text">如何在C++代码中加入一个标准的C头文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%9C%A8C-%E4%BB%A3%E7%A0%81%E4%B8%AD%E5%8C%85%E5%90%AB%E9%9D%9E%E7%B3%BB%E7%BB%9FC%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="toc-text">如何在C++代码中包含非系统C头文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9%E8%87%AA%E5%B7%B1%E7%9A%84C%E5%A4%B4%E6%96%87%E4%BB%B6%EF%BC%8C%E5%9C%A8C-%E4%BB%A3%E7%A0%81%E4%B8%AD%E6%9B%B4%E5%AE%B9%E6%98%93-include%E5%AE%83%E4%BB%AC"><span class="toc-text">如何修改自己的C头文件，在C++代码中更容易#include它们</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BB%8EC-%E4%BB%A3%E7%A0%81%E8%B0%83%E7%94%A8%E9%9D%9E%E7%B3%BB%E7%BB%9FC%E5%87%BD%E6%95%B0f-int-char-float"><span class="toc-text">如何从C++代码调用非系统C函数f(int,char,float)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%8F%AF%E4%BB%A5%E8%A2%ABC%E4%BB%A3%E7%A0%81%E8%B0%83%E7%94%A8%E7%9A%84f-int-char-float-C-%E5%87%BD%E6%95%B0%EF%BC%9F"><span class="toc-text">如何创建一个可以被C代码调用的f(int,char,float)C ++函数？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#C-C-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8C-C%E5%87%BD%E6%95%B0%E6%97%B6%E4%B8%BA%E4%BB%80%E4%B9%88%E9%93%BE%E6%8E%A5%E5%99%A8%E4%BC%9A%E5%87%BA%E9%94%99%EF%BC%9F"><span class="toc-text">C&#x2F;C ++函数调用C++&#x2F;C函数时为什么链接器会出错？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%B0%86C-%E7%9A%84class%E5%AF%B9%E8%B1%A1%E4%BC%A0%E9%80%92%E7%BB%99C%E5%87%BD%E6%95%B0%EF%BC%9F"><span class="toc-text">如何将C++的class对象传递给C函数？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#C%E5%87%BD%E6%95%B0%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E8%AE%BF%E9%97%AEC-%E5%AF%B9%E8%B1%A1%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AEclass%E5%90%97%EF%BC%9F"><span class="toc-text">C函数可以直接访问C++对象中的数据class吗？</span></a></li></ol>
+    </div>
+
+        <p>本文翻译的链接在<a target="_blank" rel="noopener" href="https://isocpp.org/wiki/faq/mixing-c-and-cpp">这里</a></p>
+<span id="more"></span>
+<h1 id="C-C-混合编程，需要做些什么？"><a href="#C-C-混合编程，需要做些什么？" class="headerlink" title="C/C++混合编程，需要做些什么？"></a>C/C++混合编程，需要做些什么？</h1><p>以下是一些重点（尽管有一些编译器不需要这些，请查看编译器的的文档）</p>
+<ul>
+<li>编译main()时必须使用C++编译器(例如静态初始化)</li>
+<li>C++编译器应该引导链接过程(例如C和C++编译器要有兼容的头文件和运行库)</li>
+<li>C和C++编译器必须要兼容(例如，因此它们具有相同的调用约定)</li>
+</ul>
+<p>常见问题回答：</p>
+<h1 id="如何在C-代码中调用C函数"><a href="#如何在C-代码中调用C函数" class="headerlink" title="如何在C++代码中调用C函数"></a>如何在C++代码中调用C函数</h1><p>只需要在C++代码中声明extern “C” 并在C++代码调用它。<br>两种方法.例如:</p>
+<pre><code>// C++ code
+extern &quot;C&quot; void f(int); // 方法一
+extern &quot;C&quot; &#123;    // 方法二
+    int g(double);
+    double h();
+&#125;;
+void code(int i, double d)
+&#123;
+    f(i);
+    int ii = g(d);
+    double dd = h();
+    // ...
+&#125;
+</code></pre>
+<p>被调用的C函数的定义可能如下所示:</p>
+<pre><code>/* C code: */
+void f(int i)
+&#123;
+    /* ... */
+&#125;
+int g(double d)
+&#123;
+    /* ... */
+&#125;
+double h()
+&#123;
+    /* ... */
+&#125;
+</code></pre>
+<p>请注意，使用C++类型规则，而不是C规则。所以你不能用错误的参数列表调用函数声明的extern “C”。例如：</p>
+<pre><code>// C++ code
+void more_code(int i, double d)
+&#123;
+    double dd = h(i,d); // error: unexpected arguments
+    // ...
+&#125;
+</code></pre>
+<h1 id="如何从C调用C-函数"><a href="#如何从C调用C-函数" class="headerlink" title="如何从C调用C++函数"></a>如何从C调用C++函数</h1><p>只需在C++代码中声明C++函数extern “C”并在C代码调用它。例如：</p>
+<pre><code>// C++ code:
+extern &quot;C&quot; void f(int);
+void f(int i)
+&#123;
+    // ...
+&#125;
+</code></pre>
+<p>现在f()可以这样使用：</p>
+<pre><code>/* C code: */
+void f(int);
+void cc(int i)
+&#123;
+    f(i);
+    /* ... */
+&#125;
+</code></pre>
+<p>当然这只适用于非成员函数。如果要从C调用成员函数（包括虚函数），则需要提供一个简单的包装器。例如：</p>
+<pre><code>// C++ code:
+class C &#123;
+    // ...
+    virtual double f(int);
+&#125;;
+extern &quot;C&quot; double call_C_f(C* p, int i) // wrapper function
+&#123;
+    return p-&gt;f(i);
+&#125;
+</code></pre>
+<p>现在C::f()可以这样使用：</p>
+<pre><code>/* C code: */
+double call_C_f(struct C* p, int i);
+void ccc(struct C* p, int i)
+&#123;
+    double d = call_C_f(p,i);
+    /* ... */
+&#125;
+</code></pre>
+<p>如果要从C调用重载函数，则必须为封装器提供不同的C代码名称。例如：</p>
+<pre><code>// C++ code:
+void f(int);
+void f(double);
+extern &quot;C&quot; void f_i(int i) &#123; f(i); &#125;
+extern &quot;C&quot; void f_d(double d) &#123; f(d); &#125;
+</code></pre>
+<p>现在f()功能可以这样使用：</p>
+<pre><code>/* C code: */
+void f_i(int);
+void f_d(double);
+void cccc(int i,double d)
+&#123;
+    f_i(i);
+    f_d(d);
+    /* ... */
+&#125;
+</code></pre>
+<p>请注意，这些技术可用于从C代码调用C++库，即使您不能（或不想）修改C ++标头。</p>
+<h1 id="如何在C-代码中加入一个标准的C头文件"><a href="#如何在C-代码中加入一个标准的C头文件" class="headerlink" title="如何在C++代码中加入一个标准的C头文件"></a>如何在C++代码中加入一个标准的C头文件</h1><p>对于一个标准的头文件，你不必做任何不寻常的事情。例如，#include&lt;cstdio&gt;</p>
+<pre><code>// This is C++ code
+#include &lt;cstdio&gt;                // Nothing unusual in #include line
+int main()
+&#123;
+  std::printf(&quot;Hello world\n&quot;);  // Nothing unusual in the call either
+  // ...
+&#125;
+</code></pre>
+<p>如果你认为std::部分std::printf()调用是不寻常的，那么最好的做法是“解决它”。换句话说，这是在标准库中使用名称的标准方法，所以你也可以开始习惯它现在。</p>
+<p>然而，如果你正使用C++编译器编译C代码，你不希望有调整从所有这些调用printf()到std::printf()。幸运的是，在这种情况下，C代码将使用旧样式的头，&lt;stdio.h&gt;而不是新的标题<cstdio>，命名空间的魔力将处理其他的东西：</p>
+<pre><code>/* This is C code that I&#39;m compiling using a C++ compiler */
+#include &lt;stdio.h&gt;          /* Nothing unusual in #include line */
+int main()
+&#123;
+  printf(&quot;Hello world\n&quot;);  /* Nothing unusual in the call either */
+  // ...
+&#125;
+</code></pre>
+<p>最后说一下：如果您的C标题不属于标准库，那么我们对您的指导方针有所不同。有两种情况：您无法更改头文件，也可以更改头文件。</p>
+<h1 id="如何在C-代码中包含非系统C头文件"><a href="#如何在C-代码中包含非系统C头文件" class="headerlink" title="如何在C++代码中包含非系统C头文件"></a>如何在C++代码中包含非系统C头文件</h1><p>如果您包含系统未提供的C头文件，则可能需要将该#include行包装在  extern “C” { /<em>…</em>/ }构造中。这告诉C ++编译器在头文件中声明的函数是C函数。</p>
+<pre><code>// This is C++ code
+extern &quot;C&quot; &#123;
+  // Get declaration for f(int i, char c, float x)
+  #include &quot;my-C-code.h&quot;
+&#125;
+int main()
+&#123;
+  f(7, &#39;x&#39;, 3.14);   // Note: nothing unusual in the call
+  // ...
+&#125;
+</code></pre>
+<p>注意：有些不同准则适用于由系统（如提供C头文件&lt;cstdio&gt;）和C头文件，你可以改变。</p>
+<h1 id="如何修改自己的C头文件，在C-代码中更容易-include它们"><a href="#如何修改自己的C头文件，在C-代码中更容易-include它们" class="headerlink" title="如何修改自己的C头文件，在C++代码中更容易#include它们"></a>如何修改自己的C头文件，在C++代码中更容易#include它们</h1><p>如果您包含系统不提供的C头文件，并且如果能够更改C标头，则应强烈地考虑extern “C” {…}在标题中添加逻辑，以使C++用户更轻松地将 #include其转换为C++码。因为C编译器不会明白的extern “C”结构，必须包裹extern “C” {and}线的#ifdef，因此他们不会通过正常的C编译器可以看到。</p>
+<p>步骤1：将以下行放在C头文件的顶部（注意：如果编译器是C ++编译器，则该符号__cplusplus为#defined）：</p>
+<pre><code>#ifdef __cplusplus
+extern &quot;C&quot; &#123;
+#endif
+</code></pre>
+<p>步骤2：将以下行放在C头文件的最底部：</p>
+<pre><code>#ifdef __cplusplus
+&#125;
+#endif
+</code></pre>
+<p>现在你可以在C++代码中#include没有任何extern “C”废话：</p>
+<pre><code>// This is C++ code
+// Get declaration for f(int i, char c, float x)
+#include &quot;my-C-code.h&quot;   // Note: nothing unusual in #include line
+int main()
+&#123;
+  f(7, &#39;x&#39;, 3.14);       // Note: nothing unusual in the call
+  // ...
+&#125;
+</code></pre>
+<p>注意：有些不同准则适用于由系统（如提供C头文件 &lt;cstdio&gt;）和C头文件，你不能改变。</p>
+<p>Note: #define macros are evil in 4 different ways: evil#1, evil#2, evil#3, and evil#4. But they’re still useful sometimes. Just wash your hands after using them.</p>
+<h1 id="如何从C-代码调用非系统C函数f-int-char-float"><a href="#如何从C-代码调用非系统C函数f-int-char-float" class="headerlink" title="如何从C++代码调用非系统C函数f(int,char,float)"></a>如何从C++代码调用非系统C函数f(int,char,float)</h1><p>如果您有一个要调用的单个C函数，并且由于某种原因，您没有或不想要#include声明该函数的C头文件，您可以在C++代码中声明单独的C函数使用extern “C”语法。当然你需要使用全功能原型：</p>
+<pre><code>extern &quot;C&quot; void f(int i, char c, float x);
+</code></pre>
+<p>几个C函数的块可以通过大括号分组：</p>
+<pre><code>extern &quot;C&quot; &#123;
+  void   f(int i, char c, float x);
+  int    g(char* s, const char* s2);
+  double sqrtOfSumOfSquares(double a, double b);
+&#125;
+</code></pre>
+<p>之后，您只需调用该函数，就像它是一个C++函数：</p>
+<pre><code>int main()
+&#123;
+  f(7, &#39;x&#39;, 3.14);   // Note: nothing unusual in the call
+  // ...
+&#125;
+</code></pre>
+<h1 id="如何创建一个可以被C代码调用的f-int-char-float-C-函数？"><a href="#如何创建一个可以被C代码调用的f-int-char-float-C-函数？" class="headerlink" title="如何创建一个可以被C代码调用的f(int,char,float)C ++函数？"></a>如何创建一个可以被C代码调用的f(int,char,float)C ++函数？</h1><p>C++编译器必须知道f(int,char,float)由C编译器使用以下extern “C” 结构调用：</p>
+<pre><code>// This is C++ code
+// Declare f(int,char,float) using extern &quot;C&quot;:
+extern &quot;C&quot; void f(int i, char c, float x);
+// ...
+// Define f(int,char,float) in some C++ module:
+void f(int i, char c, float x)
+&#123;
+  // ...
+&#125;
+</code></pre>
+<p>该extern “C”行告诉编译器发送到链接器的外部信息应该使用C调用约定和名称调整（例如，前面加上一个下划线）。由于C不支持名称重载，因此不能使C程序同时调用多个重载函数。</p>
+<h1 id="C-C-函数调用C-C函数时为什么链接器会出错？"><a href="#C-C-函数调用C-C函数时为什么链接器会出错？" class="headerlink" title="C/C ++函数调用C++/C函数时为什么链接器会出错？"></a>C/C ++函数调用C++/C函数时为什么链接器会出错？</h1><p>如果你没有获取到你的extern “C”权利，你有时会得到链接器错误，而不是编译错误。这是因为C++编译器通常与C编译器不同的是“mangle”函数名称（例如，支持函数重载）。</p>
+<p>请参阅前面两个常见问题解答如何使用extern “C”。</p>
+<h1 id="如何将C-的class对象传递给C函数？"><a href="#如何将C-的class对象传递给C函数？" class="headerlink" title="如何将C++的class对象传递给C函数？"></a>如何将C++的class对象传递给C函数？</h1><p>这是一个例子（有关信息extern “C”，请参阅前两个常见问题）。</p>
+<pre><code>Fred.h：
+
+/* This header can be read by both C and C++ compilers */
+#ifndef FRED_H
+#define FRED_H
+#ifdef __cplusplus
+  class Fred &#123;
+  public:
+    Fred();
+    void wilma(int);
+  private:
+    int a_;
+  &#125;;
+#else
+  typedef
+    struct Fred
+      Fred;
+#endif
+#ifdef __cplusplus
+extern &quot;C&quot; &#123;
+#endif
+#if defined(__STDC__) || defined(__cplusplus)
+  extern void c_function(Fred*);   /* ANSI C prototypes */
+  extern Fred* cplusplus_callback_function(Fred*);
+#else
+  extern void c_function();        /* K&amp;R style */
+  extern Fred* cplusplus_callback_function();
+#endif
+#ifdef __cplusplus
+&#125;
+#endif
+#endif /*FRED_H*/
+</code></pre>
+<hr>
+<pre><code>Fred.cpp：
+
+// This is C++ code
+#include &quot;Fred.h&quot;
+Fred::Fred() : a_(0) &#123; &#125;
+void Fred::wilma(int a) &#123; &#125;
+Fred* cplusplus_callback_function(Fred* fred)
+&#123;
+  fred-&gt;wilma(123);
+  return fred;
+&#125;
+</code></pre>
+<hr>
+<pre><code>main.cpp：
+
+// This is C++ code
+#include &quot;Fred.h&quot;
+int main()
+&#123;
+  Fred fred;
+  c_function(&amp;fred);
+  // ...
+&#125;
+</code></pre>
+<hr>
+<pre><code>c-function.c：
+
+/* This is C code */
+#include &quot;Fred.h&quot;
+void c_function(Fred* fred)
+&#123;
+  cplusplus_callback_function(fred);
+&#125;
+</code></pre>
+<p>与C++代码不同，您的C代码将无法指出两个指针指向同一个对象，除非指针是完全相同的类型。例如，在C++中，它是容易的，如果一个检查Derived<em>叫dp为指向一个指向同一个对象 Base</em>叫bp：刚才说if (dp == bp) …。在这种情况下Base*，C++编译器会自动将两个指针转换为相同的类型，然后进行比较。根据C++编译器的实现细节，这种转换有时会改变指针值的位。</p>
+<p>（技术方面：大多数C ++编译器都使用二进制对象布局，导致这种转换发生在多个继承和/或虚拟继承中，但是C ++语言原则上并不强加该对象布局，即使在非虚拟的情况下也可能发生转换单一遗产。）</p>
+<p>要点很简单：您的C编译器将不会知道如何执行该指针转换，因此，转换Derived* 到Base*例如必须在使用C ++编译器编译的代码中进行，而不是使用C编译器编译的代码。</p>
+<p>注意：转换两者时必须格外小心，void*因为该转换不允许C或C ++编译器做适当的指针调整！比较(x == y)可能false即使(b == d) 是true：</p>
+<pre><code>void f(Base* b, Derived* d)
+&#123;
+  if (b == d) &#123;   ☺ Validly compares a Base* to a Derived*
+    // ...
+  &#125;
+  void* x = b;
+  void* y = d;
+  if (x == y) &#123;   ☹ BAD FORM! DO NOT DO THIS!
+    // ...
+  &#125;
+&#125;
+</code></pre>
+<p>如上所述，上述指针转换通常会发生多个和/或虚拟继承，但请不要将其视为指针转换将发生的唯一时间的详尽列表。</p>
+<p>如果你真的想使用void*指针，这里是安全的方法：</p>
+<pre><code>void f(Base* b, Derived* d)
+&#123;
+  void* x = b;
+  void* y = static_cast&lt;Base*&gt;(d);  // If conversion is needed, it will happen in the static_cast&lt;&gt;
+  if (x == y) &#123;   // ☺ Validly compares a Base* to a Derived*
+    // ...
+  &#125;
+&#125;
+</code></pre>
+<h1 id="C函数可以直接访问C-对象中的数据class吗？"><a href="#C函数可以直接访问C-对象中的数据class吗？" class="headerlink" title="C函数可以直接访问C++对象中的数据class吗？"></a>C函数可以直接访问C++对象中的数据class吗？</h1><p>有关将C++对象传递给C函数的基本信息，请阅读以前的常见问题</p>
+<p>如果C++类，则可以从C函数安全地访问C++对象的数据：</p>
+<ul>
+<li>没有virtual功能（包括继承的virtual功能）</li>
+<li>所有数据都在同一访问级别的部分（private/protected/public）</li>
+<li>没有包含virtual功能的完全包含的子对象</li>
+</ul>
+<p>如果C++类根本没有任何基类（或者如果任何完全包含的子对象有基类），访问数据将在技术上是不可移植的，因为class继承下的布局不是由该语言强加的。然而在实践中，所有C++编译器都以相同的方式执行：基类对象首先出现（在多个继承的情况下以从左到右的顺序），并且成员对象跟随。</p>
+<p>此外，如果类（或任何基类）包含任何virtual函数，几乎所有的C++编译器void* 都会在对象的第一个virtual函数的位置或对象的开始处放入对象。再次，这不是语言所要求的，而是“每个人”都是这样做的。</p>
+<p>如果类有任何基virtual类，它更复杂，更不便携。一个常见的实现技术是使对象包含最后一个virtual基类（V）的对象（不管在继承层次结构中哪个位置V显示为virtual基类）。对象的其余部分按正常顺序显示。每个派生类具有V作为virtual基类实际上有一个指针到V最终对象的一部分。</p>
+<p>后期润色修改。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/01-CPP-基础/">01. CPP 基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/CPP/">CPP</a>, <a href="/tags/Linux/">Linux</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

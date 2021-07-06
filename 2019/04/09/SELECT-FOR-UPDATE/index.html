@@ -1,0 +1,268 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>SELECT_FOR_UPDATE | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="SELECT … FOR UPDATE 是为了在查询时,避免其他用户以该表进行插入,修改或删除等操作,造成表的不一致性.排他锁">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="SELECT_FOR_UPDATE"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2019-04-09T06:49:08.000Z"><a href="/2019/04/09/SELECT-FOR-UPDATE/">2019-04-09</a></time>
+        
+  
+    <h1 class="title">SELECT_FOR_UPDATE</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        
+    </div>
+
+        <p>SELECT … FOR UPDATE 是为了在查询时,避免其他用户以该表进行插入,修改或删除等操作,造成表的不一致性.排他锁</p>
+<span id="more"></span>
+
+<p>应用场景：</p>
+<p>处理库存的时候，防止多线程进行操作，在一定时间内，只允许一个线程操作。</p>
+<pre><code>SELECT * FROM table_name for update; -- 会等待行锁释放之后，返回查询结果。 [MYSQL;Informix;Orcale]
+SELECT * FROM table_name for update nowait ; -- 不等待行锁释放，提示锁冲突，不返回结果[MYSQL;ORcale;Informix不支持,可以设置全局NOWAIT]
+SELECT * FROM table_name for update wait 10 ; -- 等待5秒，若行锁仍未释放，则提示锁冲突，不返回结果[MYSQL;ORcale;Informix不支持，可以设置全局NOWAIT 10]
+SELECT * FROM table_name for update skip locked; -- 查询返回查询结果，但忽略有行锁的记录 [oracle支持跳过锁区域;MYSQL和Informix不支持]
+</code></pre>
+<hr>
+<pre><code>BEGIN ;
+SELECT * FROM table_name WHERE field_name1 = xxx FOR UPDATE;
+UPDATE table_name SET field_name2 = &#39;xyz&#39; WHERE field_name1 = xxx;
+COMMIT;
+</code></pre>
+<p>Mysql Locking Reads[<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html]">https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html]</a></p>
+<p>Informix-4GL</p>
+<p>Use the FOR UPDATE option to declare an update cursor. You can use the update cursor to modify (update or delete) the current row. </p>
+<ol>
+<li>使用select for update 语句可以使用行锁锁定你要更改的记录．当遇到下一个commit和rollback语句时会被释放．</li>
+</ol>
+<p>The Select For Update statement allows you to lock the records in the cursor result set. You are not required to make changes to the records in order to use this statement. The record locks are released when the next commit or rollback statement is issued.</p>
+<p>The syntax for the SELECT FOR UPDATE statement in Oracle/PLSQL is:</p>
+<pre><code>CURSOR cursor_name
+IS
+    select_statement
+    FOR UPDATE [OF column_list] [NOWAIT];
+</code></pre>
+<p>** Parameters or Arguments **</p>
+<pre><code>cursor_name
+    The name of the cursor.
+select_statement
+    A SELECT statement that will populate your cursor result set.
+column_list
+    The columns in the cursor result set that you wish to update.
+NOWAIT
+    Optional. The cursor does not wait for resources.
+</code></pre>
+<p>当你要使用游标进行更新和删除操作时(informix-4gl)，则需要使用where current of 语句，这个是标示出当前游标的位置．</p>
+<p>If you plan on updating or deleting records that have been referenced by a select for update statement, you can use the Where Current Of statement.</p>
+<p> 语法如下：The syntax for the Where Current Of statement is either:</p>
+<pre><code>UPDATE table_name
+    SET set_clause
+    WHERE CURRENT OF cursor_name;
+</code></pre>
+<p>OR</p>
+<pre><code>DELETE FROM table_name
+WHERE CURRENT OF cursor_name;
+
+在这时的例子中我采用上面所建的test表来试验．
+
+
+
+
+更新．
+
+SQL&gt; DECLARE
+  2  CURSOR  test_cur IS SELECT  * FROM test
+  3  FOR UPDATE OF sal;
+  4  BEGIN
+  5  FOR test_rec IN  test_cur LOOP
+  6  UPDATE test
+  7  SET sal = test_rec.sal +1
+  8  WHERE CURRENT OF test_cur;
+  9  END LOOP;
+ 10  COMMIT;
+ 11  END;
+ 12  /
+
+PL/SQL 过程已成功完成。
+
+删除．
+
+SQL&gt; DECLARE
+  2  CURSOR test_cur IS select * from test for update;
+  3  BEGIN
+  4  FOR test_rec IN test_cur LOOP
+  5  DELETE FROM test WHERE CURRENT OF test_cur;
+  6  END LOOP;
+  7  END;
+  8  /
+
+PL/SQL 过程已成功完成。
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/08-Database/">08. Database</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/MYSQL/">MYSQL</a>, <a href="/tags/SELECT/">SELECT</a>, <a href="/tags/INFORMIX/">INFORMIX</a>, <a href="/tags/ORACLE/">ORACLE</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Nginx简单入门 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="Nginx是一个网页服务器，它能反向代理HTTP, HTTPS, SMTP, POP3, IMAP的协议链接，以及一个负载均衡器和一个HTTP缓存。
+安装环境：Centos安装方式：yum">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Nginx简单入门"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-10-10T04:55:39.000Z"><a href="/2017/10/10/Nginx简单入门/">2017-10-10</a></time>
+        
+  
+    <h1 class="title">Nginx简单入门</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81Nginx%E7%AE%80%E5%8D%95%E5%85%A5%E9%97%A8"><span class="toc-text">一、Nginx简单入门</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81-Nginx%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86"><span class="toc-text">二、 Nginx正向代理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86"><span class="toc-text">三、反向代理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-text">四、负载均衡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%B9%B6%E5%8F%91%E8%BF%9E%E6%8E%A5%EF%BC%8C%E4%BC%98%E5%8C%96Linux%E5%86%85%E6%A0%B8"><span class="toc-text">五、并发连接，优化Linux内核</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E4%BC%98%E5%8C%96Nginx%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">六、优化Nginx配置文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E3%80%81%E5%B7%A5%E4%BD%9C%E8%BF%9B%E7%A8%8B"><span class="toc-text">（1）、工作进程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E3%80%81%E9%95%BF%E8%BF%9E%E6%8E%A5"><span class="toc-text">（2）、长连接</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%883%EF%BC%89%E3%80%81%E8%AE%BF%E9%97%AE%E6%97%A5%E5%BF%97"><span class="toc-text">（3）、访问日志</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%884%EF%BC%89%E3%80%81Sendfile"><span class="toc-text">（4）、Sendfile</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%885%EF%BC%89%E3%80%81%E9%99%90%E5%88%B6"><span class="toc-text">（5）、限制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%886%EF%BC%89%E3%80%81%E7%BC%93%E5%AD%98%E5%92%8C%E5%8E%8B%E7%BC%A9%E5%8F%AF%E4%BB%A5%E6%8F%90%E9%AB%98%E6%80%A7%E8%83%BD"><span class="toc-text">（6）、缓存和压缩可以提高性能</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%887%EF%BC%89%E3%80%81%E7%BC%93%E5%AD%98"><span class="toc-text">（7）、缓存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%888%EF%BC%89%E3%80%81%E5%8E%8B%E7%BC%A9"><span class="toc-text">（8）、压缩</span></a></li></ol></li></ol>
+    </div>
+
+        <p>Nginx是一个网页服务器，它能反向代理HTTP, HTTPS, SMTP, POP3, IMAP的协议链接，以及一个负载均衡器和一个HTTP缓存。</p>
+<p>安装环境：Centos<br>安装方式：yum</p>
+<span id="more"></span>
+
+<h3 id="一、Nginx简单入门"><a href="#一、Nginx简单入门" class="headerlink" title="一、Nginx简单入门"></a>一、Nginx简单入门</h3><p>（1）、安装</p>
+<pre><code># yum install nginx
+</code></pre>
+<p>（2）、启动，停止，重启</p>
+<pre><code># 启动
+nginx -s start;
+# 重新启动，热启动，修改配置重启不影响线上
+nginx -s reload;
+# 关闭
+nginx -s stop;
+# 修改配置后，可以通过下面的命令测试是否有语法错误
+nginx -t;
+</code></pre>
+<p>-s，signal，意思就是向 nginx 发送 start|reload|stop 命令。</p>
+<p>（3）、配置文件解析</p>
+<p>配置文件一般可以在 /etc/nginx/nginx.conf</p>
+<pre><code>#定义Nginx运行的用户和用户组
+user www www;
+
+#nginx进程数，建议设置为等于CPU总核心数。
+worker_processes 8;
+
+#全局错误日志定义类型，[ debug | info | notice | warn | error | crit ]
+error_log /var/log/nginx/error.log info;
+
+#进程文件
+pid /var/run/nginx.pid;
+
+#一个nginx进程打开的最多文件描述符数目，理论值应该是最多打开文件数（系统的值ulimit -n）与nginx进程数相除，但是nginx分配请求并不均匀，所以建议与ulimit -n的值保持一致。
+worker_rlimit_nofile 65535;
+
+#工作模式与连接数上限
+events
+&#123;
+#参考事件模型，use [ kqueue | rtsig | epoll | /dev/poll | select | poll ]; epoll模型是Linux 2.6以上版本内核中的高性能网络I/O模型，如果跑在FreeBSD上面，就用kqueue模型。
+use epoll;
+#单个进程最大连接数（最大连接数=连接数*进程数）
+worker_connections 65535;
+&#125;
+
+#设定http服务器
+http
+&#123;
+include mime.types; #文件扩展名与文件类型映射表
+default_type application/octet-stream; #默认文件类型
+#charset utf-8; #默认编码
+server_names_hash_bucket_size 128; #服务器名字的hash表大小
+client_header_buffer_size 32k; #上传文件大小限制
+large_client_header_buffers 4 64k; #设定请求缓
+client_max_body_size 8m; #设定请求缓
+sendfile on; #开启高效文件传输模式，sendfile指令指定nginx是否调用sendfile函数来输出文件，对于普通应用设为 on，如果用来进行下载等应用磁盘IO重负载应用，可设置为off，以平衡磁盘与网络I/O处理速度，降低系统的负载。注意：如果图片显示不正常把这个改成off。
+autoindex on; #开启目录列表访问，合适下载服务器，默认关闭。
+tcp_nopush on; #防止网络阻塞
+tcp_nodelay on; #防止网络阻塞
+keepalive_timeout 120; #长连接超时时间，单位是秒
+
+#FastCGI相关参数是为了改善网站的性能：减少资源占用，提高访问速度。下面参数看字面意思都能理解。
+fastcgi_connect_timeout 300;
+fastcgi_send_timeout 300;
+fastcgi_read_timeout 300;
+fastcgi_buffer_size 64k;
+fastcgi_buffers 4 64k;
+fastcgi_busy_buffers_size 128k;
+fastcgi_temp_file_write_size 128k;
+
+#gzip模块设置
+gzip on; #开启gzip压缩输出
+gzip_min_length 1k; #最小压缩文件大小
+gzip_buffers 4 16k; #压缩缓冲区
+gzip_http_version 1.0; #压缩版本（默认1.1，前端如果是squid2.5请使用1.0）
+gzip_comp_level 2; #压缩等级
+gzip_types text/plain application/x-javascript text/css application/xml;
+#压缩类型，默认就已经包含text/html，所以下面就不用再写了，写上去也不会有问题，但是会有一个warn。
+gzip_vary on;
+#limit_zone crawler $binary_remote_addr 10m; #开启限制IP连接数的时候需要使用
+
+upstream blog.ha97.com &#123;
+#upstream的负载均衡，weight是权重，可以根据机器配置定义权重。weigth参数表示权值，权值越高被分配到的几率越大。
+server 192.168.80.121:80 weight=3;
+server 192.168.80.122:80 weight=2;
+server 192.168.80.123:80 weight=3;
+&#125;
+
+#虚拟主机的配置
+server
+&#123;
+    #监听端口
+    listen 80;
+    #域名可以有多个，用空格隔开
+    server_name www.ha97.com ha97.com;
+    index index.html index.htm index.php;
+    root /data/www/ha97;
+    location ~ .*\.(php|php5)?$
+    &#123;
+    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_index index.php;
+    include fastcgi.conf;
+    &#125;
+    #图片缓存时间设置
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
+    &#123;
+    expires 10d;
+    &#125;
+    #JS和CSS缓存时间设置
+    location ~ .*\.(js|css)?$
+    &#123;
+    expires 1h;
+    &#125;
+    #日志格式设定
+    log_format access &#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;
+    &#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;
+    &#39;&quot;$http_user_agent&quot; $http_x_forwarded_for&#39;;
+    #定义本虚拟主机的访问日志
+    access_log /var/log/nginx/ha97access.log access;
+
+    #对 &quot;/&quot; 启用反向代理
+    location / &#123;
+    proxy_pass http://127.0.0.1:88;
+    proxy_redirect off;
+    proxy_set_header X-Real-IP $remote_addr;
+    #后端的Web服务器可以通过X-Forwarded-For获取用户真实IP
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #以下是一些反向代理的配置，可选。
+    proxy_set_header Host $host;
+    client_max_body_size 10m; #允许客户端请求的最大单文件字节数
+    client_body_buffer_size 128k; #缓冲区代理缓冲用户端请求的最大字节数，
+    proxy_connect_timeout 90; #nginx跟后端服务器连接超时时间(代理连接超时)
+    proxy_send_timeout 90; #后端服务器数据回传时间(代理发送超时)
+    proxy_read_timeout 90; #连接成功后，后端服务器响应时间(代理接收超时)
+    proxy_buffer_size 4k; #设置代理服务器（nginx）保存用户头信息的缓冲区大小
+    proxy_buffers 4 32k; #proxy_buffers缓冲区，网页平均在32k以下的设置
+    proxy_busy_buffers_size 64k; #高负荷下缓冲大小（proxy_buffers*2）
+    proxy_temp_file_write_size 64k;
+    #设定缓存文件夹大小，大于这个值，将从upstream服务器传
+    &#125;
+
+    #设定查看Nginx状态的地址
+    location /NginxStatus &#123;
+    stub_status on;
+    access_log on;
+    auth_basic &quot;NginxStatus&quot;;
+    auth_basic_user_file conf/htpasswd;
+    #htpasswd文件的内容可以用apache提供的htpasswd工具来产生。
+    &#125;
+
+    #本地动静分离反向代理配置
+    #所有jsp的页面均交由tomcat或resin处理
+    location ~ .(jsp|jspx|do)?$ &#123;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://127.0.0.1:8080;
+    &#125;
+    #所有静态文件由nginx直接读取不经过tomcat或resin
+    location ~ .*.(htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid|doc|ppt|pdf|xls|mp3|wma)$
+    &#123; expires 15d; &#125;
+    location ~ .*.(js|css)?$
+    &#123; expires 1h; &#125;
+&#125;
+&#125;
+</code></pre>
+<h3 id="二、-Nginx正向代理"><a href="#二、-Nginx正向代理" class="headerlink" title="二、 Nginx正向代理"></a>二、 Nginx正向代理</h3><p>正向代理的概念：<br>正向代理，也就是传说中的代理,它的工作原理就像一个跳板。</p>
+<p>只是在nginx.conf中配置如下位置</p>
+<pre><code>server &#123;
+    listen 8080;
+    resolver 8.8.8.8;
+    location /&#123;
+        proxy_pass http://$http_host$request_uri;
+        #allow 127.0.0.1;
+        #deny all;
+    &#125;
+&#125;
+</code></pre>
+<p>注意：必须加上resolver 8.8.8.8,给nginx指定dns，否则会报告“nginx 502 bad gateway”错误，也可以通过allow和deny来设置只有指定IP能够访问。修改后重启nginx</p>
+<h3 id="三、反向代理"><a href="#三、反向代理" class="headerlink" title="三、反向代理"></a>三、反向代理</h3><p>反向代理的概念:</p>
+<blockquote>
+<p>例如用户访问<a target="_blank" rel="noopener" href="http://www.test.com/readme">http://www.test.com/readme</a><br>但<a target="_blank" rel="noopener" href="http://www.test.com上并不存在readme页面,它是偷偷从另外一台服务器上取回来,/">www.test.com上并不存在readme页面，它是偷偷从另外一台服务器上取回来，</a><br>然后作为自己的内容返回用户，但用户并不知情。<br>这里所提到的<a target="_blank" rel="noopener" href="http://www.test.com这个域名对应的服务器就设置了反向代理功能./">www.test.com这个域名对应的服务器就设置了反向代理功能。</a></p>
+</blockquote>
+<p>结论就是，反向代理正好相反，对于客户端而言它就像是原始服务器，并且客户端不需要进行任何特别的设置。客户端向反向代理的命名空间(name-space)中的内容发送普通请求，接着反向代理将判断向何处(原始服务器)转交请求，并将获得的内容返回给客户端，就像这些内容原本就是它自己的一样。</p>
+<pre><code>#反向代理配置，Nginx代理模块的指令有很多这里只讲解重要的proxy_pass，想了解更多代理指令请参考官方文档。
+location / &#123;
+  proxy_pass        http://192.168.18.10:8080;
+  proxy_set_header  X-Real-IP  $remote_addr;
+&#125;
+</code></pre>
+<p>proxy_pass 指定被代理服务器的地址和被映射的URI，地址可以是主机名或IP地址加端口号。<br>proxy_set_header 设置由后端的服务器获取用户的主机名或真实IP地址，以及代理者的真实IP地址。</p>
+<h3 id="四、负载均衡"><a href="#四、负载均衡" class="headerlink" title="四、负载均衡"></a>四、负载均衡</h3><pre><code>#负载均衡配置
+upstream server &#123;
+      ip_hash;
+      server 127.0.0.1:7878;
+      server 192.168.10.121:80 down;
+      server 192.168.10.122:8009 max_fails=3 fail_timeout=20s;
+      server 192.168.10.123:8080;
+    &#125;
+</code></pre>
+<p>upstream 是Nginx的HTTP Upstream模块，这个模块通过一个简单的调度算法来实现客户端IP到后端服务器的负载均衡。server是负载均衡组的名称，可以任意指定，方便用的地方直接调用。<br>server 指令指定后端服务器的IP地址和端口，同时还可以设定每个后端服务器在负载均衡调度中的状态。常用的状态有：</p>
+<pre><code>down ，表示当前的server暂时不参与负载均衡。
+backup ，预留的备份机器。当所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因些这台机器的压力最轻。
+max_fails ，允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream模块定义的错误。
+fail_timeout ，在经历了max_fails次失败后，暂停服务的时间。max_fails可以和fail_timeout一起使用。
+</code></pre>
+<p>Nginx 的负载均衡模块目前支持4种调度算法，下面进行分别介绍，后两种属于第三方调度算法。</p>
+<ul>
+<li>轮询（默认）。每个请求按时间顺序逐一分配到不同的后端服务器，如果后端某台服务器宕机，故障系统被自动剔除，使用户访问不受影响。</li>
+<li>Weight。指定轮询权值，Weight值越大，分配到的访问机率越高，主要用于后端每个服务器性能不均的情况下。</li>
+<li>ip_hash。每个请求按访问IP的hash结果分配，这样来自同一个IP的访客固定访问一个后端服务器，有效解决了动态网页存在的session共享问题。</li>
+<li>fair。这是比上面两个更加智能的负载均衡算法。这种算法可以依据页面大小和加载时间长短智能地进行负载均衡，也就是根据后端服务器的响应时间来分配请求，响应时间短的优先分配。Nginx本身是不支持fair的，如果需要使用这种调度算法，必须下载Nginx的upstream_fair模块。</li>
+<li>url_hash。此方法按访问url的hash结果来分配请求，使每个url定向到同一个后端服务器，可以进一步提高后端缓存服务器的效率。Nginx本身是不支持url_hash的，如果需要使用这种调度算法，必须安装Nginx的hash软件包。</li>
+</ul>
+<p>注意：当负载均衡算法为ip_hash时，后端服务器在负载均衡调度中的状态不能是weight和backup。</p>
+<pre><code>location / &#123;
+proxy_pass      http://server;                                 #请求转向server定义的服务器群
+&#125;
+</code></pre>
+<p>然后在location中使用proxy_pass指令，调用负载均衡组的名称server，即可实现负载调度功能。</p>
+<p>下面介绍几种常用的upstream配置方法</p>
+<ul>
+<li><p>1、热备：如果你有2台服务器，当一台服务器发生事故时，才启用第二台服务器给提供服务。服务器处理请求的顺序：AAA突然A挂啦，BBB…..</p>
+<p>  upstream server { </p>
+<pre><code>    server 127.0.0.1:7878 backup;                                     #热备
+    server 192.168.10.121:3333;
+  &#125;
+</code></pre>
+</li>
+<li><p>2、轮询：nginx默认就是轮询其权重都默认为1，服务器处理请求的顺序：ABABAB….</p>
+<p>  upstream server { </p>
+<pre><code>    server 127.0.0.1:7878;
+    server 192.168.10.121:3333;       
+  &#125;
+</code></pre>
+</li>
+<li><p>3、加权轮询：跟据配置的权重的大小而分发给服务器不同数量的请求。如果不设置则默认为1。服务器的请求顺序为：ABBABBABB….</p>
+<p>  upstream server { </p>
+<pre><code>    server 127.0.0.1:7878 weight=1;
+    server 192.168.10.121:3333 weight=2;
+  &#125;
+</code></pre>
+</li>
+<li><p>4、ip_hash：nginx会让相同的客户端ip请求相同的服务器。</p>
+<p>  upstream server {</p>
+<pre><code>    server 127.0.0.1:7878; 
+    server 192.168.10.121:3333;
+    ip_hash;
+  &#125;
+</code></pre>
+</li>
+</ul>
+<h3 id="五、并发连接，优化Linux内核"><a href="#五、并发连接，优化Linux内核" class="headerlink" title="五、并发连接，优化Linux内核"></a>五、并发连接，优化Linux内核</h3><p>由于默认的linux内核参数考虑的是最通用场景，这明显不符合用于支持高并发访问的Web服务器的定义，所以需要修改Linux内核参数，是的Nginx可以拥有更高的性能；<br>在优化内核时，可以做的事情很多，不过，我们通常会根据业务特点来进行调整，当Nginx作为静态web内容服务器、反向代理或者提供压缩服务器的服务器时，期内核参数的调整都是不同的，这里针对最通用的、使Nginx支持更多并发请求的TCP网络参数做简单的配置；<br>首先，你需要修改/etc/sysctl.conf来更改内核参数。</p>
+<pre><code>fs.file-max = 999999
+#表示单个进程最大可以打开的句柄数；
+
+net.ipv4.tcp_tw_reuse = 1
+#参数设置为 1 ，表示允许将TIME_WAIT状态的socket重新用于新的TCP链接，这对于服务器来说意义重大，因为总有大量TIME_WAIT状态的链接存在；
+
+ner.ipv4.tcp_keepalive_time = 600
+#当keepalive启动时，TCP发送keepalive消息的频度；默认是2小时，将其设置为10分钟，可以更快的清理无效链接。
+
+net.ipv4.tcp_fin_timeout = 30
+#当服务器主动关闭链接时，socket保持在FIN_WAIT_2状态的最大时间
+
+net.ipv4.tcp_max_tw_buckets = 5000
+#这个参数表示操作系统允许TIME_WAIT套接字数量的最大值，如果超过这个数字，TIME_WAIT套接字将立刻被清除并打印警告信息。
+#该参数默认为180000，过多的TIME_WAIT套接字会使Web服务器变慢。
+
+net.ipv4.ip_local_port_range = 1024 65000
+#定义UDP和TCP链接的本地端口的取值范围。
+
+net.ipv4.tcp_rmem = 10240 87380 12582912
+#定义了TCP接受缓存的最小值、默认值、最大值。
+
+net.ipv4.tcp_wmem = 10240 87380 12582912
+#定义TCP发送缓存的最小值、默认值、最大值。
+
+net.core.netdev_max_backlog = 8096
+#当网卡接收数据包的速度大于内核处理速度时，会有一个列队保存这些数据包。这个参数表示该列队的最大值。
+##在提交到CPU前网卡中数据包缓冲的速率，高带宽下提高这个值可提高性能。检查内核日志文件中有关这个设置的错误，根据网卡文档中的建议修改这个值。
+
+net.core.rmem_default = 6291456
+#表示内核套接字接受缓存区默认大小。
+
+net.core.wmem_default = 6291456
+#表示内核套接字发送缓存区默认大小。
+
+net.core.rmem_max = 12582912
+#表示内核套接字接受缓存区最大大小。
+
+net.core.wmem_max = 12582912
+#表示内核套接字发送缓存区最大大小。
+注意：以上的四个参数，需要根据业务逻辑和实际的硬件成本来综合考虑；
+
+net.ipv4.tcp_syncookies = 1
+#与性能无关。用于解决TCP的SYN攻击。
+
+net.ipv4.tcp_max_syn_backlog = 8192
+#这个参数表示TCP三次握手建立阶段接受SYN请求列队的最大长度，默认1024，将其设置的大一些可以使出现Nginx繁忙来不及accept新连接的情况时，Linux不至于丢失客户端发起的链接请求。
+
+net.ipv4.tcp_tw_recycle = 1
+#这个参数用于设置启用timewait快速回收。
+
+net.core.somaxconn=262114
+#选项默认值是128，这个参数用于调节系统同时发起的TCP连接数，在高并发的请求中，默认的值可能会导致链接超时或者重传，因此需要结合高并发请求数来调节此值。排队等待连接的最大数目，由NGINX可接受的数目决定。默认值通常很低，但可以接受，因为NGINX 接收连接非常快，但如果网站流量大时，就应该增加这个值。内核日志中的错误消息会提醒这个值太小了，把值改大，直到错误提示消失。注意： 如果设置这个值大于512，相应地也要改变NGINX listen指令的backlog参数
+
+net.ipv4.tcp_max_orphans=262114
+#选项用于设定系统中最多有多少个TCP套接字不被关联到任何一个用户文件句柄上。如果超过这个数字，孤立链接将立即被复位并输出警告信息。这个限制指示为了防止简单的DOS攻击，不用过分依靠这个限制甚至认为的减小这个值，更多的情况是增加这个值。
+
+fs.file-max = 999999
+
+net.ipv4.tcp_tw_reuse = 1
+
+ner.ipv4.tcp_keepalive_time = 600
+
+net.ipv4.tcp_fin_timeout = 30
+</code></pre>
+<h3 id="六、优化Nginx配置文件"><a href="#六、优化Nginx配置文件" class="headerlink" title="六、优化Nginx配置文件"></a>六、优化Nginx配置文件</h3><p>调优NGINX配置</p>
+<p>以下是一些可以影响性能的NGINX指令。如上所述，我们只讨论自己能调整的指令。我们建议你在没有NGINX团队指导下，不要调整别的指令。</p>
+<h4 id="（1）、工作进程"><a href="#（1）、工作进程" class="headerlink" title="（1）、工作进程"></a>（1）、工作进程</h4><p>NGINX可以运行多个工作进程，每个都可处理大量并发连接。可以控制工作进程数，用下面的指令管理它们的连接：</p>
+<pre><code>worker_processes —— NGINX工作进程数（默认值是1）。在大多数情况下，一个CPU内核运行一个工作进程最好，建议将这个指令设置成自动就可以。有时可能想增大这个值，比如当工作进程需要做大量的磁盘I/O。
+
+worker_connections —— 每个工作进程可以处理并发的最大连接数。默认值是512，但多数系统有充足的资源可以支撑更多的连接。合适的设置可以根据服务器的大小和流量的性质决定，可以通过测试修改。
+</code></pre>
+<h4 id="（2）、长连接"><a href="#（2）、长连接" class="headerlink" title="（2）、长连接"></a>（2）、长连接</h4><p>长连接对性能有很大的影响，通过减少CPU和网络开销需要开启或关闭连接。NGINX终止所有客户端连接，创建到上游服务器独立的连接。NGINx支持客户端和上游服务器两种长连接。下面是和客户端的长连接相关的指令：</p>
+<pre><code>keepalive_requests-单个客户端长连接可以请求的数量，默认值是100，但是当使用压力测试工具从一个客户端发送多个请求测试时，这个值设更高些特别有用。
+
+keepalive_timeout—空闲长连接保持打开状态的时间。
+</code></pre>
+<p>下面是和上游服务器长连接的相关指令：</p>
+<pre><code>keepalive –每个工作进程中空闲长连接到上游服务器保持开启的连接数量。没有默认值。
+</code></pre>
+<p>要使用连接到上游服务器的长连接，必须要配置文件中下面的指令。</p>
+<pre><code>proxy_http_version 1.1;
+proxy_set_header Connection &quot;&quot;;
+</code></pre>
+<h4 id="（3）、访问日志"><a href="#（3）、访问日志" class="headerlink" title="（3）、访问日志"></a>（3）、访问日志</h4><p>记录每个请求会消耗CPU和I/O周期，一种降低这种影响的方式是缓冲访问日志。使用缓冲，而不是每条日志记录都单独执行写操作，NGINX会缓冲一连串的日志记录，使用单个操作把它们一起写到文件中。</p>
+<p>要启用访问日志的缓存，就涉及到在access_log指令中buffer=size这个参数。当缓冲区达到size值时，NGINX会把缓冲区的内容写到日志中。让NGINX在指定的一段时间后写缓存，就包含flush=time参数。当两个参数都设置了，当下个日志条目超出缓冲区值或者缓冲区中日志条目存留时间超过设定的时间值，NGINX都会将条目写入日志文件。当工作进程重新打开它的日志文件或退出时，也会记录下来。要完全禁用访问日志记录的功能，将access_log 指令设置成off参数。</p>
+<h4 id="（4）、Sendfile"><a href="#（4）、Sendfile" class="headerlink" title="（4）、Sendfile"></a>（4）、Sendfile</h4><p>操作系统的sendfile()系统调用可以实现从一个文件描述符到另一个文件描述符的数据拷贝，通常实现零拷贝，这能加速TCP数据传输。要让NGINX使用它，在http或server或location环境中包含sendfile指令。NGINX可以不需要切换到用户态，就把缓存或磁盘上的内容写入套接字 ，而且写的速度非常快，消耗更少的CPU周期。注意，尽管使用sendfile()数据拷贝可以绕过用户态，这不适用于常规的NGINX处理改变内容的链和过滤器， 比如gzip。当配置环境下有sendfile指令和激活内容更改过滤器的指令时，NGINX会自动禁用sendfile。</p>
+<h4 id="（5）、限制"><a href="#（5）、限制" class="headerlink" title="（5）、限制"></a>（5）、限制</h4><p>你可以设置多个限制，防止用户消耗太多的资源，避免影响系统性能和用户体验及安全。 以下是相关的指令：</p>
+<pre><code>limit_conn and limit_conn_zone—NGINX接受客户连接的数量限制，例如单个IP地址的连接。设置这些指令可以防止单个用户打开太多的连接，消耗超出自己的资源。
+
+limit_rate–传输到客户端响应速度的限制（每个打开多个连接的客户消耗更多的带宽）。设置这个限制防止系统过载，确保所有客户端更均匀的服务质量。
+
+limit_req and limit_req_zone– NGINX处理请求的速度限制，与limit_rate有相同的功能。可以提高安全性，尤其是对登录页面，通过对用户限制请求速率设置一个合理的值，避免太慢的程序覆盖你的应用请求（比如DDoS攻击)。
+
+max_conns上游配置块中服务器指令参数。在上游服务器组中单个服务器可接受最大并发数量。使用这个限制防止上游服务器过载。设置值为0（默认值）表示没有限制。
+
+queue (NGINX Plus) – 创建一个队列，用来存放在上游服务器中超出他们最大max_cons限制数量的请求。这个指令可以设置队列请求的最大值，还可以选择设置在错误返回之前最大等待时间（默认值是60秒）。如果忽略这个指令，请求不会放入队列。
+</code></pre>
+<h4 id="（6）、缓存和压缩可以提高性能"><a href="#（6）、缓存和压缩可以提高性能" class="headerlink" title="（6）、缓存和压缩可以提高性能"></a>（6）、缓存和压缩可以提高性能</h4><p>NGINX的一些额外功能可用于提高Web应用的性能，调优的时候web应用不需要关掉，但值得一提，因为它们的影响可能很重要。 它们包括缓存和压缩。</p>
+<h4 id="（7）、缓存"><a href="#（7）、缓存" class="headerlink" title="（7）、缓存"></a>（7）、缓存</h4><p>一个启用NGINX缓存的情景，一组web或者应用服务器负载均衡，可以显著缩短对客户端的响应时间，同时大幅度降低后端服务器的负载。缓存本身就可以作个专题来讲，这里我们就不试图讲它了。参阅NGINX Plus管理手册的NGINX内容缓存。</p>
+<h4 id="（8）、压缩"><a href="#（8）、压缩" class="headerlink" title="（8）、压缩"></a>（8）、压缩</h4><p>所以使用更小的网络带宽。然而尽管压缩数据会消耗CPU资源，但当需要减少网络带宽使用时这样做非常有效。需要注意的是，不能对已压缩的文件再压缩例如JPEG 文件。有关更多的信息，请参阅“NGINX Plus管理指南”中的压缩和解压缩。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/05-Linux-Operation/">05. Linux Operation</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Nginx/">Nginx</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

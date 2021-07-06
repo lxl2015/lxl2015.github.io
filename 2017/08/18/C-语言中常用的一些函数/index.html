@@ -1,0 +1,1188 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C 语言中常用的一些函数 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="详细的，查看man手册">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C 语言中常用的一些函数"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-18T08:12:35.000Z"><a href="/2017/08/18/C-语言中常用的一些函数/">2017-08-18</a></time>
+        
+  
+    <h1 class="title">C 语言中常用的一些函数</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#fscanf"><span class="toc-text">fscanf</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#atoi-atol-atoll-atoq"><span class="toc-text">atoi, atol, atoll, atoq</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#abs-labs-llabs-imaxabs"><span class="toc-text">abs, labs, llabs, imaxabs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pow-powf-powl"><span class="toc-text">pow, powf, powl</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#strchr-strrchr-strchrnul"><span class="toc-text">strchr , strrchr , strchrnul</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#isupper"><span class="toc-text">isupper</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unlink"><span class="toc-text">unlink</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getdtablesize-getrlimit-setrlimit"><span class="toc-text">getdtablesize ,getrlimit , setrlimit</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#socketpair"><span class="toc-text">socketpair</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getopt%E3%80%81getopt-long%E3%80%81getopt-long-only"><span class="toc-text">getopt、getopt_long、getopt_long_only</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#strdup-realloc"><span class="toc-text">strdup realloc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#uname-%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E5%86%85%E6%A0%B8%E7%9A%84%E5%90%8D%E7%A7%B0%E5%92%8C%E4%BF%A1%E6%81%AF"><span class="toc-text">uname 获取当前内核的名称和信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#clock-gettime-gettimeofday"><span class="toc-text">clock_gettime , gettimeofday</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#setproctitle"><span class="toc-text">setproctitle</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getifaddrs"><span class="toc-text">getifaddrs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#syslog"><span class="toc-text">syslog</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#syslog-conf%E6%96%87%E4%BB%B6%E8%A7%A3%E8%AF%BB"><span class="toc-text">syslog.conf文件解读</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#dlopen"><span class="toc-text">dlopen</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#dlsym"><span class="toc-text">dlsym</span></a></li></ol>
+    </div>
+
+        <p>详细的，查看man手册</p>
+<span id="more"></span>
+
+<h4 id="fscanf"><a href="#fscanf" class="headerlink" title="fscanf"></a>fscanf</h4><pre><code>$ nab fscanf
+</code></pre>
+<h4 id="atoi-atol-atoll-atoq"><a href="#atoi-atol-atoll-atoq" class="headerlink" title="atoi, atol, atoll, atoq"></a>atoi, atol, atoll, atoq</h4><pre><code>   #include &lt;stdlib.h&gt;
+
+   int atoi(const char *nptr);
+   long atol(const char *nptr);
+   long long atoll(const char *nptr);
+   long long atoq(const char *nptr);
+</code></pre>
+<p>遇到非数字或字符串结束时(‘\0’)才结束转换</p>
+<blockquote>
+<p>atoi：将指针nptr指向的字符串转化成int类型<br>atol：将指针nptr指向的字符串转化成long类型<br>atoll：将指针nptr指向的字符串转化成long long类型<br>atoq：将指针nptr指向的字符串转化成long long类型   </p>
+</blockquote>
+<p><code>atoi(nptr);</code>和<code>strtol(nptr, NULL, 10);</code>功能是一样的。</p>
+<h4 id="abs-labs-llabs-imaxabs"><a href="#abs-labs-llabs-imaxabs" class="headerlink" title="abs, labs, llabs, imaxabs"></a>abs, labs, llabs, imaxabs</h4><pre><code>   #include &lt;stdlib.h&gt;
+
+   int abs(int j);
+   long int labs(long int j);
+   long long int llabs(long long int j);
+
+   #include &lt;inttypes.h&gt;
+
+   intmax_t imaxabs(intmax_t j);
+</code></pre>
+<hr>
+<pre><code>   #include &lt;math.h&gt;
+
+   double fabs(double x);
+   float fabsf(float x);
+   long double fabsl(long double x);
+
+   Link with -lm.
+</code></pre>
+<p>求数值的绝对值</p>
+<h4 id="pow-powf-powl"><a href="#pow-powf-powl" class="headerlink" title="pow, powf, powl"></a>pow, powf, powl</h4><pre><code>   #include &lt;math.h&gt;
+
+   double pow(double x, double y);
+   float powf(float x, float y);
+   long double powl(long double x, long double y);
+
+   Link with -lm.
+</code></pre>
+<p>pow() 函数返回 x 的 y 次幂的值</p>
+<h4 id="strchr-strrchr-strchrnul"><a href="#strchr-strrchr-strchrnul" class="headerlink" title="strchr , strrchr , strchrnul"></a>strchr , strrchr , strchrnul</h4><pre><code>#include &lt;string.h&gt;
+char *strchr(const char *s, int c);
+char *strrchr(const char *s, int c);
+#define _GNU_SOURCE         /* See feature_test_macros(7) */
+#include &lt;string.h&gt;
+char *strchrnul(const char *s, int c);
+</code></pre>
+<p>描述：</p>
+<blockquote>
+<p>strchr() 功能是返回在字符串s中c第一次出现的指针位置<br>strrchr()功能是返回在字符串s中c最后一次出现的指针位置<br>strchrnul()功能和strchr()差不多。除了，如果在字符串s中未找到c，那么它返回的是一个指向s结尾的空字节的指针，而不是返回NULL；    </p>
+</blockquote>
+<p>返回值：</p>
+<blockquote>
+<p>strchr()和strchr()函数返回指向所匹配字符的指针。如果找不到字符，则返回NULL。终止空字节被认为是字符串的一部分，因此如果c被指向为’\0’，这些函数返回一个指向终止符的指针。<br>strchrnul()函数返回一个匹配的字符的指针，如果找不到字符，返回字符串的结尾位置。    </p>
+</blockquote>
+<h4 id="isupper"><a href="#isupper" class="headerlink" title="isupper"></a>isupper</h4><pre><code>#include &lt;ctype.h&gt;
+
+int isupper(int c);
+</code></pre>
+<p>功能：判断字符c是否为大写英文字母<br>说明：当参数c为大写英文字母(A-Z)时，返回非零值，否则返回零。<br>附加说明： 此为宏定义，非真正函数。</p>
+<p>其他相关函数参考    </p>
+<pre><code>   #include &lt;ctype.h&gt;
+
+   int isalnum(int c);
+   int isalpha(int c);
+   int isascii(int c);
+   int isblank(int c);
+   int iscntrl(int c);
+   int isdigit(int c);
+   int isgraph(int c);
+   int islower(int c);
+   int isprint(int c);
+   int ispunct(int c);
+   int isspace(int c);
+   int isupper(int c);
+   int isxdigit(int c);
+</code></pre>
+<p>   Feature Test Macro Requirements for glibc (see feature_test_macros(7)):</p>
+<pre><code>   isascii():
+       _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE
+   isblank():
+       _XOPEN_SOURCE &gt;= 600 || _ISOC99_SOURCE || _POSIX_C_SOURCE &gt;= 200112L;
+       or cc -std=c99
+</code></pre>
+<p>DESCRIPTION<br>       These  functions  check  whether  c, which must have the value of an unsigned char or EOF, falls into a certain character class according to the current<br>       locale.</p>
+<pre><code>   isalnum()
+          checks for an alphanumeric character; it is equivalent to (isalpha(c) || isdigit(c)).
+
+   isalpha()
+          checks for an alphabetic character; in the standard &quot;C&quot; locale, it is equivalent to (isupper(c) || islower(c)).  In some locales,  there  may  be
+          additional characters for which isalpha() is true—letters which are neither upper case nor lower case.
+
+   isascii()
+          checks whether c is a 7-bit unsigned char value that fits into the ASCII character set.
+
+   isblank()
+          checks for a blank character; that is, a space or a tab.
+
+   iscntrl()
+          checks for a control character.
+
+   isdigit()
+          检查参数c是否为阿拉伯数字0到9。
+   若参数c为阿拉伯数字，则返回非0值（不一定是1或TRUE，因为TRUE值和具体编译器相关），否则返回NULL(0)。
+
+   isgraph()
+          checks for any printable character except space.
+
+   islower()
+          checks for a lower-case character.
+
+   isprint()
+          checks for any printable character including space.
+
+   ispunct()
+          checks for any printable character which is not a space or an alphanumeric character.
+
+   isspace()
+          checks  for  white-space characters.  In the &quot;C&quot; and &quot;POSIX&quot; locales, these are: space, form-feed (&#39;\f&#39;), newline (&#39;\n&#39;), carriage return (&#39;\r&#39;),
+          horizontal tab (&#39;\t&#39;), and vertical tab (&#39;\v&#39;).
+
+   isupper()
+          checks for an uppercase letter.
+
+   isxdigit()
+          checks for a hexadecimal digits, that is, one of
+          0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F.
+</code></pre>
+<p>RETURN VALUE<br>       The values returned are nonzero if the character c falls into the tested class, and a zero value if not.</p>
+<h4 id="unlink"><a href="#unlink" class="headerlink" title="unlink"></a>unlink</h4><pre><code>#include &lt;unistd.h&gt;
+
+int unlink(const char * pathname);
+</code></pre>
+<p>函数说明：unlink()会删除参数pathname 指定的文件. 如果该文件名为最后连接点, 但有其他进程打开了此文件, 则在所有关于此文件的文件描述词皆关闭后才会删除. 如果参数pathname 为一符号连接, 则此连接会被删除。</p>
+<p>返回值：成功则返回0, 失败返回-1, 错误原因存于errno</p>
+<p>错误代码：    </p>
+<ul>
+<li>1、EROFS 文件存在于只读文件系统内。</li>
+<li>2、EFAULT 参数pathname 指针超出可存取内存空间。</li>
+<li>3、ENAMETOOLONG 参数pathname 太长。</li>
+<li>4、ENOMEM 核心内存不足。</li>
+<li>5、ELOOP 参数pathname 有过多符号连接问题。</li>
+<li>6、EIO I/O 存取错误。</li>
+</ul>
+<h4 id="getdtablesize-getrlimit-setrlimit"><a href="#getdtablesize-getrlimit-setrlimit" class="headerlink" title="getdtablesize ,getrlimit , setrlimit"></a>getdtablesize ,getrlimit , setrlimit</h4><pre><code>#include &lt;unistd.h&gt;
+
+int getdtablesize(void);
+
+Feature Test Macro Requirements for glibc (see feature_test_macros(7)):
+
+getdtablesize():
+   Since glibc 2.12:
+       _BSD_SOURCE ||
+           !(_POSIX_C_SOURCE &gt;= 200112L || _XOPEN_SOURCE &gt;= 600)
+   Before glibc 2.12:
+       _BSD_SOURCE || _XOPEN_SOURCE &gt;= 500 ||
+       _XOPEN_SOURCE &amp;&amp; _XOPEN_SOURCE_EXTENDED
+</code></pre>
+<p>getdtablesize()返回调用该函数的进程所能打开的最大文件数,是libc实现的一个函数,底层是通过调用getrlimit()实现的.在有些守护进程的代码中可以看到子进程调用该函数循环关闭所有的从父进程继承的文件描述符.</p>
+<pre><code>size = getdtablesize();
+for(fd = 0; fd &lt; size; fd++)&#123;
+    close(fd);
+&#125;
+</code></pre>
+<p>功能描述：<br>每个进程都有一组资源限制，其中一些可以使用getrlimit和setrlimit函数进行查询和修改。每种资源都有相关的软硬限制，软限制是内核强加给相应资源的限制值，硬限制是软限制的最大值。非授权调用进程只可以将其软限制指定为0~硬限制范围中的某个值，同时能不可逆转地降低其硬限制。授权进程可以任意改变其软硬限制。RLIM_INFINITY的值表示不对资源限制。<br>用法：</p>
+<pre><code># include &lt;sys/time.h&gt;
+# include &lt;sys/resource.h&gt;
+int getrlimit(int resource, struct rlimit *rlim);
+int setrlimit(int resource, const struct rlimit *rlim);
+</code></pre>
+<p>参数：<br>resource：选择下面的参数</p>
+<ol>
+<li>RLIMIT_AS：进程的最大虚内存空间，字节为单位   </li>
+<li>RLIMIT_CORE:内核转存文件的最大长度    </li>
+<li>RLIMIT_CPU //最大允许的CPU使用时间，秒为单位。当进程达到软限制，内核将给其发送SIGXCPU信号，这一信号的默认行为是终止进程的执行。然而，可以捕捉信号，处理句柄可将控制返回给主程序。如果进程继续耗费CPU时间，核心会以每秒一次的频率给其发送SIGXCPU信号，直到达到硬限制，那时将给进程发送 SIGKILL信号终止其执行。</li>
+<li>RLIMIT_DATA //进程数据段的最大值。</li>
+<li>RLIMIT_FSIZE //进程可建立的文件的最大长度。如果进程试图超出这一限制时，核心会给其发送SIGXFSZ信号，默认情况下将终止进程的执行。</li>
+<li>RLIMIT_LOCKS //进程可建立的锁和租赁的最大值。</li>
+<li>RLIMIT_MEMLOCK //进程可锁定在内存中的最大数据量，字节为单位。</li>
+<li>RLIMIT_MSGQUEUE //进程可为POSIX消息队列分配的最大字节数。</li>
+<li>RLIMIT_NICE //进程可通过setpriority() 或 nice()调用设置的最大完美值。</li>
+<li>RLIMIT_NOFILE //指定比进程可打开的最大文件描述词大一的值，超出此值，将会产生EMFILE错误。</li>
+<li>RLIMIT_NPROC //用户可拥有的最大进程数。</li>
+<li>RLIMIT_RTPRIO //进程可通过sched_setscheduler 和 sched_setparam设置的最大实时优先级。</li>
+<li>RLIMIT_SIGPENDING //用户可拥有的最大挂起信号数。</li>
+<li>RLIMIT_STACK //最大的进程堆栈，以字节为单位。</li>
+</ol>
+<p>rlim：描述资源软硬限制的结构体，原型如下</p>
+<pre><code>struct rlimit &#123;
+    rlim_t rlim_cur; /* Soft limit */
+    rlim_t rlim_max; /* Hard limit (ceiling for rlim_cur) */
+&#125;;
+</code></pre>
+<p>返回说明：<br>成功执行时，返回0。失败返回-1，errno被设为以下的某个值<br>EFAULT：rlim指针指向的空间不可访问<br>EINVAL：参数无效<br>EPERM：增加资源限制值时，权能不允许</p>
+<p>eg:</p>
+<pre><code>int    coredump_disable(void)
+&#123;
+    struct rlimit    limit;
+    limit.rlim_cur = 0;
+    limit.rlim_max = 0;
+    if (0 != setrlimit(RLIMIT_CORE, &amp;limit))
+    &#123;
+        return FAIL;
+    &#125;
+    return SUCCEED;
+&#125;
+</code></pre>
+<p>eg:</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;sys/time.h&gt;
+#include &lt;sys/resource.h&gt;
+
+int main(void)
+&#123;
+    int ret = -1;
+    struct rlimit rl;
+
+    getrlimit(RLIMIT_NOFILE, &amp;rl);
+    printf(&quot;rlim_t-&gt;rlim_cur is %d\n&quot;, rl.rlim_cur);
+    printf(&quot;rlim_t-&gt;rlim_max is %d\n&quot;, rl.rlim_max);
+
+    rl.rlim_cur = 1000;
+    rl.rlim_max = 1000;
+    setrlimit(RLIMIT_NOFILE, &amp;rl);
+
+    getrlimit(RLIMIT_NOFILE, &amp;rl);
+    printf(&quot;rlim_t-&gt;rlim_cur is %d\n&quot;, rl.rlim_cur);
+    printf(&quot;rlim_t-&gt;rlim_max is %d\n&quot;, rl.rlim_max);
+
+    ret = getdtablesize();
+    printf(&quot;ret is %d\n&quot;, ret);
+    return 0;
+&#125;
+</code></pre>
+<hr>
+<pre><code>rlim_t-&gt;rlim_cur is 1024
+rlim_t-&gt;rlim_max is 1024
+rlim_t-&gt;rlim_cur is 1000
+rlim_t-&gt;rlim_max is 1000
+ret is 1000
+</code></pre>
+<h4 id="socketpair"><a href="#socketpair" class="headerlink" title="socketpair"></a>socketpair</h4><p>套接字可以用于网络通信，也可以用于本机内的进程通信。由于本机内进程的IP地址都相同，因此只需要进程号来确定通信的双方。非网络通信套接字在Linux环境中的应用很多，最典型的就是Linux的桌面系统——Xserver，其就是使用非网络套接字的方法进行进程之间的通信的。</p>
+<p>Linux环境下使用socketpair函数创造一对未命名的、相互连接的UNIX域套接字。</p>
+<p>定义</p>
+<pre><code>int socketpair(int d, int type, int protocol, int sv[2]);
+</code></pre>
+<p>描述</p>
+<p>建立一对匿名的已经连接的套接字<br>socketpair函数概要如下：</p>
+<pre><code>#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+int socketpair(int domain, int type, int protocol, int sv[2]);
+</code></pre>
+<p>sys/types.h文件需要用来定义一些C宏常量。sys/socket.h文件必须包含进来定义socketpair函数原型。</p>
+<p>socketpair函数需要四个参数。他们是：<br>套接口的域<br>套接口类型<br>使用的协议<br>指向存储文件描述符的指针</p>
+<p>类型参数声明了我们希望创建哪种类型的套接口。socketpair函数的选择如下：<br>SOCK_STREAM<br>SOCK_DGRAM</p>
+<p>对于socketpair函数，protocol参数必须提供为0。</p>
+<p>参数sv[2]是接收代表两个套接口的整数数组。每一个文件描述符代表一个套接口，并且与另一个并没有区别。<br>如果函数成功，将会返回0值。否则将会返回-1表明创建失败，并且errno来表明特定的错误号。</p>
+<p>关于流程。socketpair()函数创建出两个进程，fork()之后这两个进程都会执行主程序中的代码，这个一定要注意！尤其是bind的时候，如果bind两次的话，那就会出错了。一般会在子进程里调用一个带死循环的函数，这样就好了。</p>
+<pre><code>/*************************************************************************
+        &gt; File Name: socketpair.c
+ ************************************************************************/
+#include &lt;stdio.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+void process_log(const char *log);
+int main(int argc, const char *argv[])
+&#123;
+    int sockfd[2];
+    pid_t pid;
+    if( socketpair(AF_LOCAL,SOCK_STREAM,0,sockfd) &lt; 0 )
+    &#123;
+        process_log(&quot;socketpair failed\n&quot;);
+        return -1;
+    &#125;
+    if((pid = fork()) == -1)
+        process_log(&quot;fork failed\n&quot;);
+    else if(pid == 0)
+    &#123;
+        char tmp[512] = &#123;0&#125;;
+        ssize_t n;
+        close(sockfd[1]);
+        if((n = read(sockfd[0],tmp,512)) &lt; 0)
+        &#123;
+            process_log(&quot;child process read failed.\n&quot;);
+            return 0;
+        &#125;
+        printf(&quot;read :%s\n&quot;,tmp);
+        close(sockfd[0]);
+        exit(0);
+    &#125;
+    else if(pid &gt; 0)
+    &#123;
+      char buf[] = &quot;hello child!&quot;;
+      ssize_t n;
+      close(sockfd[0]);
+      if((n = write(sockfd[1],buf,sizeof(buf))) &lt; 0)
+          process_log(&quot;father process failed.\n&quot;);
+      close(sockfd[1]);
+      wait(NULL);
+    &#125;
+    return 0;
+&#125;
+void process_log(const char *log)
+&#123;
+    printf(&quot;%s\n&quot;,log);
+    exit(1);
+&#125;
+</code></pre>
+<p>在nginx中，master进程与worker进程之间使用了一种全双工通信方式–socketpair。socketpair 函数成功执行后会创建一对已经建立连接的socket对，两个相互通信的进程分别使用其中一个socket进行读写操作，就能够实现两进程间的通信。</p>
+<pre><code>ngx_pid_t
+ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
+    char *name, ngx_int_t respawn)
+&#123;
+    u_long     on;
+    ngx_pid_t  pid;
+    ngx_int_t  s;
+    /. ......省略...... ./
+    if (respawn != NGX_PROCESS_DETACHED) &#123;
+        /* Solaris 9 still has no AF_LOCAL */
+        //创建socketpair
+        if (socketpair(AF_UNIX, SOCK_STREAM, 0, ngx_processes[s].channel) == -1)
+        &#123;
+            ngx_log_error(NGX_LOG_ALERT, cycle-&gt;log, ngx_errno,
+                          &quot;socketpair() failed while spawning \&quot;%s\&quot;&quot;, name);
+            return NGX_INVALID_PID;
+        &#125;
+        //非阻塞
+        if (ngx_nonblocking(ngx_processes[s].channel[0]) == -1) &#123;
+            ngx_close_channel(ngx_processes[s].channel, cycle-&gt;log);
+            return NGX_INVALID_PID;
+        &#125;
+        //非阻塞
+        if (ngx_nonblocking(ngx_processes[s].channel[1]) == -1) &#123;
+            ngx_close_channel(ngx_processes[s].channel, cycle-&gt;log);
+            return NGX_INVALID_PID;
+        &#125;
+        //异步
+        on = 1;
+        if (ioctl(ngx_processes[s].channel[0], FIOASYNC, &amp;on) == -1) &#123;
+            ngx_close_channel(ngx_processes[s].channel, cycle-&gt;log);
+            return NGX_INVALID_PID;
+        &#125;
+        //设置将要在文件描述词fd上接收SIGIO 或 SIGURG事件信号的进程或进程组标识 。
+        if (fcntl(ngx_processes[s].channel[0], F_SETOWN, ngx_pid) == -1) &#123;
+            ngx_close_channel(ngx_processes[s].channel, cycle-&gt;log);
+            return NGX_INVALID_PID;
+        &#125;
+        //设置close_on_exec，当通过exec函数族创建了新进程后，原进程的该socket会被关闭
+        if (fcntl(ngx_processes[s].channel[0], F_SETFD, FD_CLOEXEC) == -1) &#123;
+            ngx_close_channel(ngx_processes[s].channel, cycle-&gt;log);
+            return NGX_INVALID_PID;
+        &#125;
+        //设置close_on_exec，当通过exec函数族创建了新进程后，原进程的该socket会被关闭
+        if (fcntl(ngx_processes[s].channel[1], F_SETFD, FD_CLOEXEC) == -1) &#123;
+            ngx_close_channel(ngx_processes[s].channel, cycle-&gt;log);
+            return NGX_INVALID_PID;
+        &#125;
+        ngx_channel = ngx_processes[s].channel[1];
+    &#125; else &#123;
+        ngx_processes[s].channel[0] = -1;
+        ngx_processes[s].channel[1] = -1;
+    &#125;
+    ngx_process_slot = s;
+    pid = fork();
+    switch (pid) &#123;
+    case -1:
+        ngx_close_channel(ngx_processes[s].channel, cycle-&gt;log);
+        return NGX_INVALID_PID;
+    case 0:
+        //fork成功，子进程创建，同时相关socket描述符也会被复制一份
+        ngx_pid = ngx_getpid();
+        proc(cycle, data);
+        break;
+    default:
+        break;
+    &#125;
+    /. ......省略...... ./
+    return pid;
+&#125;
+</code></pre>
+<h4 id="getopt、getopt-long、getopt-long-only"><a href="#getopt、getopt-long、getopt-long-only" class="headerlink" title="getopt、getopt_long、getopt_long_only"></a>getopt、getopt_long、getopt_long_only</h4><p>1、getopt</p>
+<pre><code>#include &lt;unistd.h&gt;
+int getopt(int argc, char * const argv[],const char *optstring);
+extern char *optarg;
+extern int optind, opterr, optopt;
+</code></pre>
+<p>该函数的argc和argv参数通常直接从main()的参数直接传递而来。optstring是选项字母组成的字串。如果该字串里的任一字符后面有冒号，那么这个选项就要求有选项参数。</p>
+<p>当给定getopt()命令参数的数量 (argc)、指向这些参数的数组 (argv) 和选项字串 (optstring) 后，getopt() 将返回第一个选项，并设置一些全局变量。使用相同的参数再次调用该函数时，它将返回下一个选项，并设置相应的全局变量。如果遇到不可识别的选项，将返回 -1。</p>
+<p>getopt() 所设置的全局变量包括：</p>
+<ul>
+<li>char *optarg——当前选项参数字串（如果有）。</li>
+<li>int optind——argv的当前索引值。当getopt()在while循环中使用时，循环结束后，剩下的字串视为操作数，在argv[optind]至argv[argc-1]中可以找到。</li>
+<li>int opterr——这个变量非零时，getopt()函数为“无效选项”和“缺少参数选项，并输出其错误信息。</li>
+<li>int optopt——当发现无效选项字符之时，getopt()函数或返回’?’字符，或返回’:’字符，并且optopt包含了所发现的无效选项字符。</li>
+</ul>
+<p>字串里的任一字符后面有:或者::<br>“:”表示必须该选项带有额外的参数，全域变量optarg会指向此额外参数，”::”标识该额外的参数可选(有些Uinx可能不支持”::”）。</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+int main(int argc, const char *argv[])
+&#123;
+    int c;
+    while((c = getopt(argc,argv,&quot;abc:d123&quot;)) != -1)
+    &#123;
+        switch(c)
+        &#123;
+            case &#39;a&#39;:
+                printf(&quot;option a\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;b&#39;:
+                printf(&quot;option b\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;c&#39;:
+                printf(&quot;option c\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;d&#39;:
+                printf(&quot;option d\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;1&#39;:
+                printf(&quot;option 1\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;2&#39;:
+                printf(&quot;option 2\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;3&#39;:
+                printf(&quot;option 3\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;?&#39;:
+                printf(&quot;arguments error!\n&quot;);
+                break;
+        &#125;
+    &#125;
+    return 0;
+&#125;
+
+$:./getopt -c 123 -a -b -1 -2
+option c
+parameter is 123
+option a
+parameter is (null)
+option b
+parameter is (null)
+option 1
+parameter is (null)
+option 2
+parameter is (null)
+</code></pre>
+<p>2、getopt_long  getopt_long_only</p>
+<pre><code>#include &lt;getopt.h&gt;
+int getopt_long(int argc, char * const argv[],const char *optstring,const struct option *longopts, int *longindex);
+int getopt_long_only(int argc, char * const argv[],const char *optstring,const struct option *longopts, int *longindex);
+</code></pre>
+<p>参数解析</p>
+<pre><code>struct option &#123;
+    const char *name;        //name表示的是长参数名
+    
+    /*has_arg有3个值，no_argument(或者是0)，表示该参数后面不跟参数值,required_argument(或者是1),表示该参数后面一定要跟个参数值,optional_argument(或者是2),表示该参数后面可以跟，也可以不跟参数值*/
+    int         has_arg;    
+    int        *flag;        //用来决定，getopt_long()的返回值到底是什么。如果flag是null，则函数会返回与该项option匹配的val值
+    int         val;        //和flag联合决定返回值
+&#125;;
+</code></pre>
+<p>eg:</p>
+<pre><code>const struct option long_options = 
+&#123;
+    &#123;  “help”,      0,   NULL,   ‘h’  &#125;,
+    &#123;  “output”,    1,   NULL,   ‘o’  &#125;,
+    &#123;  “verbose”,   0,   NULL,   ‘v’  &#125;,
+    &#123;  NULL,      0,    NULL,   0  &#125;
+&#125;;
+</code></pre>
+<p>longindex参数一般赋为NULL即可；如果没有设置为NULL，那么它就指向一个变量，这个变量会被赋值为寻找到的长选项在longopts中的索引值，这可以用于错误诊断。</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;getopt.h&gt;
+struct option long_option[] = 
+&#123;
+    &#123;&quot;a123&quot;,0,NULL,&#39;a&#39;&#125;,
+    &#123;&quot;b123&quot;,0,NULL,&#39;b&#39;&#125;,
+    &#123;&quot;c123&quot;,1,NULL,&#39;c&#39;&#125;,
+    &#123;&quot;d123&quot;,0,NULL,&#39;d&#39;&#125;
+&#125;;
+int main(int argc, const char *argv[])
+&#123;
+    int c;
+    while((c = getopt_long(argc,argv,&quot;abc:d&quot;,long_option,NULL)) != -1)  
+    &#123;
+        switch(c)
+        &#123;
+            case &#39;a&#39;:
+                printf(&quot;option a\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;b&#39;:
+                printf(&quot;option b\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;c&#39;:
+                printf(&quot;option c\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;d&#39;:
+                printf(&quot;option d\n&quot;);
+                printf(&quot;parameter is %s\n&quot;,optarg);
+                break;
+            case &#39;?&#39;:
+                printf(&quot;arguments error!\n&quot;);
+                break;
+        &#125;
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<hr>
+<pre><code>$ gcc 6.c  -o l_getopt
+$ ./long_getopt -abd -c 123
+option a
+parameter is (null)
+option b
+parameter is (null)
+option d
+parameter is (null)
+option c
+parameter is 123
+</code></pre>
+<h4 id="strdup-realloc"><a href="#strdup-realloc" class="headerlink" title="strdup realloc"></a>strdup realloc</h4><pre><code>#include &lt;string.h&gt;
+char *strdup(char *s);
+</code></pre>
+<p>功 能: strdup()函数是c语言中常用的一种字符串拷贝库函数，一般和free()函数成对出现。<br>strdup()在内部调用了malloc()为变量分配内存，不使用返回的字符串时，需要用free()释放相应的内存空间，否则会造成内存泄漏。<br>返回一个指针,指向为复制字符串分配的空间;如果分配空间失败,则返回NULL值。</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;malloc.h&gt;
+int main()
+&#123;
+    char *s=&quot;Hello World!&quot;;
+    char *d;
+    d=strdup(s);
+    if(NULL != d) &#123;
+        printf(&quot;%s\n&quot;,d);
+        free(d);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>realloc<br>原型：extern void *realloc(void *mem_address, unsigned int newsize);<br>用法：#include &lt;stdlib.h&gt; 有些编译器需要#include &lt;alloc.h&gt;<br>功能：改变mem_address所指内存区域的大小为newsize长度。<br>说明：如果重新分配成功则返回指向被分配内存的指针，否则返回空指针NULL。<br>当内存不再使用时，应使用free()函数将内存块释放。<br>注意：这里原始内存中的数据还是保持不变的。 </p>
+<h4 id="uname-获取当前内核的名称和信息"><a href="#uname-获取当前内核的名称和信息" class="headerlink" title="uname 获取当前内核的名称和信息"></a>uname 获取当前内核的名称和信息</h4><pre><code>#include &lt;sys/utsname.h&gt;
+int uname(struct utsname *buf);
+</code></pre>
+<p>uname() 通过buf返回系统信息的结构体指针。struct utsname定义在 &lt;sys/utsname.h&gt;:</p>
+<pre><code>struct utsname &#123;
+   char sysname[];    /* Operating system name (e.g., &quot;Linux&quot;) */
+   char nodename[];   /* Name within &quot;some implementation-defined
+                         network&quot; */
+   char release[];    /* Operating system release (e.g., &quot;2.6.28&quot;) */
+   char version[];    /* Operating system version */
+   char machine[];    /* Hardware identifier */
+#ifdef _GNU_SOURCE
+   char domainname[]; /* NIS or YP domain name */
+#endif
+&#125;;
+</code></pre>
+<p>返回值<br>成功返回0，失败返回-1</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;sys/utsname.h&gt;
+int main()
+&#123;
+    struct utsname buf;
+    if(uname(&amp;buf) == -1)
+    &#123;
+        perror(&quot;uname&quot;);
+        return 0;
+    &#125;else
+    &#123;
+        printf(&quot; sysname:%s\n nodename:%s\n release:%s\n version:%s\n machine:%s\n \n &quot;,\
+                buf.sysname,\
+                buf.nodename,\
+                buf.release,\
+                buf.version,\
+                buf.machine);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>运行结果</p>
+<pre><code> sysname:Linux
+ nodename:develop
+ release:4.2.0-27-generic
+ version:#32~14.04.1-Ubuntu SMP Fri Jan 22 15:32:26 UTC 2016
+ machine:x86_64
+</code></pre>
+<h4 id="clock-gettime-gettimeofday"><a href="#clock-gettime-gettimeofday" class="headerlink" title="clock_gettime , gettimeofday"></a>clock_gettime , gettimeofday</h4><p>函数”clock_gettime”是基于Linux C语言的时间函数,他可以用于计算精度和纳秒<br>函数介绍</p>
+<pre><code>#include&lt;time.h&gt;
+int clock_gettime(clockid_t clk_id,struct timespec *tp);
+</code></pre>
+<p>参数<br>clk_id : 检索和设置的clk_id指定的时钟时间。<br>CLOCK_REALTIME:系统实时时间,随系统实时时间改变而改变,即从UTC1970-1-1 0:0:0开始计时,<br>中间时刻如果系统时间被用户改成其他,则对应的时间相应改变<br>CLOCK_MONOTONIC:从系统启动这一刻起开始计时,不受系统时间被用户改变的影响<br>CLOCK_PROCESS_CPUTIME_ID:本进程到当前代码系统CPU花费的时间<br>CLOCK_THREAD_CPUTIME_ID:本线程到当前代码系统CPU花费的时间</p>
+<pre><code>struct timespec
+&#123;
+    time_t tv_sec; /* 秒*/
+    long tv_nsec; /* 纳秒*/
+&#125;;
+</code></pre>
+<p>编译命令</p>
+<pre><code>gcc testClock_gettime.c -lrt -o testClock_gettime
+</code></pre>
+<hr>
+<pre><code>#include &lt;sys/time.h&gt;
+int gettimeofday(struct timeval*tv, struct timezone *tz);
+</code></pre>
+<p>其参数tv是保存获取时间结果的结构体，参数tz用于保存时区结果：</p>
+<pre><code>struct timezone&#123;
+    int tz_minuteswest;/*格林威治时间往西方的时差*/
+    int tz_dsttime;/*DST 时间的修正方式*/
+&#125;
+</code></pre>
+<p>timezone 参数若不使用则传入NULL即可。</p>
+<p>而结构体timeval的定义为：</p>
+<pre><code>struct timeval&#123;
+     long int tv_sec; // 秒数
+    long int tv_usec; // 微秒数
+&#125;
+</code></pre>
+<p>它获得的时间精确到微秒（1e-6 s)量级。</p>
+<h4 id="setproctitle"><a href="#setproctitle" class="headerlink" title="setproctitle"></a>setproctitle</h4><p>修改进程名字</p>
+<p>setproctitle(“%s”, title);</p>
+<h4 id="getifaddrs"><a href="#getifaddrs" class="headerlink" title="getifaddrs"></a>getifaddrs</h4><p>getifaddrs可以查找到系统流量，数据包，IP，MAC地址等网络接口的信息。</p>
+<p>man  手册</p>
+<pre><code>   #include &lt;sys/socket.h&gt;
+   #include &lt;netdb.h&gt;
+
+   int getnameinfo(const struct sockaddr *sa, socklen_t salen,
+                   char *host, size_t hostlen,
+                   char *serv, size_t servlen, int flags);
+</code></pre>
+<p>man7 官网上面的例子</p>
+<pre><code>#define _GNU_SOURCE     /* To get defns of NI_MAXSERV and NI_MAXHOST */
+#include &lt;arpa/inet.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;ifaddrs.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;linux/if_link.h&gt;
+
+int main(int argc, char *argv[])
+&#123;
+    struct ifaddrs *ifaddr, *ifa;
+    int family, s, n;
+    char host[NI_MAXHOST];
+
+    if (getifaddrs(&amp;ifaddr) == -1) &#123;
+        perror(&quot;getifaddrs&quot;);
+        exit(EXIT_FAILURE);
+    &#125;
+
+    /* Walk through linked list, maintaining head pointer so we
+       can free list later */
+
+    for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa-&gt;ifa_next, n++) &#123;
+        if (ifa-&gt;ifa_addr == NULL)
+            continue;
+
+        family = ifa-&gt;ifa_addr-&gt;sa_family;
+
+        /* Display interface name and family (including symbolic
+           form of the latter for the common families) */
+
+        printf(&quot;%-8s %s (%d)\n&quot;,
+                ifa-&gt;ifa_name,
+                (family == AF_PACKET) ? &quot;AF_PACKET&quot; :
+                (family == AF_INET) ? &quot;AF_INET&quot; :
+                (family == AF_INET6) ? &quot;AF_INET6&quot; : &quot;???&quot;,
+                family);
+
+        /* For an AF_INET* interface address, display the address */
+
+        if (family == AF_INET || family == AF_INET6) &#123;
+            s = getnameinfo(ifa-&gt;ifa_addr,
+                    (family == AF_INET) ? sizeof(struct sockaddr_in) :
+                    sizeof(struct sockaddr_in6),
+                    host, NI_MAXHOST,
+                    NULL, 0, NI_NUMERICHOST);
+            if (s != 0) &#123;
+                printf(&quot;getnameinfo() failed: %s\n&quot;, gai_strerror(s));
+                exit(EXIT_FAILURE);
+            &#125;
+
+            printf(&quot;\t\taddress: &lt;%s&gt;\n&quot;, host);
+
+        &#125; else if (family == AF_PACKET &amp;&amp; ifa-&gt;ifa_data != NULL) &#123;
+            struct rtnl_link_stats *stats = ifa-&gt;ifa_data;
+
+            printf(&quot;\t\ttx_packets = %10u; rx_packets = %10u\n&quot;
+                    &quot;\t\ttx_bytes   = %10u; rx_bytes   = %10u\n&quot;,
+                    stats-&gt;tx_packets, stats-&gt;rx_packets,
+                    stats-&gt;tx_bytes, stats-&gt;rx_bytes);
+        &#125;
+    &#125;
+
+    freeifaddrs(ifaddr);
+    exit(EXIT_SUCCESS);
+&#125;
+</code></pre>
+<h4 id="syslog"><a href="#syslog" class="headerlink" title="syslog"></a>syslog</h4><pre><code>   #include &lt;syslog.h&gt;
+
+   void openlog(const char *ident, int option, int facility);
+   void syslog(int priority, const char *format, ...);
+   void closelog(void);
+
+   #include &lt;stdarg.h&gt;
+
+   void vsyslog(int priority, const char *format, va_list ap);
+   
+</code></pre>
+<p>函数使用介绍</p>
+<p>这里面的三个函数openlog， syslog，closelog是一套系统日志写入接口。另外那个vsyslog和syslog功能一样，只是参数格式不同。<br><br><br>通常，syslog守护进程读取三种格式的记录消息。此守护进程在启动时读一个配置文件。一般来说，其文件名为/etc/syslog.conf，该文件决定了不同种类的消息应送向何处。例如，紧急消息可被送向系统管理员（若已登录），并在控制台上显示，而警告消息则可记录到一个文件中。该机制提供了syslog函数，其调用格式如下</p>
+<pre><code>#include &lt;syslog.h&gt;
+void openlog (char*ident,int option ,int facility);
+void syslog(int priority,char*format,……)
+void closelog();
+    
+</code></pre>
+<p>调用openlog是可选择的。如果不调用openlog，则在第一次调用syslog时，自动调用openlog。调用closelog也是可选择的，它只是关闭被用于与syslog守护进程通信的描述符。调用openlog使我们可以指定一个ident，以后， 此ident 将被加至每则记录消息中。ident 一般是程序的名称（例如 ，cron ，ine等）</p>
+<p>程序的用法示例代码如下：</p>
+<pre><code>#include &lt;syslog.h&gt;
+int main(int argc, char **argv)
+&#123;
+   openlog(&quot;MyMsgMARK&quot;, LOG_CONS | LOG_PID, 0);
+   syslog(LOG_DEBUG,
+          &quot;This is a syslog test message generated by program &#39;%s&#39;\n&quot;,
+          argv[0]);
+   closelog();
+   return0;
+&#125;
+</code></pre>
+<p>编译生成可执行程序后，运行一次程序将向/var/log/message文件添加一行信息如下：</p>
+<p>Feb 12 08:48:38 localhost MyMsgMARK[7085]: This is a syslog testmessage generated by program ‘./a.out’</p>
+<p><code>openlog</code>及<code>closelog</code>函数说明</p>
+<p>此函数原型如下：</p>
+<pre><code>void openlog(const char *ident, int option, int facility);
+</code></pre>
+<p>此函数用来打开一个到系统日志记录程序的连接，打开之后就可以用syslog或vsyslog函数向系统日志里添加信息了。而closelog函数就是用来关闭此连接的。<br>openlog的参数：</p>
+<p>第一个参数ident将是一个标记，ident所表示的字符串将固定地加在每行日志的前面以标识这个日志，通常就写成当前程序的名称以作标记。</p>
+<p>第二个参数option是下列值取与运算的结果：LOG_CONS，LOG_NDELAY， LOG_NOWAIT， LOG_ODELAY， LOG_PERROR，LOG_PID，各值意义请参考man openlog手册：<br>    LOG_CONS<br>       Writedirectly to system console if there is an error while sending tosystem logger.</p>
+<pre><code>LOG_NDELAY
+   Openthe connection immediately (normally, the connection is opened whenthe first message is logged).
+
+LOG_NOWAIT
+   Don’t wait for childprocesses that may have been created while logging themessage.  (The GNU C library does not createa child process, so this option has no effect onLinux.)
+
+LOG_ODELAY
+   The converseof LOG_NDELAY; opening of the connection is delayed until syslog()is called.  (This is the default,  and need not be specified.)
+
+LOG_PERROR
+   (Notin SUSv3.) Print to stderr as well.
+
+LOG_PID
+    IncludePID with each message. 
+</code></pre>
+<p>第三个参数facility指明记录日志的程序的类型。</p>
+<pre><code>    The facility argument is used to specify what type ofprogram  is logging  the  message.
+    This  lets the configuration file specify thatmessages from different facilities will be
+    handled differently.
+    LOG_AUTH      security/authorization messages (DEPRECATED Use LOG_AUTHPRIVinstead)
+    
+    LOG_AUTHPRIV  security/authorization messages (private)
+    
+    LOG_CRON      clock daemon (cron and at)
+    
+    LOG_DAEMON    system daemons without separate facility value
+    
+    LOG_FTP       ftp daemon
+    
+    LOG_KERN      kernel messages (these can&#39;t be generage from user processes)
+    
+    LOG_LOCAL0 through LOG_LOCAL7
+                   reserved for local use
+    
+    LOG_LPR       line printer subsystem
+    
+    LOG_MAIL      mail subsystem
+    
+    LOG_NEWS      USENET news subsystem
+    
+    LOG_SYSLOG    messages generated internally by syslogd(8)
+    
+    LOG_USER (default)
+                   generic user-level messages
+    
+    LOG_UUCP      UUCP subsystem
+</code></pre>
+<p><code>syslog</code>函数及参数</p>
+<p>syslog函数用于把日志消息发给系统程序syslogd去记录，此函数原型是：</p>
+<pre><code>void syslog(int priority, const char *format, ...);
+</code></pre>
+<p>第一个参数是消息的紧急级别</p>
+<p>第二个参数是消息的格式，之后是格式对应的参数。就是printf函数一样使用。</p>
+<pre><code>    如果我们的程序要使用系统日志功能，只需要在程序启动时使用openlog函数来连接syslogd程序，后面随时用syslog函数写日志就行了。
+</code></pre>
+<p>level<br>        This determines the importance of the message. The levels are, in  order of  decreasing<br>        importance:</p>
+<pre><code>    LOG_EMERG     system is unusable
+    
+    LOG_ALERT     action must be taken immediately
+    
+    LOG_CRIT      critical conditions
+    
+    LOG_ERR       error conditions
+    
+    LOG_WARNING   warning conditions
+    
+    LOG_NOTICE    normal, but significant, condition
+    
+    LOG_INFO      informational message
+    
+    LOG_DEBUG     debug-level message
+    
+    The function setlogmask(3) can be used to restrict logging tospecified levels only.
+</code></pre>
+<p>NOTES<br>        The  argument ident  in  the call  of openlog() is probably storedas-is.  Thus, if the<br>        string it points to is changed, syslog() may start prepending thechanged string, and  if<br>        the  string it points to ceases to exist, theresults are undefined.  Most portable is to<br>        use a string constant.</p>
+<pre><code>    Never pass a string with user-supplied data as a format, use thefollowing instead:
+    
+        syslog(priority, &quot;%s&quot;, string);
+</code></pre>
+<p>SEE ALSO<br>      logger(1), setlogmask(3), syslog.conf(5), syslogd(8)</p>
+<hr>
+<h4 id="syslog-conf文件解读"><a href="#syslog-conf文件解读" class="headerlink" title="syslog.conf文件解读"></a>syslog.conf文件解读</h4><ul>
+<li>1: syslog.conf的介绍</li>
+</ul>
+<p>对于不同类型的Unix，标准UnixLog系统的设置，实际上除了一些关键词的不同，系统的syslog.conf格式是相同的。syslog采用可配置的、统一的系统登记程序，随时从系统各处接受log请求，然后根据/etc/syslog.conf中的预先设定把log信息写入相应文件中、邮寄给特定用户或者直接以消息的方式发往控制台。值得注意的是，为了防止入侵者修改、删除messages里的记录信息，可以采用用打印机记录或采用方式来挫败入侵者的企图。</p>
+<ul>
+<li>2: syslog.conf的格式</li>
+</ul>
+<p>可以参考man [5] syslog.conf。这里是对syslog.conf的简单介绍。<br>/etc/syslog.conf文件中的一项配置记录由“选项”(selector)和“动作”(action)两个部分组成，两者间用tab制表符进行分隔(使用空格间隔是无效的)。而“选项”又由一个或多个形如“类型.级别”格式的保留字段组合而成，各保留字段间用分号分隔。如下行所示：</p>
+<pre><code>    类型.级别 [；类型.级别] `TAB` 动作
+    
+</code></pre>
+<p>2.1 类型</p>
+<p>保留字段中的“类型”代表信息产生的源头，可以是：</p>
+<pre><code>auth    认证系统，即询问用户名和口令
+cron    系统定时系统执行定时任务时发出的信息
+daemon  某些系统的守护程序的syslog,如由in.ftpd产生的log
+kern    内核的syslog信息
+lpr     打印机的syslog信息
+mail    邮件系统的syslog信息
+mark    定时发送消息的时标程序
+news    新闻系统的syslog信息
+user    本地用户应用程序的syslog信息
+uucp    uucp子系统的syslog信息
+local0..7 种本地类型的syslog信息,这些信息可以又用户来定义
+*       代表以上各种设备
+</code></pre>
+<p>2.2 级别</p>
+<p>保留字段中的“级别”代表信息的重要性，可以是：</p>
+<pre><code>emerg   紧急，处于Panic状态。通常应广播到所有用户；
+alert   告警，当前状态必须立即进行纠正。例如，系统数据库崩溃；
+crit    关键状态的警告。例如，硬件故障；
+err     其它错误；
+warning 警告；
+notice  注意；非错误状态的报告，但应特别处理；
+info    通报信息；
+debug   调试程序时的信息；
+none    通常调试程序时用，指示带有none级别的类型产生的信息无需送出。如*.debug;mail.none表示调试时除邮件信息外其它信息都送出。
+</code></pre>
+<p>2.3 动作</p>
+<p>“动作”域指示信息发送的目的地。可以是： </p>
+<pre><code>/filename   日志文件。由绝对路径指出的文件名，此文件必须事先建立；
+@host       远程主机； @符号后面可以是ip,也可以是域名，默认在/etc/hosts文件下loghost这个别名已经指定给了本机。
+user1,user2 指定用户。如果指定用户已登录，那么他们将收到信息；
+*           所有用户。所有已登录的用户都将收到信息。
+</code></pre>
+<ul>
+<li>3: 具体实例</li>
+</ul>
+<p>我们来看看/etc/syslog.conf文件中的实例：</p>
+<pre><code>……
+*.err;kern.debug;daemon.notice;mail.crit    [TAB]   /var/adm/messages 
+…… 
+</code></pre>
+<p>这行中的“action”就是我们常关心的那个/var/adm/messages文件，输出到它的信息源头“selector”是：</p>
+<pre><code>*.err - 所有的一般错误信息； 
+kern.debug - 核心产生的调试信息； 
+daemon.notice - 守护进程的注意信息； 
+mail.crit - 邮件系统的关键警告信息 
+</code></pre>
+<p><a target="_blank" rel="noopener" href="http://blog.csdn.net/wangyuling1234567890/article/details/24505589">http://blog.csdn.net/wangyuling1234567890/article/details/24505589</a>    </p>
+<h4 id="dlopen"><a href="#dlopen" class="headerlink" title="dlopen"></a>dlopen</h4><pre><code>   #include &lt;dlfcn.h&gt;
+
+   void *dlopen(const char *filename, int flag);
+
+   char *dlerror(void);
+
+   void *dlsym(void *handle, const char *symbol);
+
+   int dlclose(void *handle);
+
+   Link with -ldl.
+</code></pre>
+<p>基本定义</p>
+<p>功能：打开一个动态链接库 <br><br>包含头文件： </p>
+<pre><code>#include &lt;dlfcn.h&gt; 
+</code></pre>
+<p>函数定义：</p>
+<pre><code>void * dlopen( const char * pathname, int mode ); 
+</code></pre>
+<p>函数描述：<br>　　在dlopen的（）函数以指定模式打开指定的动态连接库文件，并返回一个句柄给调用进程。使用dlclose（）来卸载打开的库。 </p>
+<p>mode：分为这两种 </p>
+<pre><code>RTLD_LAZY 暂缓决定，等有需要时再解出符号 
+RTLD_NOW 立即决定，返回前解除所有未决定的符号。 
+RTLD_LOCAL 
+RTLD_GLOBAL 允许导出符号 
+RTLD_GROUP 
+RTLD_WORLD 
+</code></pre>
+<p>返回值:</p>
+<pre><code>打开错误返回NULL 
+成功，返回库引用 
+编译时候要加入 -ldl (指定dl库) 
+</code></pre>
+<p>例如</p>
+<pre><code>gcc test.c -o test -ldl
+</code></pre>
+<p>使用 dlopen</p>
+<p>dlopen()是一个强大的库函数。该函数将打开一个新库，并把它装入内存。该函数主要用来加载库中的符号，这些符号在编译的时候是不知道的。比如 Apache Web 服务器利用这个函数在运行过程中加载模块，这为它提供了额外的能力。一个配置文件控制了加载模块的过程。这种机制使得在系统中添加或者删除一个模块时，都不需要重新编译了。 </p>
+<p>可以在自己的程序中使用 dlopen()。dlopen() 在 dlfcn.h 中定义，并在 dl 库中实现。它需要两个参数：一个文件名和一个标志。文件名可以是我们学习过的库中的 soname。标志指明是否立刻计算库的依赖性。如果设置为 RTLD_NOW 的话，则立刻计算；如果设置的是 RTLD_LAZY，则在需要的时候才计算。另外，可以指定 RTLD_GLOBAL，它使得那些在以后才加载的库可以获得其中的符号。 </p>
+<p>当库被装入后，可以把 dlopen() 返回的句柄作为给 dlsym() 的第一个参数，以获得符号在库中的地址。使用这个地址，就可以获得库中特定函数的指针，并且调用装载库中的相应函数。</p>
+<hr>
+<h4 id="dlsym"><a href="#dlsym" class="headerlink" title="dlsym"></a>dlsym</h4><p>　　 </p>
+<p>dlsym()的函数原型是 </p>
+<pre><code>void* dlsym(void* handle,const char* symbol) 
+</code></pre>
+<p>该函数在&lt;dlfcn.h&gt;文件中。 </p>
+<p>handle是由dlopen打开动态链接库后返回的指针，symbol就是要求获取的函数的名称，函数返回值是void*,指向函数的地址，供调用使用</p>
+<p>取动态对象地址：</p>
+<pre><code>#include &lt;dlfcn.h&gt;
+void *dlsym(void *pHandle, char *symbol);
+</code></pre>
+<p>dlsym根据动态链接库操作句柄(pHandle)与符号(symbol),返回符号对应的地址。<br>使用这个函数不但可以获取函数地址，也可以获取变量地址。比如，假设在so中定义了一个void mytest()函数，那在使用so时先声明一个函数指针：void (*pMytest)(),然后使用dlsym函数将函数指针pMytest指向mytest函数，<code>pMytest = (void (*)())dlsym(pHandle, &quot;mytest&quot;);</code></p>
+<hr>
+<p>dlclose</p>
+<p>包含头文件： </p>
+<pre><code>#include &lt;dlfcn.h&gt; 
+</code></pre>
+<p>函数原型为:</p>
+<pre><code>int dlclose (void *handle); 
+</code></pre>
+<p>函数描述：</p>
+<pre><code>dlclose用于关闭指定句柄的动态链接库，只有当此动态链接库的使用计数为0时,才会真正被系统卸载。
+</code></pre>
+<hr>
+<p>dlerror</p>
+<p>包含头文件： </p>
+<pre><code>#include &lt;dlfcn.h&gt; 
+</code></pre>
+<p>函数原型: </p>
+<pre><code>const char *dlerror(void); 
+</code></pre>
+<p>函数描述： </p>
+<pre><code>当动态链接库操作函数执行失败时，dlerror可以返回出错信息，返回值为NULL时表示操作函数执行成功。
+</code></pre>
+<p>LINUX创建与使用动态链接库并不是一件难事。<br>　　编译函数源程序时选用-shared选项即可创建动态链接库，注意应以.so后缀命名，最好放到公用库目录(如/lib,/usr/lib等)下面，并要写好用户接口文件，以便其它用户共享。<br>　　使用动态链接库，源程序中要包含dlfcn.h头文件，写程序时注意dlopen等函数的正确调用，编译时要采用-rdynamic选项与-ldl选项 ，以产生可调用动态链接库的执行代码。</p>
+<p>Load the math library, and print the cosine of 2.0: </p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;dlfcn.h&gt;
+
+int main(int argc, char **argv) &#123;
+    void *handle;
+    double (*cosine)(double);
+    char *error;
+
+    handle = dlopen (&quot;libm.so&quot;, RTLD_LAZY);
+    if (!handle) &#123;
+        fprintf (stderr, &quot;%s\n&quot;, dlerror());
+        exit(1);
+    &#125;
+
+    cosine = dlsym(handle, &quot;cos&quot;);
+    if ((error = dlerror()) != NULL)  &#123;
+        fprintf (stderr, &quot;%s\n&quot;, error);
+        exit(1);
+    &#125;
+
+    printf (&quot;%f\n&quot;, (*cosine)(2.0));
+    dlclose(handle);
+    return 0;
+&#125;
+</code></pre>
+<p> If this program were in a file named “foo.c”, you would build the program with the following command: </p>
+<pre><code> # gcc -rdynamic -o foo foo.c -ldl
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/qq78292959/p/4002255.html">https://www.cnblogs.com/qq78292959/p/4002255.html</a>    </p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/02-C基础/">02. C基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/C/">C</a>, <a href="/tags/函数/">函数</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

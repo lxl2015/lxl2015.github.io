@@ -1,0 +1,314 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C 语言的一些设计技巧 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="C 语言中一些使用技巧总结">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C 语言的一些设计技巧"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-18T08:26:17.000Z"><a href="/2017/08/18/C-语言的一些设计技巧/">2017-08-18</a></time>
+        
+  
+    <h1 class="title">C 语言的一些设计技巧</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%9F%94%E6%80%A7%E6%95%B0%E7%BB%84"><span class="toc-text">1. 柔性数组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-typeof"><span class="toc-text">2. typeof</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-C%E7%BC%96%E7%A8%8B%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%87%BA%EF%BC%8C%E8%A1%A5%E5%85%A80"><span class="toc-text">3. C编程格式化输出，补全0</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%B8%89%E7%9B%AE%E8%BF%90%E7%AE%97%E7%AC%A6%E5%B5%8C%E5%A5%97"><span class="toc-text">4. 三目运算符嵌套</span></a></li></ol>
+    </div>
+
+        <p>C 语言中一些使用技巧总结</p>
+<span id="more"></span>
+
+
+<h3 id="1-柔性数组"><a href="#1-柔性数组" class="headerlink" title="1. 柔性数组"></a>1. 柔性数组</h3><p>柔性数组<br>就是申请比较大的内存，让用户使用不超过所申请内存的数组；<br>理论这么讲：<br>结构中的最后一个元素允许是未知大小的数组，这就叫做柔性数组成员，但结构中的柔性数组成员前面必须至少一个其 他成员。柔性数组成员允许结构中包含一个大小可变的数组。sizeof返回的这种结构大小不包括柔性数组的内存。包含柔性数组成员的结构用malloc ()函数进行内存的动态分配，并且分配的内存应该大于结构的大小，以适应柔性数组的预期大小。</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: arry.c
+    &gt; Author: Lin
+    &gt; Mail: 不想写邮箱
+    &gt; Created Time: Tue 07 Mar 2017 02:20:56 PM CST
+ ************************************************************************/
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+typedef struct _soft_arry_
+&#123;
+    int len;
+    char arry[];
+&#125;*p_soft_arry;
+int main(int argc, const char *argv[])
+&#123;
+    char *str = &quot;Hello World!!!&quot;;
+    p_soft_arry p;
+    p = malloc(sizeof(struct _soft_arry_) + 100*(sizeof(char)));
+    //申请一个长度为100的数组
+    //
+    p-&gt;len = 100;
+    memset(p-&gt;arry,0,100);
+    memcpy(p-&gt;arry,str,20);
+    printf(&quot; soft arry:%s\n&quot;,p-&gt;arry);
+    return 0;
+&#125;
+</code></pre>
+<h3 id="2-typeof"><a href="#2-typeof" class="headerlink" title="2. typeof"></a>2. typeof</h3><p>就像sizeof（exp）返回的 是exp的数据类型大小，那么typeof（exp）返回的就是exp.的数据类型。<br>exp</p>
+<pre><code>/*************************************************************************
+  &gt; File Name: 2.c
+  &gt; Author: Lin
+  &gt; Mail: 不想写邮箱
+  &gt; Created Time: Wed 08 Mar 2017 01:56:04 PM CST
+ ************************************************************************/
+#include &lt;stdio.h&gt;
+typedef struct 
+&#123;
+    int x;
+    char y;
+&#125;astruct, * pastrcut;
+int main(int argc, const char *argv[])
+&#123;
+    int sizem, sizew;
+    int x = 3;
+    typeof(&amp;x) m = &amp;x;
+    sizem = sizeof(m);
+    *m = 5;
+    typeof(((astruct *)5)-&gt;y) w;
+    sizew = sizeof(w);
+    w = &#39;a&#39;;
+    printf(&quot;*m = %d\n&quot;,*m);
+    return 0;
+&#125;
+</code></pre>
+<h3 id="3-C编程格式化输出，补全0"><a href="#3-C编程格式化输出，补全0" class="headerlink" title="3. C编程格式化输出，补全0"></a>3. C编程格式化输出，补全0</h3><pre><code>/*************************************************************************
+  &gt; File Name: 6.c
+  &gt; Author: Lin
+  &gt; Mail: 不想写邮箱
+  &gt; Created Time: Tue 01 Aug 2017 18:43:19 AM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+int main(int argc, const char *argv[])
+&#123;
+    int i;
+    int n = 10;
+    for(i = 1; i &lt; 50; i ++)
+    &#123;
+        printf(&quot;%08d\t&quot;,i);
+        if(i % 9 == 0)
+            printf(&quot;\n&quot;);
+    &#125;
+
+    for(i = 1; i &lt; 50; i++)
+    &#123;
+        /*
+        *    用 * 代替位数，在后面的参数列表中用变量控制输出位数；
+        */
+        printf(&quot;%0*d\t&quot;,n,i);
+        if(i % 5 == 0)
+            printf(&quot;\n&quot;);
+    &#125;
+    return 0;
+&#125;
+</code></pre>
+<p>输出格式为</p>
+<pre><code>00000001        00000002        00000003        00000004        00000005        00000006        00000007        00000008        00000009
+00000010        00000011        00000012        00000013        00000014        00000015        00000016        00000017        00000018
+00000019        00000020        00000021        00000022        00000023        00000024        00000025        00000026        00000027
+00000028        00000029        00000030        00000031        00000032        00000033        00000034        00000035        00000036
+00000037        00000038        00000039        00000040        00000041        00000042        00000043        00000044        00000045
+00000046        00000047        00000048        00000049        0000000001      0000000002      0000000003      0000000004      0000000005
+0000000006      0000000007      0000000008      0000000009      0000000010
+0000000011      0000000012      0000000013      0000000014      0000000015
+0000000016      0000000017      0000000018      0000000019      0000000020
+0000000021      0000000022      0000000023      0000000024      0000000025
+0000000026      0000000027      0000000028      0000000029      0000000030
+0000000031      0000000032      0000000033      0000000034      0000000035
+0000000036      0000000037      0000000038      0000000039      0000000040
+0000000041      0000000042      0000000043      0000000044      0000000045
+0000000046      0000000047      0000000048      0000000049       
+</code></pre>
+<h3 id="4-三目运算符嵌套"><a href="#4-三目运算符嵌套" class="headerlink" title="4. 三目运算符嵌套"></a>4. 三目运算符嵌套</h3><p>现在有ABC三个数，你查出最大值最小值中间值。</p>
+<pre><code>int max,mib,mid;
+if(A &gt; B)
+&#123;
+    if(A&gt;C)
+    &#123;
+        max = A;
+    &#125;
+&#125;
+
+...
+</code></pre>
+<p>假如使用三目运算符的话，可以这样</p>
+<pre><code>max = C&gt;(A&gt;B?A:B)?C:(A&gt;B?A:B);
+max = A&gt;B?(A&gt;C?A:C):(B&gt;C?B:C);
+</code></pre>
+<p>有时候会遇见这样的嵌套</p>
+<pre><code>1?1?1?10:20:30:40
+
+
+1?(1?(1?10:20):30):40
+</code></pre>
+<p>在没有编译器优化的情况下三目运算符比If-else快，因为三目运算符还会使用额外的临时变量，它先运算后复制，If-else是直接赋值，所以速度会快，但是现在的编译器已经会把这些做优化，优化后的汇编代码是一样的，就好比i++和++i，编译优化后的汇编代码是一样的。 </p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/02-C基础/">02. C基础</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/C/">C</a>, <a href="/tags/设计技巧/">设计技巧</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

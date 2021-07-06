@@ -1,0 +1,319 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux线程池思路以及进程池思路 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="很久之前有个项目，大概的需求就是读取邮箱服务器里面的邮件，根据邮件的内容查询数据库，再将数据库内容发送给寄件人。
+我的实现方法是：创建一个线程池，有一个线程读取到邮件之后，将邮件内容传给给线程池里面空闲的线程，由线程中的线程去执行相关的操作。
+最后因为各种原由吧，最终放弃使用C去实现这个项目，最终用Java去实现了该项目。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Linux线程池思路以及进程池思路"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-12-13T00:44:51.000Z"><a href="/2017/12/13/Linux线程池思路以及进程池思路/">2017-12-13</a></time>
+        
+  
+    <h1 class="title">Linux线程池思路以及进程池思路</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E4%BD%BF%E7%94%A8%E5%88%B0%E7%9A%84%E5%87%BD%E6%95%B0%E8%A7%A3%E6%9E%90"><span class="toc-text">一、使用到的函数解析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1%E3%80%81%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E5%8F%96%E6%B6%88%E5%88%86%E7%A6%BB"><span class="toc-text">1.1、线程创建取消分离</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2%E3%80%81%E4%BA%92%E6%96%A5%E9%94%81%E5%88%9B%E5%BB%BA%E5%8A%A0%E9%94%81%E9%87%8A%E6%94%BE%E9%94%81%E9%94%80%E6%AF%81%E9%94%81"><span class="toc-text">1.2、互斥锁创建加锁释放锁销毁锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3%E3%80%81%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E5%88%9B%E5%BB%BA%E9%80%9A%E7%9F%A5%E7%AD%89%E5%BE%85%E9%94%80%E6%AF%81"><span class="toc-text">1.3、条件变量创建通知等待销毁</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%AE%BE%E8%AE%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="toc-text">二、设计线程池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%BF%9B%E7%A8%8B%E6%B1%A0"><span class="toc-text">三、进程池</span></a></li></ol>
+    </div>
+
+        <p>很久之前有个项目，大概的需求就是读取邮箱服务器里面的邮件，根据邮件的内容查询数据库，再将数据库内容发送给寄件人。</p>
+<p>我的实现方法是：创建一个线程池，有一个线程读取到邮件之后，将邮件内容传给给线程池里面空闲的线程，由线程中的线程去执行相关的操作。</p>
+<p>最后因为各种原由吧，最终放弃使用C去实现这个项目，最终用Java去实现了该项目。</p>
+<span id="more"></span>
+
+<h3 id="一、使用到的函数解析"><a href="#一、使用到的函数解析" class="headerlink" title="一、使用到的函数解析"></a>一、使用到的函数解析</h3><h4 id="1-1、线程创建取消分离"><a href="#1-1、线程创建取消分离" class="headerlink" title="1.1、线程创建取消分离"></a>1.1、线程创建取消分离</h4><p>其实线程池不难，使用到的就是线程锁和条件变量。下面对使用的函数说明一下。</p>
+<pre><code>#include &lt;pthread.h&gt;
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+                  void *(*start_routine) (void *), void *arg);
+</code></pre>
+<p>   编译需要连接 -pthread.</p>
+<p>说明：创建线程。</p>
+<p>参数说明</p>
+<ul>
+<li>*thread             线程ID的指针</li>
+<li>*attr                线程属性的指针</li>
+<li>*start_routine     线程运行函数的起始地址</li>
+<li>*arg                线程运行函数的参数</li>
+</ul>
+<p>返回值:表示成功，返回0；表示出错，返回表示-1。</p>
+<pre><code>#include &lt;pthread.h&gt;
+int pthread_join(pthread_t thread, void **retval);
+</code></pre>
+<p>   编译需要连接 -pthread.</p>
+<p>说明：会一直阻塞调用线程，直到指定的线程终止。</p>
+<p>参数说明</p>
+<ul>
+<li>thread        阻塞线程的ID</li>
+<li>retval        用户定义的指针，用来存储被等待线程的返回值。</li>
+</ul>
+<p>返回值 ： 0代表成功。 失败，返回的则是错误号。</p>
+<pre><code>#include &lt;pthread.h&gt;
+int pthread_detach(pthread_t thread);
+</code></pre>
+<p>   Compile and link with -pthread.</p>
+<p>说明：线程分离</p>
+<p>详细说明：创建一个线程默认的状态是joinable, 如果一个线程结束运行但没有被join,则它的状态类似于进程中的Zombie Process,即还有一部分资源没有被回收（退出状态码），所以创建线程者应该pthread_join来等待线程运行结束，并可得到线程的退出代码，回收其资源（类似于wait,waitpid)。但是调用pthread_join(pthread_id)后，如果该线程没有运行结束，调用者会被阻塞，在有些情况下我们并不希望如此，比如在Web服务器中当主线程为每个新来的链接创建一个子线程进行处理的时候，主线程并不希望因为调用pthread_join而阻塞（因为还要继续处理之后到来的链接），这时可以在子线程中加入代码pthread_detach(pthread_self())或者父线程调用pthread_detach(thread_id)（非阻塞，可立即返回）这将该子线程的状态设置为detached,则该线程运行结束后会自动释放所有资源。</p>
+<p>参数说明</p>
+<ul>
+<li>thread  线程ID</li>
+</ul>
+<p>返回值 ： 0代表成功。 失败，返回的则是错误号。</p>
+<pre><code>#include &lt;pthread.h&gt;
+void pthread_exit(void *retval);
+
+Compile and link with -pthread.
+</code></pre>
+<p>说明：函数可用来终止调用线程。将释放所有线程特定数据绑定。如果调用线程尚未分离，则线程ID 和status 指定的退出状态将保持不变，直到应用程序调用pthread_join() 以等待该线程。否则，将忽略status。线程ID可以立即回收。</p>
+<h4 id="1-2、互斥锁创建加锁释放锁销毁锁"><a href="#1-2、互斥锁创建加锁释放锁销毁锁" class="headerlink" title="1.2、互斥锁创建加锁释放锁销毁锁"></a>1.2、互斥锁创建加锁释放锁销毁锁</h4><pre><code>#include &lt;pthread.h&gt;
+int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+</code></pre>
+<p>说明：初始化互斥锁</p>
+<ul>
+<li>初始化互斥锁有两种方法，一种是静态初始化：pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;使用PTHREAD_MUTEX_INITIALIZER 宏可以将以静态方式定义的互斥锁初始化为其缺省属性。</li>
+<li>另外一种就是通过pthread_mutex_init函数进行初始化。</li>
+</ul>
+<p>参数说明</p>
+<ul>
+<li>*mutex        要初始化的mutex的描述符（感觉叫ID顺耳）</li>
+<li>*attr        互斥锁的属性。</li>
+</ul>
+<p>返回值 ： 0代表成功。 失败，返回的则是错误号。</p>
+<p>如果互斥锁已初始化，则它会处于未锁定状态。互斥锁可以位于进程之间共享的内存中或者某个进程的专用内存中。将mattr 设置为NULL 的效果与传递缺省互斥锁属性对象的地址相同，但是没有内存开销。使用PTHREAD_MUTEX_INITIALIZER 宏可以将以静态方式定义的互斥锁初始化为其缺省属性。当其他线程正在使用某个互斥锁时，请勿重新初始化或销毁该互斥锁。如果任一操作没有正确完成，将会导致程序失败。如果要重新初始化或销毁某个互斥锁，则应用程序必须确保当前未使用该互斥锁。</p>
+<pre><code>#include &lt;pthread.h&gt;
+int pthread_mutex_destroy(pthread_mutex_t *mutex);
+</code></pre>
+<p>说明：销毁互斥锁</p>
+<p>参数说明</p>
+<ul>
+<li>*mutex        要销毁的互斥锁描述符</li>
+</ul>
+<p>返回值 ： 0代表成功。 失败，返回的则是错误号。</p>
+<pre><code>#include &lt;pthread.h&gt;
+int pthread_mutex_lock(pthread_mutex_t *mutex);
+int pthread_mutex_trylock(pthread_mutex_t *mutex);
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+</code></pre>
+<p>说明：加锁/尝试加锁/解锁</p>
+<p>参数说明</p>
+<ul>
+<li>*mutex        互斥锁</li>
+</ul>
+<p>返回值 ： 0代表成功。 失败，返回的则是错误号。</p>
+<h4 id="1-3、条件变量创建通知等待销毁"><a href="#1-3、条件变量创建通知等待销毁" class="headerlink" title="1.3、条件变量创建通知等待销毁"></a>1.3、条件变量创建通知等待销毁</h4><pre><code>#include &lt;pthread.h&gt;
+int pthread_cond_destroy(pthread_cond_t *cond);
+int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+</code></pre>
+<p>说明：条件变量销毁，条件变量的初始化也有两种。</p>
+<ul>
+<li>静态初始化：使用PTHREAD_COND_INITIALIZER 宏可以将以静态方式定义的条件变量初始化为其缺省属性。PTHREAD_COND_INITIALIZER 宏与动态分配具有null 属性的pthread_cond_init() 等效，但是不进行错误检查。</li>
+<li>函数初始化pthread_cond_init。</li>
+</ul>
+<p>参数说明</p>
+<ul>
+<li>*cond 要销毁/初始化的条件变量</li>
+<li>*attr 条件变量的属性</li>
+</ul>
+<p>返回值 ：0代表成功。 失败， 返回错误号。</p>
+<pre><code>#include &lt;pthread.h&gt;
+int pthread_cond_broadcast(pthread_cond_t *cond);
+int pthread_cond_signal(pthread_cond_t *cond);
+</code></pre>
+<p>说明：</p>
+<ul>
+<li>pthread_cond_signal函数的作用是发送一个信号给另外一个正在处于阻塞等待状态的线程,使其脱离阻塞状态,继续执行.如果没有线程处在阻塞等待状态,pthread_cond_signal也会成功返回。但使用pthread_cond_signal不会有“惊群现象”产生，他最多只给一个线程发信号。假如有多个线程正在阻塞等待着这个条件变量的话，那么是根据各等待线程优先级的高低确定哪个线程接收到信号开始继续执行。如果各线程优先级相同，则根据等待时间的长短来确定哪个线程获得信号。但无论如何一个pthread_cond_signal调用最多发信一次。</li>
+<li>pthread_cond_broadcast解除阻塞条件变量上的指定条件变量的所有线程。</li>
+</ul>
+<p>参数说明</p>
+<ul>
+<li>*cond 条件变量</li>
+</ul>
+<p>返回值 ：0代表成功。 失败， 返回错误号。</p>
+<pre><code>#include &lt;pthread.h&gt;
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+int pthread_cond_timedwait(pthread_cond_t *cond,pthread_mutex_t *mutex,const struct timespec *abstime);
+</code></pre>
+<p>说明：</p>
+<ul>
+<li><p>阻塞的线程可以通过pthread_cond_signal() 或pthread_cond_broadcast() 唤醒，也可以在信号传送将其中断时唤醒。不能通过pthread_cond_wait() 的返回值来推断与条件变量相关联的条件的值的任何变化。必须重新评估此类条件。pthread_cond_wait() 例程每次返回结果时调用线程都会锁定并且拥有互斥锁，即使返回错误时也是如此。该条件获得信号之前，该函数一直被阻塞。该函数会在被阻塞之前以原子方式释放相关的互斥锁，并在返回之前以原子方式再次获取该互斥锁。通常，对条件表达式的评估是在互斥锁的保护下进行的。如果条件表达式为假，线程会基于条件变量阻塞。然后，当该线程更改条件值时，另一个线程会针对条件变量发出信号。这种变化会导致所有等待该条件的线程解除阻塞并尝试再次获取互斥锁。</p>
+</li>
+<li><p>pthread_cond_timedwait的用法与pthread_cond_wait() 的用法基本相同，区别在于在由abstime 指定的时间之后pthread_cond_timedwait() 不再被阻塞。</p>
+</li>
+</ul>
+<p>参数</p>
+<ul>
+<li>*cond     条件变量</li>
+<li>*mutex    互斥锁</li>
+<li>*abstime</li>
+</ul>
+<p>返回值 ：0代表成功。 失败， 返回错误号。</p>
+<h3 id="二、设计线程池"><a href="#二、设计线程池" class="headerlink" title="二、设计线程池"></a>二、设计线程池</h3><p><a target="_blank" rel="noopener" href="https://github.com/lxl2015/lxl_tpl">代码</a></p>
+<h3 id="三、进程池"><a href="#三、进程池" class="headerlink" title="三、进程池"></a>三、进程池</h3><p>进程池其实和线程池差不多，无非就是将互斥锁，条件变量换成信号量，同时进程间同步利用共享内存。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/线程池/">线程池</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

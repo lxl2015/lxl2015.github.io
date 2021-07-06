@@ -1,0 +1,280 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Centos6  RPM包升级Openssh7.5 | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="1、打包Openssh7.5">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Centos6  RPM包升级Openssh7.5"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-06-11T14:20:54.000Z"><a href="/2017/06/11/Centos6-RPM包升级Openssh7-5/">2017-06-11</a></time>
+        
+  
+    <h1 class="title">Centos6  RPM包升级Openssh7.5</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E6%89%93%E5%8C%85Openssh7-5"><span class="toc-text">1、打包Openssh7.5</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E5%8D%87%E7%BA%A7Openssh"><span class="toc-text">2、升级Openssh</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E5%85%B3%E9%97%ADselinux"><span class="toc-text">2.1关闭selinux</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E3%80%81%E5%AE%89%E8%A3%85telnet%EF%BC%8C%E9%85%8D%E7%BD%AEtelnet"><span class="toc-text">2.2、安装telnet，配置telnet</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3%E3%80%81%E5%85%B3%E9%97%AD%E9%98%B2%E7%81%AB%E5%A2%99-%E5%8F%96%E6%B6%88%E5%BC%80%E6%9C%BA%E5%90%AF%E5%8A%A8"><span class="toc-text">2.3、关闭防火墙 取消开机启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4%E3%80%81%E5%8D%87%E7%BA%A7openssh"><span class="toc-text">2.4、升级openssh</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5%E3%80%81%E6%81%A2%E5%A4%8D%E9%85%8D%E7%BD%AE"><span class="toc-text">2.5、恢复配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E7%9B%B8%E5%85%B3%E6%8A%A5%E9%94%99%E6%95%B4%E7%90%86"><span class="toc-text">3、相关报错整理</span></a></li></ol>
+    </div>
+
+        <h2 id="1、打包Openssh7-5"><a href="#1、打包Openssh7-5" class="headerlink" title="1、打包Openssh7.5"></a>1、打包Openssh7.5</h2><span id="more"></span>
+
+<p>环境：Centos 6<br>软件包:</p>
+<blockquote>
+<p>openssh-7.5p1.tar.gz<br>x11-ssh-askpass-1.2.4.1.tar.gz</p>
+</blockquote>
+<pre><code># tar -xvf openssh-7.5p1.tar.gz
+# cp openssh-7.5p1/contrib/redhat/openssh.spec rpmbuild/SPECS/
+# cp x11-ssh-askpass-1.2.4.1.tar.gz rpmbuild/SOURCE/
+# cp openssh-7.5p1.tar.gz rpmbuild/SOURCE/
+# rpmbuild -bb rpmbuild/SPECS/openssh.spec
+</code></pre>
+<p>期间出现依赖包问题，直接yum安装即可</p>
+<h2 id="2、升级Openssh"><a href="#2、升级Openssh" class="headerlink" title="2、升级Openssh"></a>2、升级Openssh</h2><h3 id="2-1关闭selinux"><a href="#2-1关闭selinux" class="headerlink" title="2.1关闭selinux"></a>2.1关闭selinux</h3><p>由于openssh7.5升级后所有用户都不能登陆，故需要将它关闭，才能使用普通账号登陆，再切换到root账户</p>
+<pre><code># vi /etc/selinux/config
+</code></pre>
+<p>注释掉：前面添加#表示注释</p>
+<pre><code>SELINUX=enforcing  SELINUXTYPE=targeted
+</code></pre>
+<p>添加    </p>
+<pre><code>SELINUX=disabled
+</code></pre>
+<p>保存退出<br>重启</p>
+<pre><code># reboot
+</code></pre>
+<h3 id="2-2、安装telnet，配置telnet"><a href="#2-2、安装telnet，配置telnet" class="headerlink" title="2.2、安装telnet，配置telnet"></a>2.2、安装telnet，配置telnet</h3><pre><code># rpm –ivh telnet-server-0.17-48.el6.x86_64.rpm xinetd-2.3.14-39.el6_4.x86_64.rpm telnet-0.17-48.el6.x86_64.rpm
+</code></pre>
+<p>设置开机启动</p>
+<pre><code># chkconfig telnet on
+</code></pre>
+<p>备份文件<br>    # cp  /etc/securetty /etc/securetty.bak<br>    # vi /etc/securetty<br>添加</p>
+<pre><code>pts/1
+pts/2
+</code></pre>
+<p>重启telnet</p>
+<pre><code># service xinetd restart
+</code></pre>
+<h3 id="2-3、关闭防火墙-取消开机启动"><a href="#2-3、关闭防火墙-取消开机启动" class="headerlink" title="2.3、关闭防火墙 取消开机启动"></a>2.3、关闭防火墙 取消开机启动</h3><pre><code># service iptables stop
+# chkconfig iptables off
+</code></pre>
+<p>测试一下telnet登陆</p>
+<h3 id="2-4、升级openssh"><a href="#2-4、升级openssh" class="headerlink" title="2.4、升级openssh"></a>2.4、升级openssh</h3><p>如果telnet登陆成功，使用telnet登陆<br>备份文件</p>
+<pre><code># mv /etc/ssh/ssh_config /etc/ssh/ssh_config.bak
+</code></pre>
+<p>安装openssh</p>
+<pre><code># yum localinstall openssh-server-7.5p1-1.x86_64.rpm  openssh-clients-7.5p1-1.x86_64.rpm  openssh-7.5p1-1.x86_64.rpm
+</code></pre>
+<p>恢复配置文件</p>
+<pre><code># mv /etc/ssh/ssh_config /etc/ssh/ssh_config.7.5    
+# mv /etc/ssh/ssh_config.bak /etc/ssh/ssh_config
+# service xinetd restart
+</code></pre>
+<p>最好重启一下系统<br>测试一下ssh登陆。Openssh默认是禁止root登陆，请使用普通账号登陆，再切换到root用户</p>
+<h3 id="2-5、恢复配置"><a href="#2-5、恢复配置" class="headerlink" title="2.5、恢复配置"></a>2.5、恢复配置</h3><p>删除telnet</p>
+<pre><code># rpm –e  telnet-server-0.17-48.el6.x86_64 xinetd-2.3.14-39.el6_4.x86_64  telnet-0.17-48.el6.x86_64 
+</code></pre>
+<p>恢复telnet账户配置</p>
+<pre><code># mv  /etc/securetty.bak  /etc/securetty
+# chkconfig iptables  on
+</code></pre>
+<h2 id="3、相关报错整理"><a href="#3、相关报错整理" class="headerlink" title="3、相关报错整理"></a>3、相关报错整理</h2><blockquote>
+<p>error: X11/Xlib.h: No such file or directory</p>
+</blockquote>
+<pre><code>yum install libX11-devel
+</code></pre>
+<blockquote>
+<p>configure: error: PAM headers not found</p>
+</blockquote>
+<pre><code>yum install pam-devel
+</code></pre>
+<blockquote>
+<p>xmkmf: Command not found</p>
+</blockquote>
+<pre><code>yum install imake
+</code></pre>
+<blockquote>
+<p>error: X11/Intrinsic.h: No such file or directory</p>
+</blockquote>
+<pre><code>yum install libXt-devel
+</code></pre>
+<blockquote>
+<p>No package ‘gtk+-2.0’ found</p>
+</blockquote>
+<pre><code>yum install libgnomeui-devel
+</code></pre>
+<blockquote>
+<p>error: xx/xxx.h: No such file or directory</p>
+</blockquote>
+<pre><code># vi CentOS-Debuginfo.repo 
+</code></pre>
+<p>修改</p>
+<pre><code>enabled=1
+</code></pre>
+<p>查询xxx.h   </p>
+<pre><code># yum provides */xxx.h
+</code></pre>
+<p>就可以找到包文件了</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/05-Linux-Operation/">05. Linux Operation</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/Linux/">Linux</a>, <a href="/tags/Openssh/">Openssh</a>, <a href="/tags/升级/">升级</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

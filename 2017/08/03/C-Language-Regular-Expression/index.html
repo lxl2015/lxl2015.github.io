@@ -1,0 +1,304 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C Language Regular Expression | Linux开发笔记</title>
+  <meta name="author" content="lxl2015">
+  
+  <meta name="description" content="正则表达式的基础详见WIKI和百科。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C Language Regular Expression"/>
+  <meta property="og:site_name" content="Linux开发笔记"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Linux开发笔记" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <!-- wumiiVerification -->
+  <!-- meta name="wumiiVerification" content="fb50a101-84fe-4ca2-91a7-ae8cf792978b" /-->
+  <!-- meta name="wumiiVerification" content="d73b5866-c390-4156-a4dd-51b526b5335e" /-->
+  <!-- favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <!-- Font-Awesome -->
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+  <header id="header"><div class= "header-content inner">
+	<div class = "alignleft col-one">
+		
+			<div class='avatar'>
+				<img src = "/img/default/avatar.gif">
+              </div>
+		
+		<div class="header-div">
+		    <h1><a href="/">Linux开发笔记</a></h1>
+		    <h2><a href="/"></a></h2>
+		</div>
+	</div>
+	<div class = "alignright col-two">
+		
+	</div>
+	<div class="clearfix"></div>
+</div>
+
+<div class= "header-nav">
+	<div class='header-nav-content inner'>
+		<div id="main-nav" class="alignleft">
+		    		
+		    		  <a href="/"><i class="fa fa-home"></i>首页</a>
+		    		
+		    		  <a href="/archives"><i class="fa fa-archive"></i>归档</a>
+		    		
+		    		  <a href="/resume"><i class="fa fa-user"></i>关于我</a>
+		    		
+		</div>
+		<div id="sub-nav" class="alignright">
+		    
+		</div>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</header>
+  
+    <div id="content" class="inner">
+      <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+        <div class="icon"></div>
+        
+        <time datetime="2017-08-03T13:48:55.000Z"><a href="/2017/08/03/C-Language-Regular-Expression/">2017-08-03</a></time>
+        
+  
+    <h1 class="title">C Language Regular Expression</h1>
+  
+
+    </header>
+
+    <div class="entry">
+      
+        
+    <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-POSIX-regex-functions"><span class="toc-text">1. POSIX regex functions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-PCRE-Perl-compatible-regular-expressions"><span class="toc-text">2. PCRE - Perl-compatible regular expressions</span></a></li></ol>
+    </div>
+
+        <p>正则表达式的基础详见WIKI和百科。</p>
+<span id="more"></span>
+
+<p>C语言的正则表达式库有<code>regcomp, regexec, regerror, regfree - POSIX regex functions</code>和<code>PCRE - Perl-compatible regular expressions</code>。 </p>
+<h3 id="1-POSIX-regex-functions"><a href="#1-POSIX-regex-functions" class="headerlink" title="1. POSIX regex functions"></a>1. POSIX regex functions</h3><pre><code>#include &lt;sys/types.h&gt;
+#include &lt;regex.h&gt;
+
+int regcomp(regex_t *preg, const char *regex, int cflags);
+
+int regexec(const regex_t *preg, const char *string, size_t nmatch,
+                                regmatch_t pmatch[], int eflags);
+
+size_t regerror(int errcode, const regex_t *preg, char *errbuf,
+                            size_t errbuf_size);
+
+void regfree(regex_t *preg);
+</code></pre>
+<p>POSIX regex functions 正则表达式的大体逻辑是：</p>
+<ol>
+<li>使用regcomp 将正则表达式转化成特定的数据格式。 </li>
+</ol>
+<p>preg:转化后的特定数据格式<br>regex:需要匹配的字符串<br>cflags:</p>
+<pre><code>   REG_EXTENDED
+   Use Extended Regular Expressions.
+   REG_ICASE
+   Ignore case in match (see XBD Regular Expressions).
+   REG_NOSUB
+   Report only success/fail in regexec().
+   REG_NEWLINE
+   Change the handling of &lt;newline&gt; characters, as described in the text.
+</code></pre>
+<ol start="2">
+<li>调用regexec 匹配要匹配的字符串</li>
+<li>调用regfree释放内存</li>
+</ol>
+<p>eg：</p>
+<p>正则表达式匹配邮箱的格式:<code>^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$</code> xxx@xxx</p>
+<pre><code>/*************************************************************************
+    &gt; File Name: reg.c
+    &gt; Author: Lin
+    &gt; Mail: 1010361011@qq.com
+    &gt; Created Time: Mon 05 Aug 2019 02:12:59 PM CST
+ ************************************************************************/
+
+#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;regex.h&gt;
+
+#ifndef _DEBUG
+#define _DEBUG
+#endif
+
+int main(int argc, char**argv)
+&#123;
+
+    int cflags = REG_EXTENDED;
+    regex_t preg;
+    regmatch_t pmatch[1];
+    const char * regex = argv[1];
+    const char * string = argv[2];
+    size_t nmatch = 1;
+
+    if (argc != 3)
+    &#123;
+        printf(&quot;The parameters number is incorrect!\n&quot;);
+        printf(&quot;Usage: ./program regular_expression buffer\n&quot;);
+
+#ifdef _DEBUG
+    int i_debug;
+    for(i_debug = 0;i_debug &lt; argc;i_debug ++)
+        printf(&quot;the parameter number:%d,the parameter:%s\n&quot;,i_debug,argv[i_debug]);
+#endif
+        goto out;
+    &#125;
+
+    if (0 == regcomp(&amp;preg,regex,cflags))
+    &#123;
+        int reg_status;
+        reg_status = regexec(&amp;preg,string,nmatch,&amp;pmatch[1],0);
+        if (reg_status == REG_NOMATCH)
+        &#123;
+            printf(&quot;No Match\n&quot;);
+
+        &#125;
+        else if(reg_status == 0)
+            printf(&quot;Match \n&quot;);
+
+        regfree(&amp;preg);
+    &#125;
+
+
+out:
+
+    return 0;
+&#125;
+</code></pre>
+<p>编译：</p>
+<pre><code>   # gcc reg.c -o reg
+   # ./reg &quot;^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$&quot; &quot;10101010010@qq.com&quot;
+</code></pre>
+<h3 id="2-PCRE-Perl-compatible-regular-expressions"><a href="#2-PCRE-Perl-compatible-regular-expressions" class="headerlink" title="2. PCRE - Perl-compatible regular expressions"></a>2. PCRE - Perl-compatible regular expressions</h3><pre><code>#include &lt;pcre.h&gt;
+
+pcre *pcre_compile(const char *pattern, int options,
+    const char **errptr, int *erroffset,
+    const unsigned char *tableptr);
+
+pcre16 *pcre16_compile(PCRE_SPTR16 pattern, int options,
+    const char **errptr, int *erroffset,
+    const unsigned char *tableptr);
+
+pcre32 *pcre32_compile(PCRE_SPTR32 pattern, int options,
+    const char **errptr, int *erroffset,
+    const unsigned char *tableptr);
+</code></pre>
+<p><a target="_blank" rel="noopener" href="http://www.pcre.org/">http://www.pcre.org</a></p>
+<p>现在已经是pcre2了，如何使用详见src/pcre2demo.c</p>
+<pre><code>man manual
+man regcomp
+man pcre
+man pcrecpp
+</code></pre>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/07-Linux-Dev/">07. Linux Dev</a>
+  </div>
+
+        
+  <div class="tags">
+    <a href="/tags/C/">C</a>, <a href="/tags/正则表达式/">正则表达式</a>
+  </div>
+
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+  
+<section id = "relate">
+	
+</section>
+
+
+
+
+</div></div>
+      <aside id="sidebar" class="alignright">
+  
+<div class="widget tag">
+  <h3 class="title" id="categories">分类</h3>
+     <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/01-CPP-%E5%9F%BA%E7%A1%80/">01. CPP 基础</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/02-C%E5%9F%BA%E7%A1%80/">02. C基础</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/03-Python/">03.Python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/04-Algorithm/">04. Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/05-Linux-Operation/">05. Linux Operation</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/06-Compile-Tools/">06. Compile Tools</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/07-Linux-Dev/">07. Linux Dev</a><span class="category-list-count">32</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08. DataBase</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-Database/">08. Database</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/08-DataBase/">08.DataBase</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/09-Windows-System/">09. Windows System</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/10-Web/">10. Web</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11. Open Source</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/11-Open-Source/">11.Open Source</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12. Other</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/12-Other/">12.Other</a><span class="category-list-count">1</span></li></ul> 
+</div>
+ 
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+	<ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/">公元 2020 年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/">公元 2019 年</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/">公元 2018 年</a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">公元 2017 年</a><span class="archive-list-count">66</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">公元 2016 年</a><span class="archive-list-count">1</span></li></ul>
+  </div>
+
+</aside>
+      <div class="clearfix"></div>
+    </div>
+  
+  <footer id="footer"><div class="footer-content inner">
+  <div class="alignleft">
+  
+    &copy; 2021 lxl2015
+    
+  </div>
+
+  
+  <div class="clearfix"></div>
+</div></footer>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+<!-- calendar widget -->
+
+
+
+
+<!-- 返回顶部 -->
+<div id="toTop">
+	<a href="#">▲</a>
+	<a href="#footer">▼</a>
+</div>
+
+
+<!-- fancybox -->
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>
